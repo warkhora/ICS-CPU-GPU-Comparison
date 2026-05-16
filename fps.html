@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Hybrid FPS Estimator</title>
+<title>ICS Hybrid FPS Estimator v2.0</title>
 
 <style>
   body {
@@ -117,7 +117,7 @@
   .tag-amd { color: #f97373; border-color: #ef4444; }
   .tag-ics { color: #facc15; border-color: #eab308; }
 
-  /* NAV BAR (samme som index.html) */
+  /* NAV BAR */
   .ics-nav {
     width: 100%;
     background: #0d0d0d;
@@ -157,12 +157,12 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Hybrid FPS Estimator — RTX, RX & ICS Regent VX</div>
+    <div class="ics-subtitle">Hybrid FPS Estimator v2.0 — RTX 40/50, RX 7000/9000 & ICS Regent VX</div>
   </div>
 
   <div class="ics-frame">
     <h2>Base Configuration</h2>
-    <p>Velg CPU, GPU, spill og oppløsning. Deretter kan du aktivere DLSS / FSR / DCC og Frame Generation.</p>
+    <p>Velg CPU, GPU, spill og oppløsning. Modellen bruker forskjellige vekter for lette og tunge spill.</p>
 
     <div class="row">
       <div>
@@ -187,15 +187,15 @@
     </div>
 
     <p class="note">
-      <span class="tag tag-nvidia">NVIDIA RTX</span>
-      <span class="tag tag-amd">AMD Radeon</span>
+      <span class="tag tag-nvidia">NVIDIA RTX 40 / 50</span>
+      <span class="tag tag-amd">AMD RX 7000 / 9000</span>
       <span class="tag tag-ics">ICS Regent VX</span>
     </p>
   </div>
 
   <div class="ics-frame">
     <h2>Upscaling & Frame Generation</h2>
-    <p>Disse innstillingene gir ekstra FPS basert på hvilken GPU du har valgt.</p>
+    <p>DLSS (RTX), FSR (Radeon) og DCC (ICS) gir ekstra FPS. FG bruker DLSS FG / MFG 2 / DCC‑FG.</p>
 
     <div class="row-3">
       <div>
@@ -228,8 +228,8 @@
     </div>
 
     <p class="note">
-      • RTX: DLSS + FG &nbsp;• AMD: FSR (via DLSS‑menyen) &nbsp;• ICS: DCC + DCC‑FG  
-      Frame Generation brukes som FG for RTX og DCC‑FG for ICS Regent VX.
+      • RTX 40: DLSS 3.0 + FG (MFG 1) &nbsp;• RTX 50: DLSS 4.5 + FG (MFG 2)  
+      • AMD: FSR, ingen FG &nbsp;• ICS: DCC + DCC‑FG (mest aggressiv)
     </p>
   </div>
 
@@ -245,36 +245,57 @@
 <script>
 // CPU performance scores (enkel modell)
 const cpuScores = {
-  "Regent GX 9-9995RX4D": 25000,
-  "Regent GX 7-9750RX3": 20000,
-  "AMD Ryzen 9 9950X3D": 21000,
-  "AMD Ryzen 7 7800X3D": 17000,
-  "Intel Core i9-14900K": 19000,
+  "Regent GX 9-9995RX4D": 26000,
+  "Regent GX 7-9750RX3": 21000,
+  "AMD Ryzen 9 9950X3D": 22000,
+  "AMD Ryzen 7 7800X3D": 19000,
+  "Intel Core i9-14900K": 18500,
   "Intel Core i5-12400F": 9000
 };
 
 // GPU performance scores (base 1080p raster score)
 const gpuData = {
-  "Regent VX 6690": { score: 32000, type: "ics" },
-  "Regent VX 6670": { score: 26000, type: "ics" },
-  "NVIDIA RTX 4090": { score: 30000, type: "nvidia" },
-  "NVIDIA RTX 4080 Super": { score: 24000, type: "nvidia" },
-  "NVIDIA RTX 4070 Ti Super": { score: 19000, type: "nvidia" },
-  "NVIDIA RTX 4070": { score: 15000, type: "nvidia" },
-  "AMD RX 7900 XTX": { score: 23000, type: "amd" },
-  "AMD RX 7900 XT": { score: 20000, type: "amd" },
-  "AMD RX 7800 XT": { score: 16000, type: "amd" }
+  // ICS Regent VX
+  "Regent VX 6690": { score: 34000, vendor: "ics", gen: "ics" },
+  "Regent VX 6670": { score: 28000, vendor: "ics", gen: "ics" },
+
+  // NVIDIA RTX 50-serien (DLSS 4.5 + MFG 2)
+  "NVIDIA RTX 5090": { score: 36000, vendor: "nvidia", gen: "rtx50" },
+  "NVIDIA RTX 5080": { score: 32000, vendor: "nvidia", gen: "rtx50" },
+  "NVIDIA RTX 5070 Ti": { score: 28000, vendor: "nvidia", gen: "rtx50" },
+  "NVIDIA RTX 5070": { score: 25000, vendor: "nvidia", gen: "rtx50" },
+  "NVIDIA RTX 5060 Ti": { score: 21000, vendor: "nvidia", gen: "rtx50" },
+  "NVIDIA RTX 5060": { score: 18000, vendor: "nvidia", gen: "rtx50" },
+  "NVIDIA RTX 5050": { score: 15000, vendor: "nvidia", gen: "rtx50" },
+
+  // NVIDIA RTX 40-serien (DLSS 3.0 + MFG 1)
+  "NVIDIA RTX 4090": { score: 32000, vendor: "nvidia", gen: "rtx40" },
+  "NVIDIA RTX 4080 Super": { score: 27000, vendor: "nvidia", gen: "rtx40" },
+  "NVIDIA RTX 4070 Ti Super": { score: 22000, vendor: "nvidia", gen: "rtx40" },
+  "NVIDIA RTX 4070": { score: 18000, vendor: "nvidia", gen: "rtx40" },
+
+  // AMD RX 7000-serien
+  "AMD RX 7900 XTX": { score: 26000, vendor: "amd", gen: "amd7" },
+  "AMD RX 7900 XT": { score: 23000, vendor: "amd", gen: "amd7" },
+  "AMD RX 7800 XT": { score: 19000, vendor: "amd", gen: "amd7" },
+
+  // AMD RX 9000-serien (fiktiv, men svakere FG/FSR enn RTX/DCC)
+  "AMD RX 9070 XT": { score: 25000, vendor: "amd", gen: "amd9" },
+  "AMD RX 9070": { score: 22000, vendor: "amd", gen: "amd9" },
+  "AMD RX 9060 XT": { score: 19000, vendor: "amd", gen: "amd9" },
+  "AMD RX 9060": { score: 16000, vendor: "amd", gen: "amd9" }
 };
 
 // Game base difficulty multipliers (1080p, Ultra, no upscaling)
 const gameMultipliers = {
-  "Fortnite (Competitive)": 1.6,
-  "Valorant": 2.2,
-  "Apex Legends": 1.4,
-  "Cyberpunk 2077 (RT Medium)": 0.55,
-  "Cyberpunk 2077 (RT Off)": 0.8,
-  "GTA VI (Speculative)": 0.7,
-  "Minecraft RTX": 0.45
+  "GTA V (Very High)": { mul: 2.8, weight: "light" },
+  "Valorant": { mul: 3.2, weight: "light" },
+  "Fortnite (Competitive)": { mul: 1.8, weight: "light" },
+  "Apex Legends": { mul: 1.4, weight: "medium" },
+  "Cyberpunk 2077 (RT Off)": { mul: 0.8, weight: "heavy" },
+  "Cyberpunk 2077 (RT Medium)": { mul: 0.55, weight: "heavy" },
+  "GTA VI (Speculative)": { mul: 0.7, weight: "heavy" },
+  "Minecraft RTX": { mul: 0.45, weight: "heavy" }
 };
 
 // Resolution multipliers
@@ -284,31 +305,50 @@ const resolutionMultipliers = {
   "4K": 0.42
 };
 
-// DLSS / FSR multipliers (for NVIDIA / AMD)
-const dlssMultipliers = {
+// DLSS / FSR multipliers per gen
+// RTX 50 (DLSS 4.5): 1.7–3.9x
+const dlss50 = {
   off: 1.0,
-  quality: 1.25,
-  balanced: 1.45,
-  performance: 1.7,
-  ultra: 2.0
+  quality: 1.7,
+  balanced: 2.1,
+  performance: 2.9,
+  ultra: 3.9
 };
 
-// DCC multipliers (for ICS Regent VX – litt mer aggressiv)
+// RTX 40 (DLSS 3.0): 1.2–3.1x
+const dlss40 = {
+  off: 1.0,
+  quality: 1.3,
+  balanced: 1.7,
+  performance: 2.3,
+  ultra: 3.1
+};
+
+// AMD FSR (svakere)
+const fsr = {
+  off: 1.0,
+  quality: 1.15,
+  balanced: 1.3,
+  performance: 1.5,
+  ultra: 1.8
+};
+
+// DCC multipliers (ICS Regent VX – mest aggressiv)
 const dccMultipliers = {
   off: 1.0,
-  quality: 1.35,
-  balanced: 1.6,
-  performance: 1.9,
-  ultra: 2.3
+  quality: 1.5,
+  balanced: 1.9,
+  performance: 2.5,
+  ultra: 3.2
 };
 
 // Frame Generation multipliers
-// RTX FG: moderat boost (input lag, men høy FPS)
-// ICS DCC-FG: enda litt mer (din verden, dine regler)
 const fgMultipliers = {
-  nvidia: 1.35,
-  ics: 1.5,
-  amd: 1.0 // ingen ekte FG her, bare placeholder
+  rtx50: 2.5,   // DLSS FG 4.5 (MFG 2)
+  rtx40: 1.6,   // DLSS 3.0 FG (MFG 1)
+  ics: 2.8,     // DCC-FG
+  amd7: 1.0,    // ingen FG
+  amd9: 1.0
 };
 
 // Populate selectors
@@ -334,20 +374,40 @@ function loadSelectors() {
     resSel.innerHTML += `<option value="${r}">${r}</option>`;
   });
 
-  // Set some nice defaults
+  // Fine defaults
   cpuSel.value = "AMD Ryzen 7 7800X3D";
-  gpuSel.value = "NVIDIA RTX 4070";
-  gameSel.value = "Cyberpunk 2077 (RT Medium)";
-  resSel.value = "1440p";
+  gpuSel.value = "NVIDIA RTX 4080 Super";
+  gameSel.value = "GTA V (Very High)";
+  resSel.value = "1080p";
 }
 
 loadSelectors();
+
+// Helper: get upscaling multiplier
+function getUpscalingMultiplier(gpuInfo, dlssMode, dccMode) {
+  const gen = gpuInfo.gen;
+  const vendor = gpuInfo.vendor;
+
+  if (vendor === "nvidia") {
+    if (gen === "rtx50") {
+      return dlss50[dlssMode] || 1.0;
+    } else if (gen === "rtx40") {
+      return dlss40[dlssMode] || 1.0;
+    }
+  } else if (vendor === "amd") {
+    return fsr[dlssMode] || 1.0;
+  } else if (vendor === "ics") {
+    return dccMultipliers[dccMode] || 1.0;
+  }
+
+  return 1.0;
+}
 
 // Main FPS estimation
 function estimateFPS() {
   const cpuName = document.getElementById("cpu").value;
   const gpuName = document.getElementById("gpu").value;
-  const game = document.getElementById("game").value;
+  const gameName = document.getElementById("game").value;
   const res = document.getElementById("resolution").value;
   const dlss = document.getElementById("dlss").value;
   const dcc = document.getElementById("dcc").value;
@@ -356,61 +416,66 @@ function estimateFPS() {
   const cpuScore = cpuScores[cpuName];
   const gpuInfo = gpuData[gpuName];
   const gpuScore = gpuInfo.score;
-  const gpuType = gpuInfo.type;
+  const vendor = gpuInfo.vendor;
+  const gen = gpuInfo.gen;
 
-  const gameMul = gameMultipliers[game];
+  const gameInfo = gameMultipliers[gameName];
+  const gameMul = gameInfo.mul;
+  const weight = gameInfo.weight;
   const resMul = resolutionMultipliers[res];
 
   // Base FPS (uten oppskalering / FG)
-  // GPU dominerer, CPU begrenser litt
-  const basePerf = (cpuScore * 0.25 + gpuScore * 0.75);
+  let cpuWeight, gpuWeight;
+  if (weight === "light") {
+    cpuWeight = 0.55;
+    gpuWeight = 0.45;
+  } else if (weight === "medium") {
+    cpuWeight = 0.35;
+    gpuWeight = 0.65;
+  } else {
+    cpuWeight = 0.25;
+    gpuWeight = 0.75;
+  }
+
+  const basePerf = (cpuScore * cpuWeight + gpuScore * gpuWeight);
   let fps = Math.round(basePerf * gameMul * resMul / 1000);
 
-  let explain = `Base FPS (no upscaling, no FG): ~${fps} FPS.`;
+  let explain = `Base FPS (no upscaling, no FG): ~${fps} FPS. `;
 
-  // Apply DLSS / FSR / DCC
-  let upscalingMul = 1.0;
-
-  if (gpuType === "nvidia") {
-    // DLSS
-    upscalingMul = dlssMultipliers[dlss] || 1.0;
-    if (dlss !== "off") {
-      explain += ` DLSS (${dlss}) aktivert for RTX.`;
-    }
-  } else if (gpuType === "amd") {
-    // FSR via samme meny
-    upscalingMul = dlssMultipliers[dlss] || 1.0;
-    if (dlss !== "off") {
-      explain += ` FSR (${dlss}) aktivert for Radeon.`;
-    }
-  } else if (gpuType === "ics") {
-    // ICS DCC
-    upscalingMul = dccMultipliers[dcc] || 1.0;
-    if (dcc !== "off") {
-      explain += ` DCC (${dcc}) aktivert for ICS Regent VX.`;
+  // Upscaling
+  const upMul = getUpscalingMultiplier(gpuInfo, dlss, dcc);
+  if (upMul > 1.0) {
+    fps = Math.round(fps * upMul);
+    if (vendor === "nvidia") {
+      explain += `Upscaling: DLSS (${dlss}) aktivert. `;
+    } else if (vendor === "amd") {
+      explain += `Upscaling: FSR (${dlss}) aktivert. `;
+    } else if (vendor === "ics") {
+      explain += `Upscaling: DCC (${dcc}) aktivert. `;
     }
   }
 
-  fps = Math.round(fps * upscalingMul);
-
-  // Apply Frame Generation
+  // Frame Generation
   if (fg === "on") {
-    const fgMul = fgMultipliers[gpuType] || 1.0;
+    const fgKey = gen;
+    const fgMul = fgMultipliers[fgKey] || 1.0;
     if (fgMul > 1.0) {
       fps = Math.round(fps * fgMul);
-      if (gpuType === "nvidia") {
-        explain += ` RTX Frame Generation aktivert.`;
-      } else if (gpuType === "ics") {
-        explain += ` ICS DCC‑FG aktivert.`;
+      if (vendor === "nvidia" && gen === "rtx50") {
+        explain += `Frame Generation: DLSS FG 4.5 (MFG 2) aktivert. `;
+      } else if (vendor === "nvidia" && gen === "rtx40") {
+        explain += `Frame Generation: DLSS 3.0 FG (MFG 1) aktivert. `;
+      } else if (vendor === "ics") {
+        explain += `Frame Generation: ICS DCC‑FG aktivert. `;
+      } else {
+        explain += `FG valgt, men denne GPU‑typen har ingen ekte FG‑støtte. `;
       }
-    } else {
-      explain += ` FG valgt, men denne GPU‑typen har ingen FG‑støtte.`;
     }
   }
 
-  // Clamp FPS til noe rimelig
+  // Clamp FPS
   if (fps < 10) fps = 10;
-  if (fps > 1000) fps = 1000;
+  if (fps > 2000) fps = 2000;
 
   const resultBox = document.getElementById("result");
   resultBox.style.display = "block";
