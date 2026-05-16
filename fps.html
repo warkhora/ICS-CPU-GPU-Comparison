@@ -13,14 +13,12 @@
     font-family: "Segoe UI", system-ui, sans-serif;
   }
 
-  /* Glass container */
   .ics-container {
     max-width: 1100px;
     margin: auto;
     backdrop-filter: blur(18px);
   }
 
-  /* Header */
   .ics-header {
     text-align: center;
     margin-bottom: 30px;
@@ -40,7 +38,6 @@
     font-size: 15px;
   }
 
-  /* Glass card */
   .ics-frame {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -57,7 +54,6 @@
     transform: translateY(-3px);
   }
 
-  /* Inputs */
   select, button {
     width: 100%;
     background: rgba(20, 20, 20, 0.85);
@@ -76,19 +72,11 @@
     box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
   }
 
-  button {
-    cursor: pointer;
-    background: rgba(255, 215, 0, 0.15);
-    font-weight: 600;
-  }
-
-  /* Dropdown menu fix */
   select option {
     background: #111;
     color: #eee;
   }
 
-  /* Layout rows */
   .row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -101,7 +89,6 @@
     gap: 16px;
   }
 
-  /* FPS result */
   .result-box {
     margin-top: 20px;
     padding: 25px;
@@ -115,7 +102,6 @@
     transition: 0.3s ease;
   }
 
-  /* Neon glow colors */
   .fps-red    { color: #ff4d4d; text-shadow: 0 0 12px rgba(255, 0, 0, 0.6); }
   .fps-orange { color: #ffae42; text-shadow: 0 0 12px rgba(255, 165, 0, 0.6); }
   .fps-white  { color: #ffffff; text-shadow: 0 0 12px rgba(255, 255, 255, 0.6); }
@@ -129,7 +115,6 @@
     color: #ccc;
   }
 
-  /* Performance Tips */
   .tips-frame {
     margin-top: 25px;
     padding: 20px;
@@ -152,7 +137,6 @@
     line-height: 1.6;
   }
 
-  /* GPU tags */
   .tag {
     display: inline-block;
     padding: 4px 10px;
@@ -166,7 +150,6 @@
   .tag-amd { color: #f97373; border-color: #ef4444; }
   .tag-ics { color: #facc15; border-color: #eab308; }
 
-  /* Navigation bar */
   .ics-nav {
     width: 100%;
     background: rgba(0,0,0,0.65);
@@ -197,7 +180,6 @@
 </head>
 <body>
 
-<!-- Navigation -->
 <div class="ics-nav">
   <a href="index.html">CPU/GPU Comparison</a>
   <a href="fps.html">FPS Estimator</a>
@@ -210,7 +192,6 @@
     <div class="ics-subtitle">Hybrid FPS Estimator v2.3 — RTX 40/50 • RX 7000/9000 • ICS VX</div>
   </div>
 
-  <!-- Base Config -->
   <div class="ics-frame">
     <h2>Base Configuration</h2>
     <p>Select CPU, GPU, game and resolution.</p>
@@ -244,7 +225,6 @@
     </p>
   </div>
 
-  <!-- Upscaling -->
   <div class="ics-frame">
     <h2>Upscaling & Frame Generation</h2>
 
@@ -279,7 +259,6 @@
     </div>
   </div>
 
-  <!-- Estimate -->
   <div class="ics-frame">
     <h2>Estimate FPS</h2>
     <button onclick="estimateFPS()">Estimate FPS</button>
@@ -415,78 +394,3 @@ function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, gameName) 
   tips.push("• Reduce graphics settings (shadows, post-processing).");
 
   if (gpuInfo.vendor === "nvidia") {
-    if (dlssMode === "off") tips.push("• Enable DLSS for a major FPS boost.");
-    if (!fgOn && (gpuInfo.gen === "rtx40" || gpuInfo.gen === "rtx50"))
-      tips.push("• Enable Frame Generation.");
-  }
-
-  if (gpuInfo.vendor === "amd") {
-    if (dlssMode === "off") tips.push("• Enable FSR for better performance.");
-  }
-
-  if (gpuInfo.vendor === "ics") {
-    if (dccMode === "off") tips.push("• Enable DCC for a strong uplift.");
-    if (!fgOn) tips.push("• Enable DCC‑FG for maximum performance.");
-  }
-
-  if (gameName.includes("RT")) tips.push("• Lower or disable ray tracing.");
-
-  if (res === "4K") tips.push("• Consider switching to 1440p or 1080p.");
-
-  return tips.join("<br>");
-}
-
-/* Main FPS calculation */
-function estimateFPS() {
-  const cpuName  = document.getElementById("cpu").value;
-  const gpuName  = document.getElementById("gpu").value;
-  const gameName = document.getElementById("game").value;
-  const res      = document.getElementById("resolution").value;
-  const dlss     = document.getElementById("dlss").value;
-  const dcc      = document.getElementById("dcc").value;
-  const fg       = document.getElementById("fg").value;
-
-  const cpu     = cpuScores[cpuName];
-  const gpuInfo = gpuData[gpuName];
-  const gpu     = gpuInfo.score;
-  const game    = gameMultipliers[gameName];
-  const resMul  = resolutionMultipliers[res];
-
-  let cpuW = game.weight === "light" ? 0.55 :
-             game.weight === "medium" ? 0.35 : 0.25;
-  let gpuW = 1 - cpuW;
-
-  let fps = (cpu * cpuW + gpu * gpuW) * game.mul * resMul / 1000;
-
-  const upMul = getUpscalingMultiplier(gpuInfo, dlss, dcc);
-  fps *= upMul;
-
-  const fgOn = (fg === "on");
-  if (fgOn) fps *= fgMultipliers[gpuInfo.gen];
-
-  fps = Math.min(Math.max(fps, 10), 3000);
-  const rounded = Math.round(fps);
-
-  const resultEl     = document.getElementById("result");
-  const experienceEl = document.getElementById("experience");
-  const tipsFrame    = document.getElementById("tips");
-  const tipsList     = document.getElementById("tips-list");
-
-  resultEl.style.display = "block";
-  resultEl.className = "result-box " + getFpsClass(rounded);
-  resultEl.innerHTML = `Estimated FPS: <strong>${rounded}</strong>`;
-
-  experienceEl.innerText = getExperience(rounded);
-
-  const tipsHtml = buildSuggestions(rounded, gpuInfo, dlss, dcc, fgOn, res, gameName);
-  if (tipsHtml) {
-    tipsFrame.style.display = "block";
-    tipsList.innerHTML = tipsHtml;
-  } else {
-    tipsFrame.style.display = "none";
-    tipsList.innerHTML = "";
-  }
-}
-</script>
-  
-  
