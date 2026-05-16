@@ -2,152 +2,164 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Hybrid FPS Estimator v2.0</title>
+<title>ICS Hybrid FPS Estimator v2.1</title>
 
 <style>
   body {
     margin: 0;
     padding: 40px;
-    background: radial-gradient(circle at top, #101010, #000);
+    background: linear-gradient(135deg, #0a0a0a, #000000);
     color: #e6e6e6;
     font-family: "Segoe UI", system-ui, sans-serif;
   }
 
+  /* Glassmorphism container */
   .ics-container {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: auto;
+    backdrop-filter: blur(18px);
   }
 
+  /* Header */
   .ics-header {
     text-align: center;
     margin-bottom: 30px;
   }
 
   .ics-logo {
-    font-size: 26px;
-    letter-spacing: 4px;
+    font-size: 32px;
+    letter-spacing: 6px;
     text-transform: uppercase;
-    color: gold;
+    color: #ffd700;
+    font-weight: 600;
   }
 
   .ics-subtitle {
-    color: #aaa;
+    color: #bbb;
     margin-top: 8px;
-    font-size: 14px;
+    font-size: 15px;
   }
 
+  /* Glassmorphism card */
   .ics-frame {
-    background: linear-gradient(135deg, rgba(25,25,25,0.9), rgba(10,10,10,0.9));
-    border: 1px solid #333;
-    padding: 20px;
-    margin-bottom: 25px;
-    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 18px;
     transition: 0.3s ease;
-    box-shadow: 0 0 0px rgba(255, 215, 0, 0);
-    backdrop-filter: blur(6px);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
   }
 
   .ics-frame:hover {
-    border-color: gold;
-    box-shadow: 0 0 22px rgba(255, 215, 0, 0.55);
-    transform: translateY(-2px);
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25);
+    transform: translateY(-3px);
   }
 
+  /* Inputs */
   select, button {
     width: 100%;
-    background: #111;
+    background: rgba(255, 255, 255, 0.08);
     color: #eee;
-    border: 1px solid #444;
-    padding: 10px;
-    border-radius: 8px;
-    margin: 8px 0;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 12px;
+    border-radius: 10px;
+    margin: 10px 0;
     transition: 0.2s;
-    font-size: 14px;
+    font-size: 15px;
+    backdrop-filter: blur(12px);
   }
 
   select:hover, button:hover {
-    border-color: gold;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
   }
 
   button {
     cursor: pointer;
-    background: #222;
+    background: rgba(255, 215, 0, 0.15);
+    font-weight: 600;
   }
 
+  /* Layout rows */
   .row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 16px;
   }
 
   .row-3 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    gap: 16px;
   }
 
+  /* Result box */
   .result-box {
     margin-top: 20px;
-    padding: 20px;
-    background: #111;
-    border-radius: 10px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
     text-align: center;
-    font-size: 22px;
-    color: gold;
-    border: 1px solid #333;
+    font-size: 26px;
+    color: #ffd700;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px);
   }
 
   .note {
-    font-size: 12px;
-    color: #aaa;
+    font-size: 13px;
+    color: #ccc;
     margin-top: 6px;
   }
 
+  /* GPU tags */
   .tag {
     display: inline-block;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 999px;
     font-size: 11px;
     margin-right: 6px;
-    border: 1px solid #444;
+    border: 1px solid rgba(255,255,255,0.2);
   }
 
   .tag-nvidia { color: #7dd3fc; border-color: #0ea5e9; }
   .tag-amd { color: #f97373; border-color: #ef4444; }
   .tag-ics { color: #facc15; border-color: #eab308; }
 
-  /* NAV BAR */
+  /* Navigation bar */
   .ics-nav {
     width: 100%;
-    background: #0d0d0d;
-    border-bottom: 1px solid #333;
-    padding: 14px 20px;
+    background: rgba(0,0,0,0.65);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 16px 24px;
     display: flex;
-    gap: 25px;
+    gap: 30px;
     position: sticky;
     top: 0;
     z-index: 999;
-    margin: -40px -40px 30px -40px;
+    backdrop-filter: blur(12px);
+    margin: -40px -40px 40px -40px;
   }
 
   .ics-nav a {
-    color: gold;
+    color: #ffd700;
     text-decoration: none;
-    font-size: 15px;
+    font-size: 16px;
     letter-spacing: 1px;
     transition: 0.2s;
   }
 
   .ics-nav a:hover {
     color: white;
-    text-shadow: 0 0 8px gold;
+    text-shadow: 0 0 10px #ffd700;
   }
 </style>
 </head>
 <body>
 
-<!-- ICS NAVIGATION BAR -->
+<!-- Navigation -->
 <div class="ics-nav">
   <a href="index.html">CPU/GPU Comparison</a>
   <a href="fps.html">FPS Estimator</a>
@@ -157,12 +169,13 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Hybrid FPS Estimator v2.0 — RTX 40/50, RX 7000/9000 & ICS Regent VX</div>
+    <div class="ics-subtitle">Hybrid FPS Estimator v2.1 — RTX 40/50 • RX 7000/9000 • ICS VX</div>
   </div>
 
+  <!-- Base Config -->
   <div class="ics-frame">
     <h2>Base Configuration</h2>
-    <p>Velg CPU, GPU, spill og oppløsning. Modellen bruker forskjellige vekter for lette og tunge spill.</p>
+    <p>Select CPU, GPU, game and resolution. The model automatically adjusts weights for light vs heavy games.</p>
 
     <div class="row">
       <div>
@@ -193,13 +206,14 @@
     </p>
   </div>
 
+  <!-- Upscaling -->
   <div class="ics-frame">
     <h2>Upscaling & Frame Generation</h2>
-    <p>DLSS (RTX), FSR (Radeon) og DCC (ICS) gir ekstra FPS. FG bruker DLSS FG / MFG 2 / DCC‑FG.</p>
+    <p>DLSS (RTX), FSR (Radeon) and DCC (ICS) provide additional performance. FG uses DLSS FG / MFG 2 / DCC‑FG.</p>
 
     <div class="row-3">
       <div>
-        <label>DLSS / FSR (RTX / RX)</label>
+        <label>DLSS / FSR</label>
         <select id="dlss">
           <option value="off">Off</option>
           <option value="quality">Quality</option>
@@ -209,7 +223,7 @@
         </select>
       </div>
       <div>
-        <label>DCC (ICS Regent VX)</label>
+        <label>DCC (ICS Only)</label>
         <select id="dcc">
           <option value="off">Off</option>
           <option value="quality">Quality</option>
@@ -228,13 +242,16 @@
     </div>
 
     <p class="note">
-      • RTX 40: DLSS 3.0 + FG (MFG 1) &nbsp;• RTX 50: DLSS 4.5 + FG (MFG 2)  
-      • AMD: FSR, ingen FG &nbsp;• ICS: DCC + DCC‑FG (mest aggressiv)
+      • RTX 50: DLSS 4.5 + MFG 2  
+      • RTX 40: DLSS 3.0 + MFG 1  
+      • AMD: FSR only  
+      • ICS: DCC + DCC‑FG (strongest)
     </p>
   </div>
 
+  <!-- Estimate -->
   <div class="ics-frame">
-    <h2>Estimate</h2>
+    <h2>Estimate FPS</h2>
     <button onclick="estimateFPS()">Estimate FPS</button>
     <div id="result" class="result-box" style="display:none;"></div>
     <p id="explain" class="note"></p>
@@ -243,7 +260,7 @@
 </div>
 
 <script>
-// CPU performance scores (enkel modell)
+/* CPU SCORES */
 const cpuScores = {
   "Regent GX 9-9995RX4D": 26000,
   "Regent GX 7-9750RX3": 21000,
@@ -253,13 +270,13 @@ const cpuScores = {
   "Intel Core i5-12400F": 9000
 };
 
-// GPU performance scores (base 1080p raster score)
+/* GPU SCORES */
 const gpuData = {
-  // ICS Regent VX
+  /* ICS VX */
   "Regent VX 6690": { score: 34000, vendor: "ics", gen: "ics" },
   "Regent VX 6670": { score: 28000, vendor: "ics", gen: "ics" },
 
-  // NVIDIA RTX 50-serien (DLSS 4.5 + MFG 2)
+  /* RTX 50 */
   "NVIDIA RTX 5090": { score: 36000, vendor: "nvidia", gen: "rtx50" },
   "NVIDIA RTX 5080": { score: 32000, vendor: "nvidia", gen: "rtx50" },
   "NVIDIA RTX 5070 Ti": { score: 28000, vendor: "nvidia", gen: "rtx50" },
@@ -268,25 +285,25 @@ const gpuData = {
   "NVIDIA RTX 5060": { score: 18000, vendor: "nvidia", gen: "rtx50" },
   "NVIDIA RTX 5050": { score: 15000, vendor: "nvidia", gen: "rtx50" },
 
-  // NVIDIA RTX 40-serien (DLSS 3.0 + MFG 1)
+  /* RTX 40 */
   "NVIDIA RTX 4090": { score: 32000, vendor: "nvidia", gen: "rtx40" },
   "NVIDIA RTX 4080 Super": { score: 27000, vendor: "nvidia", gen: "rtx40" },
   "NVIDIA RTX 4070 Ti Super": { score: 22000, vendor: "nvidia", gen: "rtx40" },
   "NVIDIA RTX 4070": { score: 18000, vendor: "nvidia", gen: "rtx40" },
 
-  // AMD RX 7000-serien
+  /* AMD RX 7000 */
   "AMD RX 7900 XTX": { score: 26000, vendor: "amd", gen: "amd7" },
   "AMD RX 7900 XT": { score: 23000, vendor: "amd", gen: "amd7" },
   "AMD RX 7800 XT": { score: 19000, vendor: "amd", gen: "amd7" },
 
-  // AMD RX 9000-serien (fiktiv, men svakere FG/FSR enn RTX/DCC)
+  /* AMD RX 9000 */
   "AMD RX 9070 XT": { score: 25000, vendor: "amd", gen: "amd9" },
   "AMD RX 9070": { score: 22000, vendor: "amd", gen: "amd9" },
   "AMD RX 9060 XT": { score: 19000, vendor: "amd", gen: "amd9" },
   "AMD RX 9060": { score: 16000, vendor: "amd", gen: "amd9" }
 };
 
-// Game base difficulty multipliers (1080p, Ultra, no upscaling)
+/* GAME MULTIPLIERS */
 const gameMultipliers = {
   "GTA V (Very High)": { mul: 2.8, weight: "light" },
   "Valorant": { mul: 3.2, weight: "light" },
@@ -298,189 +315,95 @@ const gameMultipliers = {
   "Minecraft RTX": { mul: 0.45, weight: "heavy" }
 };
 
-// Resolution multipliers
+/* RESOLUTION MULTIPLIERS */
 const resolutionMultipliers = {
   "1080p": 1.0,
   "1440p": 0.72,
   "4K": 0.42
 };
 
-// DLSS / FSR multipliers per gen
-// RTX 50 (DLSS 4.5): 1.7–3.9x
-const dlss50 = {
-  off: 1.0,
-  quality: 1.7,
-  balanced: 2.1,
-  performance: 2.9,
-  ultra: 3.9
-};
+/* UPSCALING MULTIPLIERS */
+const dlss50 = { off:1.0, quality:1.7, balanced:2.1, performance:2.9, ultra:3.9 };
+const dlss40 = { off:1.0, quality:1.3, balanced:1.7, performance:2.3, ultra:3.1 };
+const fsr = { off:1.0, quality:1.15, balanced:1.3, performance:1.5, ultra:1.8 };
+const dccMultipliers = { off:1.0, quality:1.5, balanced:1.9, performance:2.5, ultra:3.2 };
 
-// RTX 40 (DLSS 3.0): 1.2–3.1x
-const dlss40 = {
-  off: 1.0,
-  quality: 1.3,
-  balanced: 1.7,
-  performance: 2.3,
-  ultra: 3.1
-};
-
-// AMD FSR (svakere)
-const fsr = {
-  off: 1.0,
-  quality: 1.15,
-  balanced: 1.3,
-  performance: 1.5,
-  ultra: 1.8
-};
-
-// DCC multipliers (ICS Regent VX – mest aggressiv)
-const dccMultipliers = {
-  off: 1.0,
-  quality: 1.5,
-  balanced: 1.9,
-  performance: 2.5,
-  ultra: 3.2
-};
-
-// Frame Generation multipliers
+/* FRAME GENERATION MULTIPLIERS */
 const fgMultipliers = {
-  rtx50: 2.5,   // DLSS FG 4.5 (MFG 2)
-  rtx40: 1.6,   // DLSS 3.0 FG (MFG 1)
-  ics: 2.8,     // DCC-FG
-  amd7: 1.0,    // ingen FG
+  rtx50: 2.5,
+  rtx40: 1.6,
+  ics: 2.8,
+  amd7: 1.0,
   amd9: 1.0
 };
 
-// Populate selectors
+/* Populate selectors */
 function loadSelectors() {
   const cpuSel = document.getElementById("cpu");
   const gpuSel = document.getElementById("gpu");
   const gameSel = document.getElementById("game");
   const resSel = document.getElementById("resolution");
 
-  Object.keys(cpuScores).forEach(c => {
-    cpuSel.innerHTML += `<option value="${c}">${c}</option>`;
-  });
+  Object.keys(cpuScores).forEach(c => cpuSel.innerHTML += `<option>${c}</option>`);
+  Object.keys(gpuData).forEach(g => gpuSel.innerHTML += `<option>${g}</option>`);
+  Object.keys(gameMultipliers).forEach(g => gameSel.innerHTML += `<option>${g}</option>`);
+  Object.keys(resolutionMultipliers).forEach(r => resSel.innerHTML += `<option>${r}</option>`);
 
-  Object.keys(gpuData).forEach(g => {
-    gpuSel.innerHTML += `<option value="${g}">${g}</option>`;
-  });
-
-  Object.keys(gameMultipliers).forEach(g => {
-    gameSel.innerHTML += `<option value="${g}">${g}</option>`;
-  });
-
-  Object.keys(resolutionMultipliers).forEach(r => {
-    resSel.innerHTML += `<option value="${r}">${r}</option>`;
-  });
-
-  // Fine defaults
   cpuSel.value = "AMD Ryzen 7 7800X3D";
   gpuSel.value = "NVIDIA RTX 4080 Super";
   gameSel.value = "GTA V (Very High)";
   resSel.value = "1080p";
 }
-
 loadSelectors();
 
-// Helper: get upscaling multiplier
+/* Upscaling logic */
 function getUpscalingMultiplier(gpuInfo, dlssMode, dccMode) {
-  const gen = gpuInfo.gen;
-  const vendor = gpuInfo.vendor;
-
-  if (vendor === "nvidia") {
-    if (gen === "rtx50") {
-      return dlss50[dlssMode] || 1.0;
-    } else if (gen === "rtx40") {
-      return dlss40[dlssMode] || 1.0;
-    }
-  } else if (vendor === "amd") {
-    return fsr[dlssMode] || 1.0;
-  } else if (vendor === "ics") {
-    return dccMultipliers[dccMode] || 1.0;
+  if (gpuInfo.vendor === "nvidia") {
+    return gpuInfo.gen === "rtx50" ? dlss50[dlssMode] : dlss40[dlssMode];
   }
-
+  if (gpuInfo.vendor === "amd") return fsr[dlssMode];
+  if (gpuInfo.vendor === "ics") return dccMultipliers[dccMode];
   return 1.0;
 }
 
-// Main FPS estimation
+/* Main FPS calculation */
 function estimateFPS() {
-  const cpuName = document.getElementById("cpu").value;
-  const gpuName = document.getElementById("gpu").value;
-  const gameName = document.getElementById("game").value;
-  const res = document.getElementById("resolution").value;
+  const cpu = cpuScores[document.getElementById("cpu").value];
+  const gpuInfo = gpuData[document.getElementById("gpu").value];
+  const gameInfo = gameMultipliers[document.getElementById("game").value];
+  const resMul = resolutionMultipliers[document.getElementById("resolution").value];
   const dlss = document.getElementById("dlss").value;
   const dcc = document.getElementById("dcc").value;
   const fg = document.getElementById("fg").value;
 
-  const cpuScore = cpuScores[cpuName];
-  const gpuInfo = gpuData[gpuName];
-  const gpuScore = gpuInfo.score;
-  const vendor = gpuInfo.vendor;
-  const gen = gpuInfo.gen;
+  const gpu = gpuInfo.score;
 
-  const gameInfo = gameMultipliers[gameName];
-  const gameMul = gameInfo.mul;
-  const weight = gameInfo.weight;
-  const resMul = resolutionMultipliers[res];
+  let cpuW = gameInfo.weight === "light" ? 0.55 :
+             gameInfo.weight === "medium" ? 0.35 : 0.25;
 
-  // Base FPS (uten oppskalering / FG)
-  let cpuWeight, gpuWeight;
-  if (weight === "light") {
-    cpuWeight = 0.55;
-    gpuWeight = 0.45;
-  } else if (weight === "medium") {
-    cpuWeight = 0.35;
-    gpuWeight = 0.65;
-  } else {
-    cpuWeight = 0.25;
-    gpuWeight = 0.75;
-  }
+  let gpuW = 1 - cpuW;
 
-  const basePerf = (cpuScore * cpuWeight + gpuScore * gpuWeight);
-  let fps = Math.round(basePerf * gameMul * resMul / 1000);
+  let fps = (cpu * cpuW + gpu * gpuW) * gameInfo.mul * resMul / 1000;
 
-  let explain = `Base FPS (no upscaling, no FG): ~${fps} FPS. `;
+  let explain = `Base FPS: ~${Math.round(fps)}. `;
 
-  // Upscaling
   const upMul = getUpscalingMultiplier(gpuInfo, dlss, dcc);
+  fps *= upMul;
+
   if (upMul > 1.0) {
-    fps = Math.round(fps * upMul);
-    if (vendor === "nvidia") {
-      explain += `Upscaling: DLSS (${dlss}) aktivert. `;
-    } else if (vendor === "amd") {
-      explain += `Upscaling: FSR (${dlss}) aktivert. `;
-    } else if (vendor === "ics") {
-      explain += `Upscaling: DCC (${dcc}) aktivert. `;
-    }
+    explain += `Upscaling applied (${gpuInfo.vendor === "nvidia" ? "DLSS" : gpuInfo.vendor === "amd" ? "FSR" : "DCC"}). `;
   }
 
-  // Frame Generation
   if (fg === "on") {
-    const fgKey = gen;
-    const fgMul = fgMultipliers[fgKey] || 1.0;
-    if (fgMul > 1.0) {
-      fps = Math.round(fps * fgMul);
-      if (vendor === "nvidia" && gen === "rtx50") {
-        explain += `Frame Generation: DLSS FG 4.5 (MFG 2) aktivert. `;
-      } else if (vendor === "nvidia" && gen === "rtx40") {
-        explain += `Frame Generation: DLSS 3.0 FG (MFG 1) aktivert. `;
-      } else if (vendor === "ics") {
-        explain += `Frame Generation: ICS DCC‑FG aktivert. `;
-      } else {
-        explain += `FG valgt, men denne GPU‑typen har ingen ekte FG‑støtte. `;
-      }
-    }
+    const fgMul = fgMultipliers[gpuInfo.gen];
+    fps *= fgMul;
+    if (fgMul > 1.0) explain += `Frame Generation applied. `;
   }
 
-  // Clamp FPS
-  if (fps < 10) fps = 10;
-  if (fps > 2000) fps = 2000;
+  fps = Math.min(Math.max(fps, 10), 3000);
 
-  const resultBox = document.getElementById("result");
-  resultBox.style.display = "block";
-  resultBox.innerHTML = `Estimated FPS: <strong>${fps}</strong>`;
-
+  document.getElementById("result").style.display = "block";
+  document.getElementById("result").innerHTML = `Estimated FPS: <strong>${Math.round(fps)}</strong>`;
   document.getElementById("explain").innerText = explain;
 }
 </script>
