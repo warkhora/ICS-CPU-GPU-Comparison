@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Hybrid FPS Estimator v2.1</title>
+<title>ICS Hybrid FPS Estimator v2.3</title>
 
 <style>
   body {
     margin: 0;
     padding: 40px;
-    background: linear-gradient(135deg, #0a0a0a, #000000);
+    background: linear-gradient(135deg, #050505, #000000);
     color: #e6e6e6;
     font-family: "Segoe UI", system-ui, sans-serif;
   }
 
-  /* Glassmorphism container */
+  /* Glass container */
   .ics-container {
     max-width: 1100px;
     margin: auto;
@@ -40,7 +40,7 @@
     font-size: 15px;
   }
 
-  /* Glassmorphism card */
+  /* Glass card */
   .ics-frame {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -60,7 +60,7 @@
   /* Inputs */
   select, button {
     width: 100%;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(20, 20, 20, 0.85);
     color: #eee;
     border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 12px;
@@ -82,6 +82,12 @@
     font-weight: 600;
   }
 
+  /* Dropdown menu fix */
+  select option {
+    background: #111;
+    color: #eee;
+  }
+
   /* Layout rows */
   .row {
     display: grid;
@@ -95,23 +101,55 @@
     gap: 16px;
   }
 
-  /* Result box */
+  /* FPS result */
   .result-box {
     margin-top: 20px;
     padding: 25px;
     background: rgba(255, 255, 255, 0.08);
     border-radius: 14px;
     text-align: center;
-    font-size: 26px;
-    color: #ffd700;
+    font-size: 32px;
+    font-weight: 700;
     border: 1px solid rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(14px);
+    transition: 0.3s ease;
   }
 
-  .note {
-    font-size: 13px;
+  /* Neon glow colors */
+  .fps-red    { color: #ff4d4d; text-shadow: 0 0 12px rgba(255, 0, 0, 0.6); }
+  .fps-orange { color: #ffae42; text-shadow: 0 0 12px rgba(255, 165, 0, 0.6); }
+  .fps-white  { color: #ffffff; text-shadow: 0 0 12px rgba(255, 255, 255, 0.6); }
+  .fps-green  { color: #7CFC00; text-shadow: 0 0 12px rgba(124, 252, 0, 0.6); }
+  .fps-blue   { color: #4dc3ff; text-shadow: 0 0 12px rgba(0, 170, 255, 0.6); }
+
+  .experience {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 15px;
     color: #ccc;
-    margin-top: 6px;
+  }
+
+  /* Performance Tips */
+  .tips-frame {
+    margin-top: 25px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    backdrop-filter: blur(12px);
+  }
+
+  .tips-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffd700;
+    margin-bottom: 10px;
+  }
+
+  .tips-list {
+    font-size: 14px;
+    color: #ddd;
+    line-height: 1.6;
   }
 
   /* GPU tags */
@@ -169,13 +207,13 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Hybrid FPS Estimator v2.1 — RTX 40/50 • RX 7000/9000 • ICS VX</div>
+    <div class="ics-subtitle">Hybrid FPS Estimator v2.3 — RTX 40/50 • RX 7000/9000 • ICS VX</div>
   </div>
 
   <!-- Base Config -->
   <div class="ics-frame">
     <h2>Base Configuration</h2>
-    <p>Select CPU, GPU, game and resolution. The model automatically adjusts weights for light vs heavy games.</p>
+    <p>Select CPU, GPU, game and resolution.</p>
 
     <div class="row">
       <div>
@@ -209,7 +247,6 @@
   <!-- Upscaling -->
   <div class="ics-frame">
     <h2>Upscaling & Frame Generation</h2>
-    <p>DLSS (RTX), FSR (Radeon) and DCC (ICS) provide additional performance. FG uses DLSS FG / MFG 2 / DCC‑FG.</p>
 
     <div class="row-3">
       <div>
@@ -240,21 +277,20 @@
         </select>
       </div>
     </div>
-
-    <p class="note">
-      • RTX 50: DLSS 4.5 + MFG 2  
-      • RTX 40: DLSS 3.0 + MFG 1  
-      • AMD: FSR only  
-      • ICS: DCC + DCC‑FG (strongest)
-    </p>
   </div>
 
   <!-- Estimate -->
   <div class="ics-frame">
     <h2>Estimate FPS</h2>
     <button onclick="estimateFPS()">Estimate FPS</button>
+
     <div id="result" class="result-box" style="display:none;"></div>
-    <p id="explain" class="note"></p>
+    <div id="experience" class="experience"></div>
+
+    <div id="tips" class="tips-frame" style="display:none;">
+      <div class="tips-title">⚠️ ICS Performance Tips</div>
+      <div id="tips-list" class="tips-list"></div>
+    </div>
   </div>
 
 </div>
@@ -366,47 +402,9 @@ function getUpscalingMultiplier(gpuInfo, dlssMode, dccMode) {
   return 1.0;
 }
 
-/* Main FPS calculation */
-function estimateFPS() {
-  const cpu = cpuScores[document.getElementById("cpu").value];
-  const gpuInfo = gpuData[document.getElementById("gpu").value];
-  const gameInfo = gameMultipliers[document.getElementById("game").value];
-  const resMul = resolutionMultipliers[document.getElementById("resolution").value];
-  const dlss = document.getElementById("dlss").value;
-  const dcc = document.getElementById("dcc").value;
-  const fg = document.getElementById("fg").value;
-
-  const gpu = gpuInfo.score;
-
-  let cpuW = gameInfo.weight === "light" ? 0.55 :
-             gameInfo.weight === "medium" ? 0.35 : 0.25;
-
-  let gpuW = 1 - cpuW;
-
-  let fps = (cpu * cpuW + gpu * gpuW) * gameInfo.mul * resMul / 1000;
-
-  let explain = `Base FPS: ~${Math.round(fps)}. `;
-
-  const upMul = getUpscalingMultiplier(gpuInfo, dlss, dcc);
-  fps *= upMul;
-
-  if (upMul > 1.0) {
-    explain += `Upscaling applied (${gpuInfo.vendor === "nvidia" ? "DLSS" : gpuInfo.vendor === "amd" ? "FSR" : "DCC"}). `;
-  }
-
-  if (fg === "on") {
-    const fgMul = fgMultipliers[gpuInfo.gen];
-    fps *= fgMul;
-    if (fgMul > 1.0) explain += `Frame Generation applied. `;
-  }
-
-  fps = Math.min(Math.max(fps, 10), 3000);
-
-  document.getElementById("result").style.display = "block";
-  document.getElementById("result").innerHTML = `Estimated FPS: <strong>${Math.round(fps)}</strong>`;
-  document.getElementById("explain").innerText = explain;
-}
-</script>
-
-</body>
-</html>
+/* Experience rating */
+function getExperience(fps) {
+  if (fps < 30) return "Unplayable";
+  if (fps < 60) return "Playable but not smooth";
+  if (fps < 120) return "Smooth";
+  if (fps < 160
