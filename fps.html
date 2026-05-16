@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Hybrid FPS Estimator v2.4</title>
+<title>ICS Hybrid FPS Estimator v3.0</title>
 
 <style>
   body {
@@ -189,9 +189,10 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Hybrid FPS Estimator v2.4 — RTX 40/50 • RX 9000 • ICS VX</div>
+    <div class="ics-subtitle">Hybrid FPS Estimator v3.0 — RTX 40/50 • RX 9000 • ICS VX</div>
   </div>
 
+  <!-- Base configuration -->
   <div class="ics-frame">
     <h2>Base Configuration</h2>
     <p>Select CPU, GPU, game, resolution and graphics quality.</p>
@@ -238,6 +239,31 @@
     </div>
   </div>
 
+  <!-- RT / RR -->
+  <div class="ics-frame">
+    <h2>Ray Tracing & Ray Reconstruction</h2>
+
+    <div class="row">
+      <div>
+        <label>Ray Tracing</label>
+        <select id="rt">
+          <option value="off">Off</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="ultra">Ultra</option>
+        </select>
+      </div>
+      <div>
+        <label>Ray Reconstruction</label>
+        <select id="rr">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upscaling -->
   <div class="ics-frame">
     <h2>Upscaling & Frame Generation</h2>
 
@@ -272,6 +298,7 @@
     </div>
   </div>
 
+  <!-- Estimate -->
   <div class="ics-frame">
     <h2>Estimate FPS</h2>
     <button onclick="estimateFPS()">Estimate FPS</button>
@@ -298,40 +325,40 @@ const cpuScores = {
   "Intel Core i5-12400F": 9000
 };
 
-/* GPU SCORES */
+/* GPU SCORES + CLASS */
 const gpuData = {
-  "Regent VX 6690": { score: 34000, vendor: "ics", gen: "ics" },
-  "Regent VX 6670": { score: 28000, vendor: "ics", gen: "ics" },
+  "Regent VX 6690": { score: 36000, vendor: "ics", gen: "ics", cls: "ultra" },
+  "Regent VX 6670": { score: 30000, vendor: "ics", gen: "ics", cls: "strong" },
 
-  "NVIDIA RTX 5090": { score: 36000, vendor: "nvidia", gen: "rtx50" },
-  "NVIDIA RTX 5080": { score: 32000, vendor: "nvidia", gen: "rtx50" },
-  "NVIDIA RTX 5070 Ti": { score: 28000, vendor: "nvidia", gen: "rtx50" },
-  "NVIDIA RTX 5070": { score: 25000, vendor: "nvidia", gen: "rtx50" },
-  "NVIDIA RTX 5060 Ti": { score: 21000, vendor: "nvidia", gen: "rtx50" },
-  "NVIDIA RTX 5060": { score: 18000, vendor: "nvidia", gen: "rtx50" },
-  "NVIDIA RTX 5050": { score: 15000, vendor: "nvidia", gen: "rtx50" },
+  "NVIDIA RTX 5090": { score: 36000, vendor: "nvidia", gen: "rtx50", cls: "ultra" },
+  "NVIDIA RTX 5080": { score: 32000, vendor: "nvidia", gen: "rtx50", cls: "strong" },
+  "NVIDIA RTX 5070 Ti": { score: 28000, vendor: "nvidia", gen: "rtx50", cls: "strong" },
+  "NVIDIA RTX 5070": { score: 25000, vendor: "nvidia", gen: "rtx50", cls: "medium" },
+  "NVIDIA RTX 5060 Ti": { score: 21000, vendor: "nvidia", gen: "rtx50", cls: "medium" },
+  "NVIDIA RTX 5060": { score: 18000, vendor: "nvidia", gen: "rtx50", cls: "medium" },
+  "NVIDIA RTX 5050": { score: 15000, vendor: "nvidia", gen: "rtx50", cls: "weak" },
 
-  "NVIDIA RTX 4090": { score: 32000, vendor: "nvidia", gen: "rtx40" },
-  "NVIDIA RTX 4080 Super": { score: 27000, vendor: "nvidia", gen: "rtx40" },
-  "NVIDIA RTX 4070 Ti Super": { score: 22000, vendor: "nvidia", gen: "rtx40" },
-  "NVIDIA RTX 4070": { score: 18000, vendor: "nvidia", gen: "rtx40" },
+  "NVIDIA RTX 4090": { score: 32000, vendor: "nvidia", gen: "rtx40", cls: "strong" },
+  "NVIDIA RTX 4080 Super": { score: 27000, vendor: "nvidia", gen: "rtx40", cls: "strong" },
+  "NVIDIA RTX 4070 Ti Super": { score: 22000, vendor: "nvidia", gen: "rtx40", cls: "medium" },
+  "NVIDIA RTX 4070": { score: 18000, vendor: "nvidia", gen: "rtx40", cls: "medium" },
 
-  "AMD RX 9070 XT": { score: 25000, vendor: "amd", gen: "amd9" },
-  "AMD RX 9070": { score: 22000, vendor: "amd", gen: "amd9" },
-  "AMD RX 9060 XT": { score: 19000, vendor: "amd", gen: "amd9" },
-  "AMD RX 9060": { score: 16000, vendor: "amd", gen: "amd9" }
+  "AMD RX 9070 XT": { score: 25000, vendor: "amd", gen: "amd9", cls: "medium" },
+  "AMD RX 9070": { score: 22000, vendor: "amd", gen: "amd9", cls: "medium" },
+  "AMD RX 9060 XT": { score: 19000, vendor: "amd", gen: "amd9", cls: "medium" },
+  "AMD RX 9060": { score: 16000, vendor: "amd", gen: "amd9", cls: "weak" }
 };
 
-/* GAME MULTIPLIERS */
+/* GAME MULTIPLIERS + DIFFICULTY + SIZE */
 const gameMultipliers = {
-  "GTA V (Very High)": { mul: 2.8, weight: "light" },
-  "Valorant": { mul: 3.2, weight: "light" },
-  "Fortnite (Competitive)": { mul: 1.8, weight: "light" },
-  "Apex Legends": { mul: 1.4, weight: "medium" },
-  "Cyberpunk 2077 (RT Off)": { mul: 0.8, weight: "heavy" },
-  "Cyberpunk 2077 (RT Medium)": { mul: 0.55, weight: "heavy" },
-  "GTA VI (Speculative)": { mul: 0.7, weight: "heavy" },
-  "Minecraft RTX": { mul: 0.45, weight: "heavy" }
+  "GTA V (Very High)": { mul: 4.2, difficulty: "light", size: "small" },
+  "Valorant": { mul: 4.8, difficulty: "light", size: "small" },
+  "Fortnite (Competitive)": { mul: 2.2, difficulty: "medium", size: "medium" },
+  "Apex Legends": { mul: 1.6, difficulty: "medium", size: "medium" },
+  "Cyberpunk 2077 (RT Off)": { mul: 0.9, difficulty: "heavy", size: "large" },
+  "Cyberpunk 2077 (RT Medium)": { mul: 0.6, difficulty: "heavy", size: "large" },
+  "GTA VI (Speculative)": { mul: 0.7, difficulty: "heavy", size: "large" },
+  "Minecraft RTX": { mul: 0.5, difficulty: "heavy", size: "medium" }
 };
 
 /* RESOLUTION MULTIPLIERS */
@@ -341,16 +368,16 @@ const resolutionMultipliers = {
   "4K": 0.42
 };
 
-/* GRAPHICS QUALITY MULTIPLIERS */
+/* GRAPHICS QUALITY MULTIPLIERS (mer aggressive) */
 const qualityMultipliers = {
-  low: 1.25,
+  low: 1.6,
   medium: 1.0,
-  high: 0.8,
-  ultra: 0.65
+  high: 0.75,
+  ultra: 0.55
 };
 
-/* UPSCALING MULTIPLIERS (midpoints based on your ranges) */
-const dlss50 = { // DLSS 4.5
+/* DLSS 4.5 (RTX 50) – basert på dine ranges */
+const dlss50 = {
   off:1.0,
   quality:1.5,      // ~30–70%
   balanced:1.7,     // ~60–80%
@@ -358,15 +385,17 @@ const dlss50 = { // DLSS 4.5
   ultra:4.5         // ~250–700%
 };
 
-const dlss40 = { // DLSS 3.0
+/* DLSS 3.0 (RTX 40) */
+const dlss40 = {
   off:1.0,
   quality:1.35,     // ~20–55%
   balanced:1.55,    // ~38–69%
-  performance:2.4,  // litt under 3.0
+  performance:2.4,
   ultra:3.8         // ~170–550%
 };
 
-const fsr = { // FSR for RX 9000 (40–200%)
+/* FSR (RX 9000) – 40–200% */
+const fsr = {
   off:1.0,
   quality:1.4,
   balanced:1.7,
@@ -374,7 +403,8 @@ const fsr = { // FSR for RX 9000 (40–200%)
   ultra:3.0
 };
 
-const dccMultipliers = { // ICS DCC – vår super‑DLSS
+/* DCC (ICS) – vår super‑DLSS */
+const dccMultipliers = {
   off:1.0,
   quality:1.6,
   balanced:2.1,
@@ -384,10 +414,18 @@ const dccMultipliers = { // ICS DCC – vår super‑DLSS
 
 /* FRAME GENERATION MULTIPLIERS */
 const fgMultipliers = {
-  rtx50: 2.8,  // DMFG 2 ~180% ekstra → 2.8x total
-  rtx40: 1.7,  // MFG 1 ~70% ekstra
-  ics:   3.0,  // DCC‑FG, enda litt bedre
+  rtx50: 2.8,  // DMFG2 ~180% ekstra
+  rtx40: 1.7,  // MFG1 ~70% ekstra
+  ics:   3.0,  // DCC‑FG
   amd9:  1.0   // ingen ekte FG
+};
+
+/* GPU STRENGTH SCALING (lette spill) */
+const gpuStrengthScaling = {
+  weak:   1.0,
+  medium: 1.1,
+  strong: 1.25,
+  ultra:  1.4
 };
 
 /* Populate selectors */
@@ -409,19 +447,66 @@ function loadSelectors() {
 }
 loadSelectors();
 
-/* Upscaling logic – HER var feilen før (manglet) */
+/* CPU bottleneck detection */
+function getCpuGpuWeights(game, resolution) {
+  const diff = game.difficulty;
+  const res  = resolution;
+
+  if (diff === "light" && res === "1080p") {
+    return { cpuW: 0.75, gpuW: 0.25 };
+  }
+  if (diff === "heavy" && res === "4K") {
+    return { cpuW: 0.25, gpuW: 0.75 };
+  }
+  if (diff === "medium") {
+    return { cpuW: 0.45, gpuW: 0.55 };
+  }
+  return { cpuW: 0.35, gpuW: 0.65 };
+}
+
+/* Upscaling logic */
 function getUpscalingMultiplier(gpuInfo, dlssMode, dccMode) {
   if (gpuInfo.vendor === "nvidia") {
     return gpuInfo.gen === "rtx50" ? dlss50[dlssMode] : dlss40[dlssMode];
   }
   if (gpuInfo.vendor === "amd") {
-    // bare RX 9000 får ekte FSR‑boost
     return gpuInfo.gen === "amd9" ? fsr[dlssMode] : 1.0;
   }
   if (gpuInfo.vendor === "ics") {
     return dccMultipliers[dccMode];
   }
   return 1.0;
+}
+
+/* Ray Tracing loss */
+function getRtLossMultiplier(gpuInfo, rtLevel) {
+  if (rtLevel === "off") return 1.0;
+
+  let baseLoss;
+  if (rtLevel === "low")    baseLoss = 0.18;
+  else if (rtLevel === "medium") baseLoss = 0.3;
+  else baseLoss = 0.45; // ultra
+
+  let strengthFactor;
+  if (gpuInfo.cls === "ultra") strengthFactor = 0.6;
+  else if (gpuInfo.cls === "strong") strengthFactor = 0.75;
+  else if (gpuInfo.cls === "medium") strengthFactor = 1.0;
+  else strengthFactor = 1.2;
+
+  const loss = baseLoss * strengthFactor;
+  return Math.max(0.4, 1.0 - loss);
+}
+
+/* Ray Reconstruction gain */
+function getRrGainMultiplier(game, rrOn) {
+  if (!rrOn) return 1.0;
+
+  let gain;
+  if (game.size === "small") gain = 0.045;   // 4–5%
+  else if (game.size === "medium") gain = 0.025; // 2–3%
+  else gain = 0.018; // large: 1.5–2%
+
+  return 1.0 + gain;
 }
 
 /* Experience rating */
@@ -443,7 +528,7 @@ function getFpsClass(fps) {
 }
 
 /* Suggestions */
-function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, gameName, gfx) {
+function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, game, gfx, rtLevel, rrOn) {
   if (fps >= 120) return "";
 
   const tips = [];
@@ -463,7 +548,7 @@ function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, gameName, 
       if (dlssMode === "off") tips.push("• Enable FSR (Quality or Balanced) to improve performance.");
       else tips.push("• Use FSR Performance or Ultra Performance if image quality is acceptable.");
     } else {
-      tips.push("• RX 7000 and older get limited benefit from FSR – consider lowering resolution.");
+      tips.push("• Older Radeon GPUs benefit less from FSR – consider lowering resolution.");
     }
   }
 
@@ -473,8 +558,13 @@ function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, gameName, 
     if (!fgOn) tips.push("• Enable DCC‑FG to leverage ICS frame generation.");
   }
 
-  if (gameName.includes("RT")) tips.push("• Lower or disable ray tracing for a massive FPS increase.");
+  if (rtLevel !== "off") tips.push("• Lower or disable Ray Tracing for a massive FPS increase.");
+  if (rrOn && rtLevel === "off") tips.push("• Ray Reconstruction is most useful together with Ray Tracing.");
+
   if (res === "4K") tips.push("• Consider playing at 1440p or 1080p instead of native 4K.");
+
+  if (game.difficulty === "heavy" && fps < 60)
+    tips.push("• This is a very demanding title – consider a stronger GPU for high settings.");
 
   return tips.join("<br>");
 }
@@ -489,6 +579,8 @@ function estimateFPS() {
   const dlss     = document.getElementById("dlss").value;
   const dcc      = document.getElementById("dcc").value;
   const fg       = document.getElementById("fg").value;
+  const rtLevel  = document.getElementById("rt").value;
+  const rr       = document.getElementById("rr").value;
 
   const cpu     = cpuScores[cpuName];
   const gpuInfo = gpuData[gpuName];
@@ -497,22 +589,34 @@ function estimateFPS() {
   const resMul  = resolutionMultipliers[res];
   const gfxMul  = qualityMultipliers[gfx];
 
-  let cpuW = game.weight === "light" ? 0.55 :
-             game.weight === "medium" ? 0.35 : 0.25;
-  let gpuW = 1 - cpuW;
+  const weights = getCpuGpuWeights(game, res);
+  let cpuW = weights.cpuW;
+  let gpuW = weights.gpuW;
 
-  let fps = (cpu * cpuW + gpu * gpuW) * game.mul * resMul * gfxMul / 1000;
+  let baseFps = (cpu * cpuW + gpu * gpuW) * game.mul * resMul * gfxMul / 1000;
+
+  if (game.difficulty === "light") {
+    const strengthMul = gpuStrengthScaling[gpuInfo.cls] || 1.0;
+    baseFps *= strengthMul;
+  }
 
   const upMul = getUpscalingMultiplier(gpuInfo, dlss, dcc);
-  fps *= upMul;
+  baseFps *= upMul;
+
+  const rtMul = getRtLossMultiplier(gpuInfo, rtLevel);
+  baseFps *= rtMul;
+
+  const rrOn = (rr === "on");
+  const rrMul = getRrGainMultiplier(game, rrOn);
+  baseFps *= rrMul;
 
   const fgOn = (fg === "on");
   if (fgOn) {
     const fgMul = fgMultipliers[gpuInfo.gen] || 1.0;
-    fps *= fgMul;
+    baseFps *= fgMul;
   }
 
-  fps = Math.min(Math.max(fps, 10), 3000);
+  let fps = Math.min(Math.max(baseFps, 10), 3000);
   const rounded = Math.round(fps);
 
   const resultEl     = document.getElementById("result");
@@ -526,7 +630,19 @@ function estimateFPS() {
 
   experienceEl.innerText = getExperience(rounded);
 
-  const tipsHtml = buildSuggestions(rounded, gpuInfo, dlss, dcc, fgOn, res, gameName, gfx);
+  const tipsHtml = buildSuggestions(
+    rounded,
+    gpuInfo,
+    dlss,
+    dcc,
+    fgOn,
+    res,
+    game,
+    gfx,
+    rtLevel,
+    rrOn
+  );
+
   if (tipsHtml) {
     tipsFrame.style.display = "block";
     tipsList.innerHTML = tipsHtml;
