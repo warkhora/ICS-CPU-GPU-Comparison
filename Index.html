@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ICS Premium Comparison</title>
+
+<style>
+  body {
+    margin: 0;
+    padding: 40px;
+    background: radial-gradient(circle at top, #101010, #000);
+    color: #e6e6e6;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+
+  .ics-container {
+    max-width: 1100px;
+    margin: auto;
+  }
+
+  .ics-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .ics-logo {
+    font-size: 26px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: gold;
+  }
+
+  .ics-subtitle {
+    color: #aaa;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .ics-frame {
+    background: linear-gradient(135deg, rgba(25,25,25,0.9), rgba(10,10,10,0.9));
+    border: 1px solid #333;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 14px;
+    transition: 0.3s ease;
+    box-shadow: 0 0 0px rgba(255, 215, 0, 0);
+    backdrop-filter: blur(6px);
+  }
+
+  .ics-frame:hover {
+    border-color: gold;
+    box-shadow: 0 0 22px rgba(255, 215, 0, 0.55);
+    transform: translateY(-2px);
+  }
+
+  h1, h2 {
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #f5f5f5;
+    margin-top: 0;
+  }
+
+  p {
+    color: #b5b5b5;
+    font-size: 14px;
+  }
+
+  .selectors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  select, button {
+    background: #111;
+    color: #eee;
+    border: 1px solid #444;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin: 5px 0;
+    transition: 0.2s;
+    font-size: 14px;
+  }
+
+  select:hover, button:hover {
+    border-color: gold;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 14px;
+  }
+
+  th {
+    background: #111;
+    padding: 12px;
+    border-bottom: 2px solid #333;
+    text-align: left;
+    color: #f0f0f0;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #222;
+    color: #ddd;
+  }
+
+  tr:nth-child(even) td {
+    background: rgba(255,255,255,0.01);
+  }
+
+  .spec-label {
+    font-weight: 600;
+    color: #f0f0f0;
+    width: 190px;
+    white-space: nowrap;
+  }
+
+  .product-type {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #ffdd88;
+  }
+
+  .note {
+    font-size: 12px;
+    color: #888;
+    margin-top: 6px;
+  }
+</style>
+
+</head>
+<body>
+
+<div class="ics-container">
+
+  <div class="ics-header">
+    <div class="ics-logo">ICS REGENT</div>
+    <div class="ics-subtitle">Premium CPU & GPU Comparison — Regent Dot, Ultra, RA5 & Real-World CPUs</div>
+  </div>
+
+  <div class="ics-frame">
+    <h1>ICS CPU/GPU Comparison</h1>
+    <p>Select up to three ICS or real-world processors/GPUs to compare side by side.</p>
+
+    <div class="selectors">
+      <select id="p1"></select>
+      <select id="p2"></select>
+      <select id="p3"></select>
+      <button onclick="compare()">Compare</button>
+    </div>
+
+    <p class="note">Tip: Compare ICS GX / SR / Flagship against Intel, AMD Ryzen and Apple M‑series.</p>
+  </div>
+
+  <div class="ics-frame">
+    <h2>Comparison Result</h2>
+    <table id="result"></table>
+  </div>
+
+</div>
+
+<script>
+const products = [
+  // ICS GX 7 / GX 9 gaming CPUs
+  {
+    name: "Regent GX 7-9650RX3",
+    type: "CPU",
+    family: "ICS GX Series",
+    segment: "High-Performance Gaming",
+    cores: "12C / 24T",
+    base: "4.7 GHz",
+    boost: "Up to 6.0 GHz",
+    cache: "112MB HyperCache X3",
+    arch: "Regent Dot",
+    socket: "LGA-1851",
+    tdp: "135W",
+    ai: "Single NMA",
+    mem: "DDR5-7800",
+    pcie: "PCIe 5.0, 24 lanes",
+    perf: "Baseline"
+  },
+  {
+    name: "Regent GX 7-9750RX3",
+    type: "CPU",
+    family: "ICS GX Series",
+    segment: "High-Performance Gaming",
+    cores: "14C / 28T",
+    base: "4.8 GHz",
+    boost: "Up to 6.2 GHz",
+    cache: "128MB HyperCache X3",
+    arch: "Regent Dot",
+    socket: "LGA-1851",
+    tdp: "150W",
+    ai: "Dual NMA",
+    mem: "DDR5-8200",
+    pcie: "PCIe 5.0, 28 lanes",
+    perf: "+12% vs GX 7-9650RX3"
+  },
+  {
+    name: "Regent GX 9-9850RX3",
+    type: "CPU",
+    family: "ICS GX Series",
+    segment: "Enthusiast Gaming",
+    cores: "16C / 32T",
+    base: "4.9 GHz",
+    boost: "Up to 6.3 GHz",
+    cache: "144MB HyperCache X3",
+    arch: "Regent Dot",
+    socket: "LGA-1851",
+    tdp: "170W",
+    ai: "Dual NMA-2",
+    mem: "DDR5-8400",
+    pcie: "PCIe 5.0, 32 lanes",
+    perf: "+22% vs GX 7-9650RX3"
+  },
+  {
+    name: "Regent GX 9-9950RX3",
+    type: "CPU",
+    family: "ICS GX Series",
+    segment: "Enthusiast Gaming",
+    cores: "16C / 32T",
+    base: "5.0 GHz",
+    boost: "Up to 6.35 GHz",
+    cache: "160MB HyperCache X3",
+    arch: "Regent Dot (Enhanced)",
+    socket: "LGA-1851",
+    tdp: "185W",
+    ai: "Dual NMA-2",
+    mem: "DDR5-8600",
+    pcie: "PCIe 5.0, 32 lanes",
+    perf: "+28% vs GX 7-9650RX3"
+  },
+  {
+    name: "Regent GX 9-9975RX3",
+    type: "CPU",
+    family: "ICS GX Series",
+    segment: "Flagship Gaming",
+    cores: "16C / 32T",
+    base: "5.0 GHz",
+    boost: "Up to 6.4 GHz",
+    cache: "176MB HyperCache X3",
+    arch: "Regent Dot (Flagship)",
+    socket: "LGA-1851",
+    tdp: "195W",
+    ai: "Dual NMA-3",
+    mem: "DDR5-8800",
+    pcie: "PCIe 5.0, 32 lanes",
+    perf: "+38–45% vs Ryzen 9 9950X3D"
+  },
+
+  // ICS SR series
+  {
+    name: "Regent SR-37",
+    type: "CPU",
+    family: "ICS SR Series",
+    segment: "Ultra-Efficient",
+    cores: "10C / 12T",
+    base: "3.8 GHz",
+    boost: "Up to 5.1 GHz",
+    cache: "48MB LiteCache",
+    arch: "Ultra Architecture",
+    socket: "Regent-S1",
+    tdp: "35–50W",
+    ai: "Single NMA",
+    mem: "LPDDR6-8800",
+    pcie: "PCIe 5.0, 8 lanes",
+    perf: "Baseline"
+  },
+  {
+    name: "Regent SR-37 Pro",
+    type: "CPU",
+    family: "ICS SR Series",
+    segment: "Ultra-Efficient",
+    cores: "12C / 16T",
+    base: "4.0 GHz",
+    boost: "Up to 5.4 GHz",
+    cache: "64MB LiteCache",
+    arch: "Ultra Architecture",
+    socket: "Regent-S1",
+    tdp: "45–65W",
+    ai: "Dual NMA",
+    mem: "LPDDR6-9600",
+    pcie: "PCIe 5.0, 12 lanes",
+    perf: "+18% over SR-37"
+  },
+  {
+    name: "Regent SR-37 Max",
+    type: "CPU",
+    family: "ICS SR Series",
+    segment: "Ultra-Efficient",
+    cores: "14C / 18T",
+    base: "4.2 GHz",
+    boost: "Up to 5.6 GHz",
+    cache: "80MB LiteCache",
+    arch: "Ultra Architecture",
+    socket: "Regent-S1",
+    tdp: "55–80W",
+    ai: "Dual NMA-2",
+    mem: "LPDDR6-10400",
+    pcie: "PCIe 5.0, 16 lanes",
+    perf: "+32% over SR-37 Pro"
+  },
+  {
+    name: "Regent SR-37 Ultra",
+    type: "CPU",
+    family: "ICS SR Series",
+    segment: "Ultra-Efficient Flagship",
+    cores: "18C / 24T",
+    base: "4.2 GHz",
+    boost: "Up to 5.9 GHz",
+    cache: "96MB LiteCache Gen-2",
+    arch: "Ultra Architecture (Gen-2)",
+    socket: "Regent-S1",
+    tdp: "65–105W Dynamic",
+    ai: "Dual NMA-3 (70 TOPS)",
+    mem: "LPDDR6-11200",
+    pcie: "PCIe 5.0, 16 lanes",
+    perf: "+25–40% vs Apple M5 Max"
+  },
+
+  // ICS GX Flagship
+  {
+    name: "Regent GX 9-9995RX4D",
+    type: "CPU",
+    family: "ICS GX Flagship",
+    segment: "Extreme Gaming & Creation",
+    cores: "18C / 36T (8 HyperCores + 10 assist-cores)",
+    base: "4.9 GHz",
+    boost: "Up to 6.6 GHz (HyperCore boost)",
+    cache: "256MB HyperCache RX4 (64MB L2 + 192MB stacked L3)",
+    arch: "Regent Dot RA5 + HyperCore 8HC Engine",
+    socket: "LGA-1951 (RA5-platform, flagship-only)",
+    tdp: "220–260W Dynamic OC Range",
+    ai: "Quad NMA-3 (Next-Gen, 90+ TOPS)",
+    mem: "DDR5-9200 / DDR5-9600 (Quad-Channel)",
+    pcie: "PCIe 5.0, 32 lanes (GPU) + 16 lanes (NVMe/IO)",
+    perf: "Up to 1.8–1.9x Ryzen 9 9950X3D, +85% single-core vs best 8C/16T gaming CPU"
+  },
+
+  // ICS GPU
+  {
+    name: "Regent VX 6690",
+    type: "GPU",
+    family: "ICS VX Series",
+    segment: "Flagship Graphics",
+    cores: "192 VCU",
+    base: "Missing Data",
+    boost: "Missing Data",
+    cache: "128MB Unified HyperCache 1",
+    arch: "Vortex Architecture 1",
+    socket: "PCIe 5.0 x16",
+    tdp: "Missing Data",
+    ai: "MatrixCore 4",
+    mem: "24GB HyperVRAM",
+    pcie: "PCIe 5.0, x16",
+    perf: "Next-gen 4K/8K flagship"
+  },
+
+  // REAL-WORLD AMD RYZEN X3D & OTHERS
+  {
+    name: "AMD Ryzen 9 9950X3D",
+    type: "CPU",
+    family: "AMD Ryzen 9000",
+    segment: "Flagship Gaming & Creation",
+    cores: "16C / 32T",
+    base: "4.3 GHz",
+    boost: "Up to 5.7 GHz",
+    cache: "145MB total (incl. 128MB 3D V-Cache)",
+    arch: "Zen 5 \"Granite Ridge\" + 2nd-gen 3D V-Cache",
+    socket: "AM5",
+    tdp: "170W (up to ~230W)",
+    ai: "Missing Data",
+    mem: "DDR5, up to 256GB",
+    pcie: "Missing Data",
+    perf: "Marketed as top CPU for gamers & creators"
+  },
+  {
+    name: "AMD Ryzen 7 9800X3D",
+    type: "CPU",
+    family: "AMD Ryzen 9000",
+    segment: "High-End Gaming",
+    cores: "8C / 16T",
+    base: "4.7 GHz",
+    boost: "Up to 5.2 GHz",
+    cache: "96MB L3 3D V-Cache",
+    arch: "Zen 5",
+    socket: "AM5",
+    tdp: "120W",
+    ai: "Missing Data",
+    mem: "DDR5",
+    pcie: "Missing Data",
+    perf: "Missing Data"
+  },
+  {
+    name: "AMD Ryzen 7 7800X3D",
+    type: "CPU",
+    family: "AMD Ryzen 7000",
+    segment: "High-End Gaming",
+    cores: "8C / 16T",
+    base: "4.2 GHz",
+    boost: "Up to 5.0 GHz",
+    cache: "96MB 3D V-Cache",
+    arch: "Zen 4",
+    socket: "AM5",
+    tdp: "Missing Data",
+    ai: "Missing Data",
+    mem: "DDR5",
+    pcie: "Missing Data",
+    perf: "Missing Data"
+  },
+
+  // REAL-WORLD INTEL
+  {
+    name: "Intel Core i9-14900K",
+    type: "CPU",
+    family: "Intel Core i9 14th Gen",
+    segment: "Flagship Desktop",
+    cores: "24C / 32T (8P + 16E)",
+    base: "3.2 GHz P / 2.4 GHz E",
+    boost: "Up to 6.0 GHz (TVB)",
+    cache: "32MB L2 + 36MB L3",
+    arch: "Raptor Lake Refresh (Intel 7)",
+    socket: "LGA 1700",
+    tdp: "Missing Data",
+    ai: "Missing Data",
+    mem: "DDR4 / DDR5",
+    pcie: "PCIe 5.0, 16 lanes GPU + 4 NVMe",
+    perf: "Missing Data"
+  },
+  {
+    name: "Intel Core i9-13900K",
+    type: "CPU",
+    family: "Intel Core i9 13th Gen",
+    segment: "High-End Desktop",
+    cores: "24C / 32T (8P + 16E)",
+    base: "3.0 GHz (P-cores)",
+    boost: "Up to 5.8 GHz",
+    cache: "32MB L2 + 36MB L3",
+    arch: "Raptor Lake (Intel 7)",
+    socket: "LGA 1700",
+    tdp: "Missing Data",
+    ai: "Missing Data",
+    mem: "DDR4 / DDR5",
+    pcie: "PCIe 5.0, 16 lanes",
+    perf: "Missing Data"
+  },
+  {
+    name: "Intel Core i5-12400F",
+    type: "CPU",
+    family: "Intel Core i5 12th Gen",
+    segment: "Mainstream Desktop",
+    cores: "6C / 12T (6P)",
+    base: "2.5 GHz",
+    boost: "Up to 4.4 GHz",
+    cache: "7.5MB L2 + 18MB L3",
+    arch: "Alder Lake-S (Golden Cove)",
+    socket: "LGA 1700",
+    tdp: "Missing Data",
+    ai: "Missing Data",
+    mem: "DDR4 / DDR5",
+    pcie: "PCIe 5.0, 16 lanes",
+    perf: "Missing Data"
+  },
+
+  // REAL-WORLD APPLE M-SERIES
+  {
+    name: "Apple M5",
+    type: "CPU",
+    family: "Apple M Series",
+    segment: "Notebook SoC",
+    cores: "9C / 9T (3P + 6E)",
+    base: "0.9–4.61 GHz P / 0.9–3.05 GHz E",
+    boost: "Up to 4.61 GHz (P-cores)",
+    cache: "28MB L2 (no disclosed L3)",
+    arch: "Apple M5 (3 nm, hybrid)",
+    socket: "SoC (soldered)",
+    tdp: "Missing Data",
+    ai: "16-core Neural Engine (Missing detailed TOPS)",
+    mem: "Unified memory",
+    pcie: "Missing Data",
+    perf: "Missing Data"
+  },
+  {
+    name: "Apple M5 Pro",
+    type: "CPU",
+    family: "Apple M Series",
+    segment: "Pro Notebook SoC",
+    cores: "18C / 18T (6 super + 12 performance)",
+    base: "Missing Data",
+    boost: "Missing Data",
+    cache: "Missing Data",
+    arch: "Apple Fusion Architecture (M5 Pro)",
+    socket: "SoC (soldered)",
+    tdp: "Missing Data",
+    ai: "16-core Neural Engine",
+    mem: "Unified memory (high bandwidth)",
+    pcie: "Integrated Thunderbolt 5 controllers",
+    perf: "Up to ~2.5x multithread vs M1 Pro (approx.)"
+  },
+  {
+    name: "Apple M5 Max",
+    type: "CPU",
+    family: "Apple M Series",
+    segment: "Max Notebook SoC",
+    cores: "18C / 18T (6 super + 12 performance)",
+    base: "Missing Data",
+    boost: "Missing Data",
+    cache: "Missing Data",
+    arch: "Apple Fusion Architecture (M5 Max)",
+    socket: "SoC (soldered)",
+    tdp: "Missing Data",
+    ai: "16-core Neural Engine",
+    mem: "Unified memory (high bandwidth, larger capacity)",
+    pcie: "Integrated Thunderbolt 5 controllers",
+    perf: "Missing Data"
+  }
+];
+
+function load() {
+  const selects = [p1, p2, p3];
+  selects.forEach(sel => {
+    const placeholder = document.createElement("option");
+    placeholder.textContent = "Select product...";
+    placeholder.value = "";
+    sel.appendChild(placeholder);
+
+    products.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p.name;
+      opt.textContent = p.name;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function compare() {
+  const chosen = [p1.value, p2.value, p3.value]
+    .map(name => products.find(p => p.name === name))
+    .filter(Boolean);
+
+  if (chosen.length === 0) {
+    result.innerHTML = "<tr><td>No products selected.</td></tr>";
+    return;
+  }
+
+  const col = (fn) => chosen.map(c => `<td>${fn(c) || "Missing Data"}</td>`).join("");
+
+  result.innerHTML = `
+    <tr>
+      <th></th>
+      ${chosen.map(c => `<th>${c.name}<br><span class="product-type">${c.family}</span></th>`).join("")}
+    </tr>
+    <tr><td class="spec-label">Type</td>${col(c => c.type)}</tr>
+    <tr><td class="spec-label">Segment</td>${col(c => c.segment)}</tr>
+    <tr><td class="spec-label">Cores / Threads</td>${col(c => c.cores)}</tr>
+    <tr><td class="spec-label">Base Clock</td>${col(c => c.base)}</tr>
+    <tr><td class="spec-label">Boost Clock</td>${col(c => c.boost)}</tr>
+    <tr><td class="spec-label">Total Cache</td>${col(c => c.cache)}</tr>
+    <tr><td class="spec-label">Architecture</td>${col(c => c.arch)}</tr>
+    <tr><td class="spec-label">Socket / Interface</td>${col(c => c.socket)}</tr>
+    <tr><td class="spec-label">TDP</td>${col(c => c.tdp)}</tr>
+    <tr><td class="spec-label">AI Engines</td>${col(c => c.ai)}</tr>
+    <tr><td class="spec-label">Memory Support</td>${col(c => c.mem)}</tr>
+    <tr><td class="spec-label">PCIe / Lanes</td>${col(c => c.pcie)}</tr>
+    <tr><td class="spec-label">Performance</td>${col(c => c.perf)}</tr>
+  `;
+}
+
+load();
+</script>
+
+</body>
+</html>
