@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Hybrid FPS Estimator v3.0</title>
+<title>ICS Hybrid FPS Estimator v3.1</title>
 
 <style>
   body {
@@ -189,7 +189,7 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Hybrid FPS Estimator v3.0 — RTX 40/50 • RX 9000 • ICS VX</div>
+    <div class="ics-subtitle">Hybrid FPS Estimator v3.1 — RTX 40/50 • RX 9000 • ICS VX</div>
   </div>
 
   <!-- Base configuration -->
@@ -315,13 +315,24 @@
 </div>
 
 <script>
-/* CPU SCORES */
+/* CPU SCORES – v3.1 */
 const cpuScores = {
   "Regent GX 9-9995RX4D": 26000,
   "Regent GX 7-9750RX3": 21000,
+
+  "AMD Ryzen 7 9850X3D": 23300,
+  "AMD Ryzen 7 9800X3D": 23000,
   "AMD Ryzen 9 9950X3D": 22000,
-  "AMD Ryzen 7 7800X3D": 19000,
+  "AMD Ryzen 9 9900X3D": 21000,
+
+  "AMD Ryzen 5 7500F": 7600,
+
+  "AMD Ryzen Threadripper PRO 9955WX": 14700,
+  "AMD Ryzen Threadripper PRO 9995WX": 23500,
+
   "Intel Core i9-14900K": 18500,
+  "Intel Core Ultra 9 285K": 17000,
+  "Intel Core Ultra 7 270K": 14000,
   "Intel Core i5-12400F": 9000
 };
 
@@ -351,14 +362,22 @@ const gpuData = {
 
 /* GAME MULTIPLIERS + DIFFICULTY + SIZE */
 const gameMultipliers = {
-  "GTA V (Very High)": { mul: 4.2, difficulty: "light", size: "small" },
+  "GTA V": { mul: 4.2, difficulty: "light", size: "small" },
   "Valorant": { mul: 4.8, difficulty: "light", size: "small" },
-  "Fortnite (Competitive)": { mul: 2.2, difficulty: "medium", size: "medium" },
+  "CS2": { mul: 4.5, difficulty: "light", size: "small" },
+  "Overwatch 2": { mul: 2.8, difficulty: "light", size: "small" },
+
+  "Fortnite": { mul: 2.2, difficulty: "medium", size: "medium" },
   "Apex Legends": { mul: 1.6, difficulty: "medium", size: "medium" },
-  "Cyberpunk 2077 (RT Off)": { mul: 0.9, difficulty: "heavy", size: "large" },
-  "Cyberpunk 2077 (RT Medium)": { mul: 0.6, difficulty: "heavy", size: "large" },
-  "GTA VI (Speculative)": { mul: 0.7, difficulty: "heavy", size: "large" },
-  "Minecraft RTX": { mul: 0.5, difficulty: "heavy", size: "medium" }
+  "Rust": { mul: 1.3, difficulty: "medium", size: "medium" },
+  "Forza Horizon 5": { mul: 2.4, difficulty: "medium", size: "medium" },
+  "Forza Horizon 6": { mul: 2.1, difficulty: "medium", size: "large" },
+
+  "Cyberpunk 2077": { mul: 0.9, difficulty: "heavy", size: "large" },
+  "GTA VI": { mul: 0.7, difficulty: "heavy", size: "large" },
+  "Minecraft RTX": { mul: 0.5, difficulty: "heavy", size: "medium" },
+  "ARK Survival Ascended": { mul: 0.6, difficulty: "heavy", size: "large" },
+  "Microsoft Flight Simulator 2024": { mul: 0.45, difficulty: "heavy", size: "large" }
 };
 
 /* RESOLUTION MULTIPLIERS */
@@ -368,7 +387,7 @@ const resolutionMultipliers = {
   "4K": 0.42
 };
 
-/* GRAPHICS QUALITY MULTIPLIERS (mer aggressive) */
+/* GRAPHICS QUALITY MULTIPLIERS */
 const qualityMultipliers = {
   low: 1.6,
   medium: 1.0,
@@ -376,25 +395,25 @@ const qualityMultipliers = {
   ultra: 0.55
 };
 
-/* DLSS 4.5 (RTX 50) – basert på dine ranges */
+/* DLSS 4.5 (RTX 50) */
 const dlss50 = {
   off:1.0,
-  quality:1.5,      // ~30–70%
-  balanced:1.7,     // ~60–80%
-  performance:2.6,  // mellom balanced og UP
-  ultra:4.5         // ~250–700%
+  quality:1.5,
+  balanced:1.7,
+  performance:2.6,
+  ultra:4.5
 };
 
 /* DLSS 3.0 (RTX 40) */
 const dlss40 = {
   off:1.0,
-  quality:1.35,     // ~20–55%
-  balanced:1.55,    // ~38–69%
+  quality:1.35,
+  balanced:1.55,
   performance:2.4,
-  ultra:3.8         // ~170–550%
+  ultra:3.8
 };
 
-/* FSR (RX 9000) – 40–200% */
+/* FSR (RX 9000) */
 const fsr = {
   off:1.0,
   quality:1.4,
@@ -403,7 +422,7 @@ const fsr = {
   ultra:3.0
 };
 
-/* DCC (ICS) – vår super‑DLSS */
+/* DCC (ICS) */
 const dccMultipliers = {
   off:1.0,
   quality:1.6,
@@ -414,10 +433,10 @@ const dccMultipliers = {
 
 /* FRAME GENERATION MULTIPLIERS */
 const fgMultipliers = {
-  rtx50: 2.8,  // DMFG2 ~180% ekstra
-  rtx40: 1.7,  // MFG1 ~70% ekstra
-  ics:   3.0,  // DCC‑FG
-  amd9:  1.0   // ingen ekte FG
+  rtx50: 2.8,
+  rtx40: 1.7,
+  ics:   3.0,
+  amd9:  1.0
 };
 
 /* GPU STRENGTH SCALING (lette spill) */
@@ -440,9 +459,9 @@ function loadSelectors() {
   Object.keys(gameMultipliers).forEach(g => gameSel.innerHTML += `<option>${g}</option>`);
   Object.keys(resolutionMultipliers).forEach(r => resSel.innerHTML += `<option>${r}</option>`);
 
-  cpuSel.value  = "AMD Ryzen 7 7800X3D";
-  gpuSel.value  = "NVIDIA RTX 4080 Super";
-  gameSel.value = "GTA V (Very High)";
+  cpuSel.value  = "AMD Ryzen 7 9800X3D";
+  gpuSel.value  = "NVIDIA RTX 5080";
+  gameSel.value = "GTA V";
   resSel.value  = "1080p";
 }
 loadSelectors();
@@ -485,7 +504,7 @@ function getRtLossMultiplier(gpuInfo, rtLevel) {
   let baseLoss;
   if (rtLevel === "low")    baseLoss = 0.18;
   else if (rtLevel === "medium") baseLoss = 0.3;
-  else baseLoss = 0.45; // ultra
+  else baseLoss = 0.45;
 
   let strengthFactor;
   if (gpuInfo.cls === "ultra") strengthFactor = 0.6;
@@ -502,9 +521,9 @@ function getRrGainMultiplier(game, rrOn) {
   if (!rrOn) return 1.0;
 
   let gain;
-  if (game.size === "small") gain = 0.045;   // 4–5%
-  else if (game.size === "medium") gain = 0.025; // 2–3%
-  else gain = 0.018; // large: 1.5–2%
+  if (game.size === "small") gain = 0.045;
+  else if (game.size === "medium") gain = 0.025;
+  else gain = 0.018;
 
   return 1.0 + gain;
 }
