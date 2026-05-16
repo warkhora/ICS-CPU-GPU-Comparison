@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ICS FPS Estimator</title>
+
+<style>
+  body {
+    margin: 0;
+    padding: 40px;
+    background: radial-gradient(circle at top, #101010, #000);
+    color: #e6e6e6;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+
+  .ics-container {
+    max-width: 900px;
+    margin: auto;
+  }
+
+  .ics-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .ics-logo {
+    font-size: 26px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: gold;
+  }
+
+  .ics-subtitle {
+    color: #aaa;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .ics-frame {
+    background: linear-gradient(135deg, rgba(25,25,25,0.9), rgba(10,10,10,0.9));
+    border: 1px solid #333;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 14px;
+    transition: 0.3s ease;
+    box-shadow: 0 0 0px rgba(255, 215, 0, 0);
+    backdrop-filter: blur(6px);
+  }
+
+  .ics-frame:hover {
+    border-color: gold;
+    box-shadow: 0 0 22px rgba(255, 215, 0, 0.55);
+    transform: translateY(-2px);
+  }
+
+  select, button {
+    width: 100%;
+    background: #111;
+    color: #eee;
+    border: 1px solid #444;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px 0;
+    transition: 0.2s;
+    font-size: 14px;
+  }
+
+  select:hover, button:hover {
+    border-color: gold;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  }
+
+  button {
+    cursor: pointer;
+    background: #222;
+  }
+
+  .result-box {
+    margin-top: 20px;
+    padding: 20px;
+    background: #111;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 22px;
+    color: gold;
+    border: 1px solid #333;
+  }
+</style>
+
+</head>
+<body>
+
+<div class="ics-container">
+
+  <div class="ics-header">
+    <div class="ics-logo">ICS REGENT</div>
+    <div class="ics-subtitle">FPS Performance Estimator — ICS Engine</div>
+  </div>
+
+  <div class="ics-frame">
+    <h2>FPS Estimator</h2>
+    <p>Velg CPU, GPU, spill og oppløsning for å estimere FPS.</p>
+
+    <select id="cpu"></select>
+    <select id="gpu"></select>
+    <select id="game"></select>
+    <select id="resolution"></select>
+
+    <button onclick="estimateFPS()">Estimate FPS</button>
+
+    <div id="result" class="result-box" style="display:none;"></div>
+  </div>
+
+</div>
+
+<script>
+// CPU performance scores
+const cpuScores = {
+  "Regent GX 9-9995RX4D": 25000,
+  "Regent GX 9-9975RX3": 23000,
+  "Regent GX 9-9950RX3": 22000,
+  "Regent GX 7-9750RX3": 20000,
+  "Regent GX 7-9650RX3": 18000,
+
+  "AMD Ryzen 9 9950X3D": 21000,
+  "AMD Ryzen 7 9800X3D": 17000,
+  "AMD Ryzen 7 7800X3D": 16000,
+
+  "Intel Core i9-14900K": 19000,
+  "Intel Core i9-13900K": 17500,
+  "Intel Core i5-12400F": 9000
+};
+
+// GPU performance scores
+const gpuScores = {
+  "Regent VX 6690": 30000,
+  "NVIDIA RTX 4090": 28000,
+  "NVIDIA RTX 4080": 22000,
+  "NVIDIA RTX 4070": 16000,
+  "AMD RX 7900 XTX": 21000,
+  "AMD RX 7800 XT": 15000,
+  "NVIDIA RTX 4060": 9000
+};
+
+// Game multipliers
+const gameMultipliers = {
+  "Fortnite": 1.4,
+  "Valorant": 2.0,
+  "Cyberpunk 2077": 0.6,
+  "GTA VI": 0.8,
+  "Minecraft RTX": 0.5,
+  "Apex Legends": 1.3
+};
+
+// Resolution multipliers
+const resolutionMultipliers = {
+  "1080p": 1.0,
+  "1440p": 0.75,
+  "4K": 0.45
+};
+
+// Load dropdowns
+function loadSelectors() {
+  const cpuSel = document.getElementById("cpu");
+  const gpuSel = document.getElementById("gpu");
+  const gameSel = document.getElementById("game");
+  const resSel = document.getElementById("resolution");
+
+  Object.keys(cpuScores).forEach(c => {
+    cpuSel.innerHTML += `<option value="${c}">${c}</option>`;
+  });
+
+  Object.keys(gpuScores).forEach(g => {
+    gpuSel.innerHTML += `<option value="${g}">${g}</option>`;
+  });
+
+  Object.keys(gameMultipliers).forEach(g => {
+    gameSel.innerHTML += `<option value="${g}">${g}</option>`;
+  });
+
+  Object.keys(resolutionMultipliers).forEach(r => {
+    resSel.innerHTML += `<option value="${r}">${r}</option>`;
+  });
+}
+
+loadSelectors();
+
+// FPS calculation
+function estimateFPS() {
+  const cpu = document.getElementById("cpu").value;
+  const gpu = document.getElementById("gpu").value;
+  const game = document.getElementById("game").value;
+  const res = document.getElementById("resolution").value;
+
+  const cpuScore = cpuScores[cpu];
+  const gpuScore = gpuScores[gpu];
+  const gameMul = gameMultipliers[game];
+  const resMul = resolutionMultipliers[res];
+
+  const fps = Math.round((cpuScore * 0.35 + gpuScore * 0.65) * gameMul * resMul / 1000);
+
+  const resultBox = document.getElementById("result");
+  resultBox.style.display = "block";
+  resultBox.innerHTML = `Estimated FPS: <strong>${fps}</strong>`;
+}
+</script>
+
+</body>
+</html>
