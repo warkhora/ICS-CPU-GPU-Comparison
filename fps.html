@@ -308,11 +308,9 @@ const cpuScores = {
 
 /* GPU SCORES */
 const gpuData = {
-  /* ICS VX */
   "Regent VX 6690": { score: 34000, vendor: "ics", gen: "ics" },
   "Regent VX 6670": { score: 28000, vendor: "ics", gen: "ics" },
 
-  /* RTX 50 */
   "NVIDIA RTX 5090": { score: 36000, vendor: "nvidia", gen: "rtx50" },
   "NVIDIA RTX 5080": { score: 32000, vendor: "nvidia", gen: "rtx50" },
   "NVIDIA RTX 5070 Ti": { score: 28000, vendor: "nvidia", gen: "rtx50" },
@@ -321,18 +319,15 @@ const gpuData = {
   "NVIDIA RTX 5060": { score: 18000, vendor: "nvidia", gen: "rtx50" },
   "NVIDIA RTX 5050": { score: 15000, vendor: "nvidia", gen: "rtx50" },
 
-  /* RTX 40 */
   "NVIDIA RTX 4090": { score: 32000, vendor: "nvidia", gen: "rtx40" },
   "NVIDIA RTX 4080 Super": { score: 27000, vendor: "nvidia", gen: "rtx40" },
   "NVIDIA RTX 4070 Ti Super": { score: 22000, vendor: "nvidia", gen: "rtx40" },
   "NVIDIA RTX 4070": { score: 18000, vendor: "nvidia", gen: "rtx40" },
 
-  /* AMD RX 7000 */
   "AMD RX 7900 XTX": { score: 26000, vendor: "amd", gen: "amd7" },
   "AMD RX 7900 XT": { score: 23000, vendor: "amd", gen: "amd7" },
   "AMD RX 7800 XT": { score: 19000, vendor: "amd", gen: "amd7" },
 
-  /* AMD RX 9000 */
   "AMD RX 9070 XT": { score: 25000, vendor: "amd", gen: "amd9" },
   "AMD RX 9070": { score: 22000, vendor: "amd", gen: "amd9" },
   "AMD RX 9060 XT": { score: 19000, vendor: "amd", gen: "amd9" },
@@ -392,17 +387,7 @@ function loadSelectors() {
 }
 loadSelectors();
 
-/* Upscaling logic */
-function getUpscalingMultiplier(gpuInfo, dlssMode, dccMode) {
-  if (gpuInfo.vendor === "nvidia") {
-    return gpuInfo.gen === "rtx50" ? dlss50[dlssMode] : dlss40[dlssMode];
-  }
-  if (gpuInfo.vendor === "amd") return fsr[dlssMode];
-  if (gpuInfo.vendor === "ics") return dccMultipliers[dccMode];
-  return 1.0;
-}
-
-/* Experience rating text */
+/* Experience rating */
 function getExperience(fps) {
   if (fps < 30)  return "Unplayable";
   if (fps < 60)  return "Playable but not smooth";
@@ -420,52 +405,33 @@ function getFpsClass(fps) {
   return "fps-blue";
 }
 
-/* Suggestions based on FPS + GPU */
+/* Suggestions */
 function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, gameName) {
   if (fps >= 120) return "";
 
   const tips = [];
 
-  tips.push("• Lower resolution (e.g. from 4K to 1440p or 1080p).");
-  tips.push("• Reduce graphics preset (shadows, post-processing, foliage).");
+  tips.push("• Lower resolution (e.g. 1440p → 1080p).");
+  tips.push("• Reduce graphics settings (shadows, post-processing).");
 
   if (gpuInfo.vendor === "nvidia") {
-    if (dlssMode === "off") {
-      tips.push("• Enable DLSS (Quality or Balanced) for a big FPS boost.");
-    } else if (dlssMode === "quality") {
-      tips.push("• Try DLSS Balanced or Performance for even higher FPS.");
-    }
-    if (!fgOn && (gpuInfo.gen === "rtx40" || gpuInfo.gen === "rtx50")) {
-      tips.push("• Enable Frame Generation if latency is acceptable.");
-    }
+    if (dlssMode === "off") tips.push("• Enable DLSS for a major FPS boost.");
+    if (!fgOn && (gpuInfo.gen === "rtx40" || gpuInfo.gen === "rtx50"))
+      tips.push("• Enable Frame Generation.");
   }
 
   if (gpuInfo.vendor === "amd") {
-    if (dlssMode === "off") {
-      tips.push("• Enable FSR (Quality or Balanced) to improve performance.");
-    } else {
-      tips.push("• Use FSR Performance or Ultra Performance if image quality is acceptable.");
-    }
+    if (dlssMode === "off") tips.push("• Enable FSR for better performance.");
   }
 
   if (gpuInfo.vendor === "ics") {
-    if (dccMode === "off") {
-      tips.push("• Enable DCC (Quality or Balanced) for a strong FPS uplift.");
-    } else if (dccMode === "quality") {
-      tips.push("• Try DCC Balanced or Performance for maximum FPS.");
-    }
-    if (!fgOn) {
-      tips.push("• Enable DCC‑FG to leverage ICS frame generation.");
-    }
+    if (dccMode === "off") tips.push("• Enable DCC for a strong uplift.");
+    if (!fgOn) tips.push("• Enable DCC‑FG for maximum performance.");
   }
 
-  if (gameName.includes("RT")) {
-    tips.push("• Lower or disable ray tracing for a massive FPS increase.");
-  }
+  if (gameName.includes("RT")) tips.push("• Lower or disable ray tracing.");
 
-  if (res === "4K") {
-    tips.push("• Consider playing at 1440p or 1080p instead of native 4K.");
-  }
+  if (res === "4K") tips.push("• Consider switching to 1440p or 1080p.");
 
   return tips.join("<br>");
 }
@@ -496,10 +462,7 @@ function estimateFPS() {
   fps *= upMul;
 
   const fgOn = (fg === "on");
-  if (fgOn) {
-    const fgMul = fgMultipliers[gpuInfo.gen] || 1.0;
-    fps *= fgMul;
-  }
+  if (fgOn) fps *= fgMultipliers[gpuInfo.gen];
 
   fps = Math.min(Math.max(fps, 10), 3000);
   const rounded = Math.round(fps);
@@ -525,4 +488,5 @@ function estimateFPS() {
   }
 }
 </script>
+  
   
