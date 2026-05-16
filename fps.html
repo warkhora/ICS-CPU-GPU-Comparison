@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS FPS Estimator</title>
+<title>ICS Hybrid FPS Estimator</title>
 
 <style>
   body {
@@ -14,7 +14,7 @@
   }
 
   .ics-container {
-    max-width: 900px;
+    max-width: 1000px;
     margin: auto;
   }
 
@@ -58,9 +58,9 @@
     background: #111;
     color: #eee;
     border: 1px solid #444;
-    padding: 12px;
+    padding: 10px;
     border-radius: 8px;
-    margin: 10px 0;
+    margin: 8px 0;
     transition: 0.2s;
     font-size: 14px;
   }
@@ -75,6 +75,18 @@
     background: #222;
   }
 
+  .row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .row-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
   .result-box {
     margin-top: 20px;
     padding: 20px;
@@ -85,20 +97,27 @@
     color: gold;
     border: 1px solid #333;
   }
-</style>
 
-</head>
-<body>
+  .note {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 6px;
+  }
 
-  <body>
+  .tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    margin-right: 6px;
+    border: 1px solid #444;
+  }
 
-<!-- ICS NAVIGATION BAR -->
-<div class="ics-nav">
-  <a href="index.html">CPU/GPU Comparison</a>
-  <a href="fps.html">FPS Estimator</a>
-</div>
+  .tag-nvidia { color: #7dd3fc; border-color: #0ea5e9; }
+  .tag-amd { color: #f97373; border-color: #ef4444; }
+  .tag-ics { color: #facc15; border-color: #eab308; }
 
-<style>
+  /* NAV BAR (samme som index.html) */
   .ics-nav {
     width: 100%;
     background: #0d0d0d;
@@ -109,6 +128,7 @@
     position: sticky;
     top: 0;
     z-index: 999;
+    margin: -40px -40px 30px -40px;
   }
 
   .ics-nav a {
@@ -124,100 +144,174 @@
     text-shadow: 0 0 8px gold;
   }
 </style>
+</head>
+<body>
+
+<!-- ICS NAVIGATION BAR -->
+<div class="ics-nav">
+  <a href="index.html">CPU/GPU Comparison</a>
+  <a href="fps.html">FPS Estimator</a>
+</div>
 
 <div class="ics-container">
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Premium CPU & GPU Comparison — Regent Dot, Ultra, RA5 & Real-World CPUs</div>
+    <div class="ics-subtitle">Hybrid FPS Estimator — RTX, RX & ICS Regent VX</div>
   </div>
 
   <div class="ics-frame">
-    <h1>ICS CPU/GPU Comparison</h1>
-    <p>Select up to three ICS or real-world processors/GPUs to compare side by side.</p>
+    <h2>Base Configuration</h2>
+    <p>Velg CPU, GPU, spill og oppløsning. Deretter kan du aktivere DLSS / FSR / DCC og Frame Generation.</p>
 
-    <div class="selectors">
-      <select id="p1"></select>
-      <select id="p2"></select>
-      <select id="p3"></select>
-      <button onclick="compare()">Compare</button>
+    <div class="row">
+      <div>
+        <label>CPU</label>
+        <select id="cpu"></select>
+      </div>
+      <div>
+        <label>GPU</label>
+        <select id="gpu"></select>
+      </div>
     </div>
 
-    <p class="note">Tip: Compare ICS GX / SR / Flagship against Intel, AMD Ryzen and Apple M‑series.</p>
+    <div class="row">
+      <div>
+        <label>Game</label>
+        <select id="game"></select>
+      </div>
+      <div>
+        <label>Resolution</label>
+        <select id="resolution"></select>
+      </div>
+    </div>
+
+    <p class="note">
+      <span class="tag tag-nvidia">NVIDIA RTX</span>
+      <span class="tag tag-amd">AMD Radeon</span>
+      <span class="tag tag-ics">ICS Regent VX</span>
+    </p>
   </div>
 
   <div class="ics-frame">
+    <h2>Upscaling & Frame Generation</h2>
+    <p>Disse innstillingene gir ekstra FPS basert på hvilken GPU du har valgt.</p>
 
-<div class="ics-container">
+    <div class="row-3">
+      <div>
+        <label>DLSS / FSR (RTX / RX)</label>
+        <select id="dlss">
+          <option value="off">Off</option>
+          <option value="quality">Quality</option>
+          <option value="balanced">Balanced</option>
+          <option value="performance">Performance</option>
+          <option value="ultra">Ultra Performance</option>
+        </select>
+      </div>
+      <div>
+        <label>DCC (ICS Regent VX)</label>
+        <select id="dcc">
+          <option value="off">Off</option>
+          <option value="quality">Quality</option>
+          <option value="balanced">Balanced</option>
+          <option value="performance">Performance</option>
+          <option value="ultra">Ultra Performance</option>
+        </select>
+      </div>
+      <div>
+        <label>Frame Generation</label>
+        <select id="fg">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+    </div>
 
-  <div class="ics-header">
-    <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">FPS Performance Estimator — ICS Engine</div>
+    <p class="note">
+      • RTX: DLSS + FG &nbsp;• AMD: FSR (via DLSS‑menyen) &nbsp;• ICS: DCC + DCC‑FG  
+      Frame Generation brukes som FG for RTX og DCC‑FG for ICS Regent VX.
+    </p>
   </div>
 
   <div class="ics-frame">
-    <h2>FPS Estimator</h2>
-    <p>Velg CPU, GPU, spill og oppløsning for å estimere FPS.</p>
-
-    <select id="cpu"></select>
-    <select id="gpu"></select>
-    <select id="game"></select>
-    <select id="resolution"></select>
-
+    <h2>Estimate</h2>
     <button onclick="estimateFPS()">Estimate FPS</button>
-
     <div id="result" class="result-box" style="display:none;"></div>
+    <p id="explain" class="note"></p>
   </div>
 
 </div>
 
 <script>
-// CPU performance scores
+// CPU performance scores (enkel modell)
 const cpuScores = {
   "Regent GX 9-9995RX4D": 25000,
-  "Regent GX 9-9975RX3": 23000,
-  "Regent GX 9-9950RX3": 22000,
   "Regent GX 7-9750RX3": 20000,
-  "Regent GX 7-9650RX3": 18000,
-
   "AMD Ryzen 9 9950X3D": 21000,
-  "AMD Ryzen 7 9800X3D": 17000,
-  "AMD Ryzen 7 7800X3D": 16000,
-
+  "AMD Ryzen 7 7800X3D": 17000,
   "Intel Core i9-14900K": 19000,
-  "Intel Core i9-13900K": 17500,
   "Intel Core i5-12400F": 9000
 };
 
-// GPU performance scores
-const gpuScores = {
-  "Regent VX 6690": 30000,
-  "NVIDIA RTX 4090": 28000,
-  "NVIDIA RTX 4080": 22000,
-  "NVIDIA RTX 4070": 16000,
-  "AMD RX 7900 XTX": 21000,
-  "AMD RX 7800 XT": 15000,
-  "NVIDIA RTX 4060": 9000
+// GPU performance scores (base 1080p raster score)
+const gpuData = {
+  "Regent VX 6690": { score: 32000, type: "ics" },
+  "Regent VX 6670": { score: 26000, type: "ics" },
+  "NVIDIA RTX 4090": { score: 30000, type: "nvidia" },
+  "NVIDIA RTX 4080 Super": { score: 24000, type: "nvidia" },
+  "NVIDIA RTX 4070 Ti Super": { score: 19000, type: "nvidia" },
+  "NVIDIA RTX 4070": { score: 15000, type: "nvidia" },
+  "AMD RX 7900 XTX": { score: 23000, type: "amd" },
+  "AMD RX 7900 XT": { score: 20000, type: "amd" },
+  "AMD RX 7800 XT": { score: 16000, type: "amd" }
 };
 
-// Game multipliers
+// Game base difficulty multipliers (1080p, Ultra, no upscaling)
 const gameMultipliers = {
-  "Fortnite": 1.4,
-  "Valorant": 2.0,
-  "Cyberpunk 2077": 0.6,
-  "GTA VI": 0.8,
-  "Minecraft RTX": 0.5,
-  "Apex Legends": 1.3
+  "Fortnite (Competitive)": 1.6,
+  "Valorant": 2.2,
+  "Apex Legends": 1.4,
+  "Cyberpunk 2077 (RT Medium)": 0.55,
+  "Cyberpunk 2077 (RT Off)": 0.8,
+  "GTA VI (Speculative)": 0.7,
+  "Minecraft RTX": 0.45
 };
 
 // Resolution multipliers
 const resolutionMultipliers = {
   "1080p": 1.0,
-  "1440p": 0.75,
-  "4K": 0.45
+  "1440p": 0.72,
+  "4K": 0.42
 };
 
-// Load dropdowns
+// DLSS / FSR multipliers (for NVIDIA / AMD)
+const dlssMultipliers = {
+  off: 1.0,
+  quality: 1.25,
+  balanced: 1.45,
+  performance: 1.7,
+  ultra: 2.0
+};
+
+// DCC multipliers (for ICS Regent VX – litt mer aggressiv)
+const dccMultipliers = {
+  off: 1.0,
+  quality: 1.35,
+  balanced: 1.6,
+  performance: 1.9,
+  ultra: 2.3
+};
+
+// Frame Generation multipliers
+// RTX FG: moderat boost (input lag, men høy FPS)
+// ICS DCC-FG: enda litt mer (din verden, dine regler)
+const fgMultipliers = {
+  nvidia: 1.35,
+  ics: 1.5,
+  amd: 1.0 // ingen ekte FG her, bare placeholder
+};
+
+// Populate selectors
 function loadSelectors() {
   const cpuSel = document.getElementById("cpu");
   const gpuSel = document.getElementById("gpu");
@@ -228,7 +322,7 @@ function loadSelectors() {
     cpuSel.innerHTML += `<option value="${c}">${c}</option>`;
   });
 
-  Object.keys(gpuScores).forEach(g => {
+  Object.keys(gpuData).forEach(g => {
     gpuSel.innerHTML += `<option value="${g}">${g}</option>`;
   });
 
@@ -239,27 +333,90 @@ function loadSelectors() {
   Object.keys(resolutionMultipliers).forEach(r => {
     resSel.innerHTML += `<option value="${r}">${r}</option>`;
   });
+
+  // Set some nice defaults
+  cpuSel.value = "AMD Ryzen 7 7800X3D";
+  gpuSel.value = "NVIDIA RTX 4070";
+  gameSel.value = "Cyberpunk 2077 (RT Medium)";
+  resSel.value = "1440p";
 }
 
 loadSelectors();
 
-// FPS calculation
+// Main FPS estimation
 function estimateFPS() {
-  const cpu = document.getElementById("cpu").value;
-  const gpu = document.getElementById("gpu").value;
+  const cpuName = document.getElementById("cpu").value;
+  const gpuName = document.getElementById("gpu").value;
   const game = document.getElementById("game").value;
   const res = document.getElementById("resolution").value;
+  const dlss = document.getElementById("dlss").value;
+  const dcc = document.getElementById("dcc").value;
+  const fg = document.getElementById("fg").value;
 
-  const cpuScore = cpuScores[cpu];
-  const gpuScore = gpuScores[gpu];
+  const cpuScore = cpuScores[cpuName];
+  const gpuInfo = gpuData[gpuName];
+  const gpuScore = gpuInfo.score;
+  const gpuType = gpuInfo.type;
+
   const gameMul = gameMultipliers[game];
   const resMul = resolutionMultipliers[res];
 
-  const fps = Math.round((cpuScore * 0.35 + gpuScore * 0.65) * gameMul * resMul / 1000);
+  // Base FPS (uten oppskalering / FG)
+  // GPU dominerer, CPU begrenser litt
+  const basePerf = (cpuScore * 0.25 + gpuScore * 0.75);
+  let fps = Math.round(basePerf * gameMul * resMul / 1000);
+
+  let explain = `Base FPS (no upscaling, no FG): ~${fps} FPS.`;
+
+  // Apply DLSS / FSR / DCC
+  let upscalingMul = 1.0;
+
+  if (gpuType === "nvidia") {
+    // DLSS
+    upscalingMul = dlssMultipliers[dlss] || 1.0;
+    if (dlss !== "off") {
+      explain += ` DLSS (${dlss}) aktivert for RTX.`;
+    }
+  } else if (gpuType === "amd") {
+    // FSR via samme meny
+    upscalingMul = dlssMultipliers[dlss] || 1.0;
+    if (dlss !== "off") {
+      explain += ` FSR (${dlss}) aktivert for Radeon.`;
+    }
+  } else if (gpuType === "ics") {
+    // ICS DCC
+    upscalingMul = dccMultipliers[dcc] || 1.0;
+    if (dcc !== "off") {
+      explain += ` DCC (${dcc}) aktivert for ICS Regent VX.`;
+    }
+  }
+
+  fps = Math.round(fps * upscalingMul);
+
+  // Apply Frame Generation
+  if (fg === "on") {
+    const fgMul = fgMultipliers[gpuType] || 1.0;
+    if (fgMul > 1.0) {
+      fps = Math.round(fps * fgMul);
+      if (gpuType === "nvidia") {
+        explain += ` RTX Frame Generation aktivert.`;
+      } else if (gpuType === "ics") {
+        explain += ` ICS DCC‑FG aktivert.`;
+      }
+    } else {
+      explain += ` FG valgt, men denne GPU‑typen har ingen FG‑støtte.`;
+    }
+  }
+
+  // Clamp FPS til noe rimelig
+  if (fps < 10) fps = 10;
+  if (fps > 1000) fps = 1000;
 
   const resultBox = document.getElementById("result");
   resultBox.style.display = "block";
   resultBox.innerHTML = `Estimated FPS: <strong>${fps}</strong>`;
+
+  document.getElementById("explain").innerText = explain;
 }
 </script>
 
