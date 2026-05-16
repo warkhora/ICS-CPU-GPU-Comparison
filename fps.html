@@ -361,34 +361,34 @@ const resolutionMultipliers = {
 /* UPSCALING MULTIPLIERS */
 const dlss50 = { off:1.0, quality:1.7, balanced:2.1, performance:2.9, ultra:3.9 };
 const dlss40 = { off:1.0, quality:1.3, balanced:1.7, performance:2.3, ultra:3.1 };
-const fsr = { off:1.0, quality:1.15, balanced:1.3, performance:1.5, ultra:1.8 };
+const fsr     = { off:1.0, quality:1.15, balanced:1.3, performance:1.5, ultra:1.8 };
 const dccMultipliers = { off:1.0, quality:1.5, balanced:1.9, performance:2.5, ultra:3.2 };
 
 /* FRAME GENERATION MULTIPLIERS */
 const fgMultipliers = {
   rtx50: 2.5,
   rtx40: 1.6,
-  ics: 2.8,
-  amd7: 1.0,
-  amd9: 1.0
+  ics:   2.8,
+  amd7:  1.0,
+  amd9:  1.0
 };
 
 /* Populate selectors */
 function loadSelectors() {
-  const cpuSel = document.getElementById("cpu");
-  const gpuSel = document.getElementById("gpu");
+  const cpuSel  = document.getElementById("cpu");
+  const gpuSel  = document.getElementById("gpu");
   const gameSel = document.getElementById("game");
-  const resSel = document.getElementById("resolution");
+  const resSel  = document.getElementById("resolution");
 
-  Object.keys(cpuScores).forEach(c => cpuSel.innerHTML += `<option>${c}</option>`);
-  Object.keys(gpuData).forEach(g => gpuSel.innerHTML += `<option>${g}</option>`);
+  Object.keys(cpuScores).forEach(c => cpuSel.innerHTML  += `<option>${c}</option>`);
+  Object.keys(gpuData).forEach(g   => gpuSel.innerHTML  += `<option>${g}</option>`);
   Object.keys(gameMultipliers).forEach(g => gameSel.innerHTML += `<option>${g}</option>`);
   Object.keys(resolutionMultipliers).forEach(r => resSel.innerHTML += `<option>${r}</option>`);
 
-  cpuSel.value = "AMD Ryzen 7 7800X3D";
-  gpuSel.value = "NVIDIA RTX 4080 Super";
+  cpuSel.value  = "AMD Ryzen 7 7800X3D";
+  gpuSel.value  = "NVIDIA RTX 4080 Super";
   gameSel.value = "GTA V (Very High)";
-  resSel.value = "1080p";
+  resSel.value  = "1080p";
 }
 loadSelectors();
 
@@ -402,9 +402,127 @@ function getUpscalingMultiplier(gpuInfo, dlssMode, dccMode) {
   return 1.0;
 }
 
-/* Experience rating */
+/* Experience rating text */
 function getExperience(fps) {
-  if (fps < 30) return "Unplayable";
-  if (fps < 60) return "Playable but not smooth";
+  if (fps < 30)  return "Unplayable";
+  if (fps < 60)  return "Playable but not smooth";
   if (fps < 120) return "Smooth";
-  if (fps < 160
+  if (fps < 160) return "Very smooth";
+  return "Ultra smooth / Esports level";
+}
+
+/* FPS color class */
+function getFpsClass(fps) {
+  if (fps < 30)  return "fps-red";
+  if (fps < 60)  return "fps-orange";
+  if (fps < 120) return "fps-white";
+  if (fps < 160) return "fps-green";
+  return "fps-blue";
+}
+
+/* Suggestions based on FPS + GPU */
+function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, gameName) {
+  if (fps >= 120) return "";
+
+  const tips = [];
+
+  tips.push("• Lower resolution (e.g. from 4K to 1440p or 1080p).");
+  tips.push("• Reduce graphics preset (shadows, post-processing, foliage).");
+
+  if (gpuInfo.vendor === "nvidia") {
+    if (dlssMode === "off") {
+      tips.push("• Enable DLSS (Quality or Balanced) for a big FPS boost.");
+    } else if (dlssMode === "quality") {
+      tips.push("• Try DLSS Balanced or Performance for even higher FPS.");
+    }
+    if (!fgOn && (gpuInfo.gen === "rtx40" || gpuInfo.gen === "rtx50")) {
+      tips.push("• Enable Frame Generation if latency is acceptable.");
+    }
+  }
+
+  if (gpuInfo.vendor === "amd") {
+    if (dlssMode === "off") {
+      tips.push("• Enable FSR (Quality or Balanced) to improve performance.");
+    } else {
+      tips.push("• Use FSR Performance or Ultra Performance if image quality is acceptable.");
+    }
+  }
+
+  if (gpuInfo.vendor === "ics") {
+    if (dccMode === "off") {
+      tips.push("• Enable DCC (Quality or Balanced) for a strong FPS uplift.");
+    } else if (dccMode === "quality") {
+      tips.push("• Try DCC Balanced or Performance for maximum FPS.");
+    }
+    if (!fgOn) {
+      tips.push("• Enable DCC‑FG to leverage ICS frame generation.");
+    }
+  }
+
+  if (gameName.includes("RT")) {
+    tips.push("• Lower or disable ray tracing for a massive FPS increase.");
+  }
+
+  if (res === "4K") {
+    tips.push("• Consider playing at 1440p or 1080p instead of native 4K.");
+  }
+
+  return tips.join("<br>");
+}
+
+/* Main FPS calculation */
+function estimateFPS() {
+  const cpuName  = document.getElementById("cpu").value;
+  const gpuName  = document.getElementById("gpu").value;
+  const gameName = document.getElementById("game").value;
+  const res      = document.getElementById("resolution").value;
+  const dlss     = document.getElementById("dlss").value;
+  const dcc      = document.getElementById("dcc").value;
+  const fg       = document.getElementById("fg").value;
+
+  const cpu     = cpuScores[cpuName];
+  const gpuInfo = gpuData[gpuName];
+  const gpu     = gpuInfo.score;
+  const game    = gameMultipliers[gameName];
+  const resMul  = resolutionMultipliers[res];
+
+  let cpuW = game.weight === "light" ? 0.55 :
+             game.weight === "medium" ? 0.35 : 0.25;
+  let gpuW = 1 - cpuW;
+
+  let fps = (cpu * cpuW + gpu * gpuW) * game.mul * resMul / 1000;
+
+  const upMul = getUpscalingMultiplier(gpuInfo, dlss, dcc);
+  fps *= upMul;
+
+  const fgOn = (fg === "on");
+  if (fgOn) {
+    const fgMul = fgMultipliers[gpuInfo.gen] || 1.0;
+    fps *= fgMul;
+  }
+
+  fps = Math.min(Math.max(fps, 10), 3000);
+  const rounded = Math.round(fps);
+
+  const resultEl     = document.getElementById("result");
+  const experienceEl = document.getElementById("experience");
+  const tipsFrame    = document.getElementById("tips");
+  const tipsList     = document.getElementById("tips-list");
+
+  resultEl.style.display = "block";
+  resultEl.className = "result-box " + getFpsClass(rounded);
+  resultEl.innerHTML = `Estimated FPS: <strong>${rounded}</strong>`;
+
+  experienceEl.innerText = getExperience(rounded);
+
+  const tipsHtml = buildSuggestions(rounded, gpuInfo, dlss, dcc, fgOn, res, gameName);
+  if (tipsHtml) {
+    tipsFrame.style.display = "block";
+    tipsList.innerHTML = tipsHtml;
+  } else {
+    tipsFrame.style.display = "none";
+    tipsList.innerHTML = "";
+  }
+}
+</script>
+  
