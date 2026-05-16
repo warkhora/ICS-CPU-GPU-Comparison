@@ -140,6 +140,39 @@
 </head>
 <body>
 
+<!-- ICS NAVIGATION BAR -->
+<div class="ics-nav">
+  <a href="index.html">CPU/GPU Comparison</a>
+  <a href="fps.html">FPS Estimator</a>
+</div>
+
+<style>
+  .ics-nav {
+    width: 100%;
+    background: #0d0d0d;
+    border-bottom: 1px solid #333;
+    padding: 14px 20px;
+    display: flex;
+    gap: 25px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+  }
+
+  .ics-nav a {
+    color: gold;
+    text-decoration: none;
+    font-size: 15px;
+    letter-spacing: 1px;
+    transition: 0.2s;
+  }
+
+  .ics-nav a:hover {
+    color: white;
+    text-shadow: 0 0 8px gold;
+  }
+</style>
+
 <div class="ics-container">
 
   <div class="ics-header">
