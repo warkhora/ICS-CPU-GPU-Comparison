@@ -181,9 +181,27 @@
 <body>
 
 <div class="ics-nav">
-  <a href="index.html">CPU/GPU Comparison</a>
-  <a href="fps.html">FPS Estimator</a>
+  <a href="index.html" class="nav-link" data-page="index">CPU/GPU Comparison</a>
+  <a href="fps.html" class="nav-link" data-page="fps">FPS Estimator</a>
+  <a href="canyourunit.html" class="nav-link" data-page="canyourunit">Can You Run It?</a>
 </div>
+
+  <style>
+  .ics-nav a.active {
+    color: white;
+    border-bottom: 2px solid #ffd700;
+    text-shadow: 0 0 12px #ffd700;
+  }
+</style>
+
+<script>
+  const current = window.location.pathname.split("/").pop().toLowerCase();
+  document.querySelectorAll(".nav-link").forEach(link => {
+    if (current.includes(link.getAttribute("data-page"))) {
+      link.classList.add("active");
+    }
+  });
+</script>
 
 <div class="ics-container">
 
