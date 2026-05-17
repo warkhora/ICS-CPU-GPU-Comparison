@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Hybrid FPS Estimator v3.1</title>
+<title>ICS Hybrid FPS Estimator v3.2</title>
 
 <style>
   body {
@@ -189,7 +189,7 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Hybrid FPS Estimator v3.1 — RTX 40/50 • RX 9000 • ICS VX</div>
+    <div class="ics-subtitle">Hybrid FPS Estimator v3.2 — RTX 40/50 • RX 9000 • ICS VX</div>
   </div>
 
   <!-- Base configuration -->
@@ -211,7 +211,7 @@
     <div class="row">
       <div>
         <label>Game</label>
-        <select id="game"></select>
+        <select id="game" onchange="updateRamOptions()"></select>
       </div>
       <div>
         <label>Resolution</label>
@@ -235,6 +235,41 @@
           <span class="tag tag-amd">AMD RX 9000</span>
           <span class="tag tag-ics">ICS Regent VX</span>
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RAM -->
+  <div class="ics-frame">
+    <h2>Memory Configuration</h2>
+    <div class="row">
+      <div>
+        <label>RAM amount</label>
+        <select id="ramAmount"></select>
+      </div>
+      <div>
+        <label>RAM speed / type</label>
+        <select id="ramSpeed">
+          <option value="ddr4-2133">DDR4-2133</option>
+          <option value="ddr4-2400">DDR4-2400</option>
+          <option value="ddr4-2666">DDR4-2666</option>
+          <option value="ddr4-3000">DDR4-3000</option>
+          <option value="ddr4-3200" selected>DDR4-3200</option>
+          <option value="ddr4-3600">DDR4-3600</option>
+          <option value="ddr5-4800">DDR5-4800</option>
+          <option value="ddr5-5200">DDR5-5200</option>
+          <option value="ddr5-5600">DDR5-5600</option>
+          <option value="ddr5-6000">DDR5-6000</option>
+          <option value="ddr5-6400">DDR5-6400</option>
+          <option value="ddr5-7200">DDR5-7200</option>
+          <option value="ddr5-8000">DDR5-8000</option>
+          <option value="ddr5-8800">DDR5-8800</option>
+          <option value="ddr5-9600">DDR5-9600</option>
+          <option value="lpddr5">LPDDR5</option>
+          <option value="lpddr5x">LPDDR5X</option>
+          <option value="lpddr6">LPDDR6</option>
+          <option value="lpddr6x">LPDDR6X</option>
+        </select>
       </div>
     </div>
   </div>
@@ -315,7 +350,7 @@
 </div>
 
 <script>
-/* CPU SCORES – v3.1 */
+/* CPU SCORES – v3.2 */
 const cpuScores = {
   "Regent GX 9-9995RX4D": 26000,
   "Regent GX 7-9750RX3": 21000,
@@ -336,7 +371,7 @@ const cpuScores = {
   "Intel Core i5-12400F": 9000
 };
 
-/* GPU SCORES + CLASS */
+/* GPU SCORES + CLASS (+8% raw boost applied later) */
 const gpuData = {
   "Regent VX 6690": { score: 36000, vendor: "ics", gen: "ics", cls: "ultra" },
   "Regent VX 6670": { score: 30000, vendor: "ics", gen: "ics", cls: "strong" },
@@ -360,24 +395,24 @@ const gpuData = {
   "AMD RX 9060": { score: 16000, vendor: "amd", gen: "amd9", cls: "weak" }
 };
 
-/* GAME MULTIPLIERS + DIFFICULTY + SIZE */
+/* GAME MULTIPLIERS + DIFFICULTY + SIZE + MIN RAM (GB) */
 const gameMultipliers = {
-  "GTA V": { mul: 4.2, difficulty: "light", size: "small" },
-  "Valorant": { mul: 4.8, difficulty: "light", size: "small" },
-  "CS2": { mul: 4.5, difficulty: "light", size: "small" },
-  "Overwatch 2": { mul: 2.8, difficulty: "light", size: "small" },
+  "GTA V": { mul: 4.2, difficulty: "light", size: "small", minRam: 4 },
+  "Valorant": { mul: 4.8, difficulty: "light", size: "small", minRam: 4 },
+  "CS2": { mul: 4.5, difficulty: "light", size: "small", minRam: 8 },
+  "Overwatch 2": { mul: 2.8, difficulty: "light", size: "small", minRam: 6 },
 
-  "Fortnite": { mul: 2.2, difficulty: "medium", size: "medium" },
-  "Apex Legends": { mul: 1.6, difficulty: "medium", size: "medium" },
-  "Rust": { mul: 1.3, difficulty: "medium", size: "medium" },
-  "Forza Horizon 5": { mul: 2.4, difficulty: "medium", size: "medium" },
-  "Forza Horizon 6": { mul: 2.1, difficulty: "medium", size: "large" },
+  "Fortnite": { mul: 2.2, difficulty: "medium", size: "medium", minRam: 8 },
+  "Apex Legends": { mul: 1.6, difficulty: "medium", size: "medium", minRam: 6 },
+  "Rust": { mul: 1.3, difficulty: "medium", size: "medium", minRam: 10 },
+  "Forza Horizon 5": { mul: 2.4, difficulty: "medium", size: "medium", minRam: 8 },
+  "Forza Horizon 6": { mul: 2.1, difficulty: "medium", size: "large", minRam: 16 },
 
-  "Cyberpunk 2077": { mul: 0.9, difficulty: "heavy", size: "large" },
-  "GTA VI": { mul: 0.7, difficulty: "heavy", size: "large" },
-  "Minecraft RTX": { mul: 0.5, difficulty: "heavy", size: "medium" },
-  "ARK Survival Ascended": { mul: 0.6, difficulty: "heavy", size: "large" },
-  "Microsoft Flight Simulator 2024": { mul: 0.45, difficulty: "heavy", size: "large" }
+  "Cyberpunk 2077": { mul: 0.9, difficulty: "heavy", size: "large", minRam: 8 },
+  "GTA VI": { mul: 0.7, difficulty: "heavy", size: "large", minRam: 16 },
+  "Minecraft RTX": { mul: 0.5, difficulty: "heavy", size: "medium", minRam: 8 },
+  "ARK Survival Ascended": { mul: 0.6, difficulty: "heavy", size: "large", minRam: 8 },
+  "Microsoft Flight Simulator 2024": { mul: 0.45, difficulty: "heavy", size: "large", minRam: 16 }
 };
 
 /* RESOLUTION MULTIPLIERS */
@@ -447,24 +482,83 @@ const gpuStrengthScaling = {
   ultra:  1.4
 };
 
+/* RAM AMOUNT OPTIONS (GB) */
+const ramAmounts = [4, 8, 16, 32, 64, 128];
+
+/* RAM SPEED MULTIPLIERS */
+const ramSpeedMultipliers = {
+  "ddr4-2133": 0.92,
+  "ddr4-2400": 0.94,
+  "ddr4-2666": 0.96,
+  "ddr4-3000": 0.98,
+  "ddr4-3200": 1.00,
+  "ddr4-3600": 1.03,
+
+  "ddr5-4800": 1.05,
+  "ddr5-5200": 1.07,
+  "ddr5-5600": 1.09,
+  "ddr5-6000": 1.10,
+  "ddr5-6400": 1.12,
+  "ddr5-7200": 1.13,
+  "ddr5-8000": 1.15,
+  "ddr5-8800": 1.16,
+  "ddr5-9600": 1.17,
+
+  "lpddr5": 1.05,
+  "lpddr5x": 1.08,
+  "lpddr6": 1.12,
+  "lpddr6x": 1.20
+};
+
 /* Populate selectors */
 function loadSelectors() {
   const cpuSel  = document.getElementById("cpu");
   const gpuSel  = document.getElementById("gpu");
   const gameSel = document.getElementById("game");
   const resSel  = document.getElementById("resolution");
+  const ramSel  = document.getElementById("ramAmount");
 
   Object.keys(cpuScores).forEach(c => cpuSel.innerHTML  += `<option>${c}</option>`);
   Object.keys(gpuData).forEach(g   => gpuSel.innerHTML  += `<option>${g}</option>`);
   Object.keys(gameMultipliers).forEach(g => gameSel.innerHTML += `<option>${g}</option>`);
   Object.keys(resolutionMultipliers).forEach(r => resSel.innerHTML += `<option>${r}</option>`);
 
+  ramAmounts.forEach(r => ramSel.innerHTML += `<option value="${r}">${r} GB</option>`);
+
   cpuSel.value  = "AMD Ryzen 7 9800X3D";
   gpuSel.value  = "NVIDIA RTX 5080";
   gameSel.value = "GTA V";
   resSel.value  = "1080p";
+  document.getElementById("ramAmount").value = 16;
+
+  updateRamOptions();
 }
 loadSelectors();
+
+/* Update RAM options based on game min RAM */
+function updateRamOptions() {
+  const gameName = document.getElementById("game").value;
+  const game = gameMultipliers[gameName];
+  const minRam = game ? game.minRam : 4;
+
+  const ramSel = document.getElementById("ramAmount");
+  const current = parseInt(ramSel.value) || 16;
+
+  ramSel.innerHTML = "";
+  ramAmounts.forEach(r => {
+    if (r >= minRam) {
+      ramSel.innerHTML += `<option value="${r}">${r} GB</option>`;
+    }
+  });
+
+  // prøv å beholde tidligere valg hvis mulig
+  const options = Array.from(ramSel.options).map(o => parseInt(o.value));
+  if (options.includes(current)) {
+    ramSel.value = current;
+  } else {
+    ramSel.value = options[0];
+  }
+}
 
 /* CPU bottleneck detection */
 function getCpuGpuWeights(game, resolution) {
@@ -528,6 +622,22 @@ function getRrGainMultiplier(game, rrOn) {
   return 1.0 + gain;
 }
 
+/* RAM amount multiplier */
+function getRamAmountMultiplier(game, ramGb) {
+  const minRam = game.minRam || 4;
+  if (ramGb <= minRam) return 1.0;
+
+  // hvert "steg" over minimum gir litt bonus
+  const steps = Math.max(0, ramAmounts.indexOf(ramGb) - ramAmounts.indexOf(minRam));
+  const bonus = Math.min(0.10, steps * 0.03); // maks +10%
+  return 1.0 + bonus;
+}
+
+/* RAM speed multiplier */
+function getRamSpeedMultiplier(speedKey) {
+  return ramSpeedMultipliers[speedKey] || 1.0;
+}
+
 /* Experience rating */
 function getExperience(fps) {
   if (fps < 30)  return "Unplayable";
@@ -547,7 +657,7 @@ function getFpsClass(fps) {
 }
 
 /* Suggestions */
-function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, game, gfx, rtLevel, rrOn) {
+function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, game, gfx, rtLevel, rrOn, ramGb) {
   if (fps >= 120) return "";
 
   const tips = [];
@@ -582,6 +692,11 @@ function buildSuggestions(fps, gpuInfo, dlssMode, dccMode, fgOn, res, game, gfx,
 
   if (res === "4K") tips.push("• Consider playing at 1440p or 1080p instead of native 4K.");
 
+  const minRam = game.minRam || 4;
+  if (ramGb === minRam) {
+    tips.push("• You are at minimum RAM – more RAM can improve stutters and 1% lows.");
+  }
+
   if (game.difficulty === "heavy" && fps < 60)
     tips.push("• This is a very demanding title – consider a stronger GPU for high settings.");
 
@@ -600,10 +715,12 @@ function estimateFPS() {
   const fg       = document.getElementById("fg").value;
   const rtLevel  = document.getElementById("rt").value;
   const rr       = document.getElementById("rr").value;
+  const ramGb    = parseInt(document.getElementById("ramAmount").value);
+  const ramSpeedKey = document.getElementById("ramSpeed").value;
 
   const cpu     = cpuScores[cpuName];
   const gpuInfo = gpuData[gpuName];
-  const gpu     = gpuInfo.score;
+  let   gpu     = gpuInfo.score * 1.08; // +8% rå GPU-boost
   const game    = gameMultipliers[gameName];
   const resMul  = resolutionMultipliers[res];
   const gfxMul  = qualityMultipliers[gfx];
@@ -635,6 +752,10 @@ function estimateFPS() {
     baseFps *= fgMul;
   }
 
+  const ramAmountMul = getRamAmountMultiplier(game, ramGb);
+  const ramSpeedMul  = getRamSpeedMultiplier(ramSpeedKey);
+  baseFps *= ramAmountMul * ramSpeedMul;
+
   let fps = Math.min(Math.max(baseFps, 10), 3000);
   const rounded = Math.round(fps);
 
@@ -659,7 +780,8 @@ function estimateFPS() {
     game,
     gfx,
     rtLevel,
-    rrOn
+    rrOn,
+    ramGb
   );
 
   if (tipsHtml) {
