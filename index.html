@@ -240,7 +240,7 @@ const products = [
     ai: "Single NMA",
     mem: "DDR5-7800",
     pcie: "PCIe 5.0, 24 lanes",
-    perf: "Baseline"
+    perf: "≈ Ryzen 7 7800X3D"
   },
   {
     name: "Regent GX 7-9750RX3",
@@ -257,7 +257,7 @@ const products = [
     ai: "Dual NMA",
     mem: "DDR5-8200",
     pcie: "PCIe 5.0, 28 lanes",
-    perf: "+12% vs GX 7-9650RX3"
+    perf: "Between Ryzen 7 7800X3D and Ryzen 7 9700X"
   },
   {
     name: "Regent GX 9-9850RX3",
@@ -274,13 +274,13 @@ const products = [
     ai: "Dual NMA-2",
     mem: "DDR5-8400",
     pcie: "PCIe 5.0, 32 lanes",
-    perf: "+22% vs GX 7-9650RX3"
+    perf: "≈ Ryzen 7 9800X3D"
   },
   {
     name: "Regent GX 9-9950RX3",
     type: "CPU",
     family: "ICS GX Series",
-    segment: "Enthusiast Gaming",
+    segment: "Enthusiast Gaming & Creation",
     cores: "16C / 32T",
     base: "5.0 GHz",
     boost: "Up to 6.35 GHz",
@@ -291,24 +291,24 @@ const products = [
     ai: "Dual NMA-2",
     mem: "DDR5-8600",
     pcie: "PCIe 5.0, 32 lanes",
-    perf: "+28% vs GX 7-9650RX3"
+    perf: "≈ Ryzen 9 9950X3D (stronger in gaming, similar multi-core)"
   },
   {
     name: "Regent GX 9-9975RX3",
     type: "CPU",
     family: "ICS GX Series",
     segment: "Flagship Gaming",
-    cores: "16C / 32T",
-    base: "5.0 GHz",
-    boost: "Up to 6.4 GHz",
-    cache: "176MB HyperCache X3",
-    arch: "Regent Dot (Flagship)",
+    cores: "12C / 24T",
+    base: "4.9 GHz",
+    boost: "Up to 6.2 GHz",
+    cache: "156MB HyperCache X3 (28MB L2 + 128MB stacked L3)",
+    arch: "Regent Dot",
     socket: "LGA-1851",
-    tdp: "195W",
-    ai: "Dual NMA-3",
-    mem: "DDR5-8800",
+    tdp: "150W",
+    ai: "Dual Neural Matrix Accelerators (NMA-2)",
+    mem: "DDR5-8000",
     pcie: "PCIe 5.0, 32 lanes",
-    perf: "+38–45% vs Ryzen 9 9950X3D"
+    perf: "+20% avg FPS vs Ryzen 9 9950X3D, +27% 1% lows, up to +35% in CPU-bound esports"
   },
 
   // ICS SR series
@@ -327,7 +327,7 @@ const products = [
     ai: "Single NMA",
     mem: "LPDDR6-8800",
     pcie: "PCIe 5.0, 8 lanes",
-    perf: "Baseline"
+    perf: "Baseline SR mobile performance"
   },
   {
     name: "Regent SR-37 Pro",
@@ -361,24 +361,24 @@ const products = [
     ai: "Dual NMA-2",
     mem: "LPDDR6-10400",
     pcie: "PCIe 5.0, 16 lanes",
-    perf: "+32% over SR-37 Pro"
+    perf: "Around 20% below Apple M5 Max in sustained multi-core"
   },
   {
     name: "Regent SR-37 Ultra",
     type: "CPU",
     family: "ICS SR Series",
     segment: "Ultra-Efficient Flagship",
-    cores: "18C / 24T",
+    cores: "10C / 20T (Ultra Hybrid Cluster)",
     base: "4.2 GHz",
-    boost: "Up to 5.9 GHz",
-    cache: "96MB LiteCache Gen-2",
-    arch: "Ultra Architecture (Gen-2)",
-    socket: "Regent-S1",
-    tdp: "65–105W Dynamic",
-    ai: "Dual NMA-3 (70 TOPS)",
-    mem: "LPDDR6-11200",
-    pcie: "PCIe 5.0, 16 lanes",
-    perf: "+25–40% vs Apple M5 Max"
+    boost: "Up to 5.6 GHz (Adaptive Ultra Boost)",
+    cache: "64MB LiteCache (20MB L2 + 44MB unified L3)",
+    arch: "Ultra Architecture (Gen-2 Efficiency Pipeline)",
+    socket: "Regent-S1 (mobile package)",
+    tdp: "65–95W Dynamic",
+    ai: "Dual Neural Matrix Accelerators (NMA-2)",
+    mem: "LPDDR6-9600, quad-channel",
+    pcie: "PCIe 5.0, 16 lanes (mobile optimized)",
+    perf: "+40% sustained vs SR-37 Max, ~40% above Apple M5 Max in pro workloads"
   },
 
   // ICS GX Flagship
@@ -400,23 +400,113 @@ const products = [
     perf: "Up to 1.8–1.9x Ryzen 9 9950X3D, +85% single-core vs best 8C/16T gaming CPU"
   },
 
-  // ICS GPU
+  // ICS Regent VX Series — New GPUs
+    {
+    name: "Regent VX 6660",
+    type: "GPU",
+    family: "ICS VX Series",
+    segment: "Mid-End Graphics",
+    cores: "120 Vortex Compute Units",
+    base: "1.95 GHz",
+    boost: "Up to 2.26 GHz",
+    cache: "56MB Unified HyperCache 1",
+    arch: "Vortex Architecture 1",
+    socket: "PCIe 5.0 x16",
+    tdp: "145–190W (ICS-efficient)",
+    ai: "MatrixCore 2 + HyperShader 4",
+    mem: "12GB HyperVRAM (410 GB/s)",
+    pcie: "PCIe 5.0 x16",
+    perf: "≈ RTX 4060 Ti in performance
+  },
+  
+  {
+    name: "Regent VX 6660 TX",
+    type: "GPU",
+    family: "ICS VX Series",
+    segment: "Mid-High-End Graphics",
+    cores: "138 Vortex Compute Units",
+    base: "2.10 GHz",
+    boost: "Up to 2.57 GHz",
+    cache: "76MB Unified HyperCache 1",
+    arch: "Vortex Architecture 1",
+    socket: "PCIe 5.0 x16",
+    tdp: "175–210W (ICS-efficient)",
+    ai: "MatrixCore 3 + HyperShader 4",
+    mem: "12GB HyperVRAM (475 GB/s)",
+    pcie: "PCIe 5.0 x16",
+    perf: "≈ RTX 4070, -4% of RTX 4070
+  },
+
+  {
+    name: "Regent VX 6670",
+    type: "GPU",
+    family: "ICS VX Series",
+    segment: "High-End Graphics",
+    cores: "144 Vortex Compute Units",
+    base: "2.20 GHz",
+    boost: "Up to 2.70 GHz",
+    cache: "96MB Unified HyperCache 1",
+    arch: "Vortex Architecture 1",
+    socket: "PCIe 5.0 x16",
+    tdp: "200–230W (ICS-efficient)",
+    ai: "MatrixCore 3 + HyperShader 4",
+    mem: "12GB HyperVRAM (570 GB/s)",
+    pcie: "PCIe 5.0 x16",
+    perf: "≈ RTX 4070 Ti / Ti Super"
+  },
+  
+  {
+    name: "Regent VX 6670 TX",
+    type: "GPU",
+    family: "ICS VX Series",
+    segment: "High-End Graphics",
+    cores: "160 Vortex Compute Units",
+    base: "2.25 GHz",
+    boost: "Up to 2.78 GHz",
+    cache: "110MB Unified HyperCache 1",
+    arch: "Vortex Architecture 1",
+    socket: "PCIe 5.0 x16",
+    tdp: "220–255W (ICS-efficient)",
+    ai: "MatrixCore 4 + HyperShader 4",
+    mem: "16GB HyperVRAM (600 GB/s)",
+    pcie: "PCIe 5.0 x16",
+    perf: "≈ RTX 4080 in performance"
+  },
+  
+  {
+    name: "Regent VX 6680",
+    type: "GPU",
+    family: "ICS VX Series",
+    segment: "Upper High-End Graphics",
+    cores: "168 Vortex Compute Units",
+    base: "2.28 GHz",
+    boost: "Up to 2.78 GHz",
+    cache: "112MB Unified HyperCache 1",
+    arch: "Vortex Architecture 1",
+    socket: "PCIe 5.0 x16",
+    tdp: "250–280W (ICS-efficient)",
+    ai: "MatrixCore 4 + HyperShader 4",
+    mem: "16GB HyperVRAM (820 GB/s)",
+    pcie: "PCIe 5.0 x16",
+    perf: "≈ 37–40% below VX 6690 (between RTX 4080 and 4080 Ti)"
+  },
+
   {
     name: "Regent VX 6690",
     type: "GPU",
     family: "ICS VX Series",
     segment: "Flagship Graphics",
-    cores: "192 VCU",
-    base: "Missing Data",
-    boost: "Missing Data",
+    cores: "192 Vortex Compute Units",
+    base: "2.35 GHz",
+    boost: "Up to 2.85 GHz",
     cache: "128MB Unified HyperCache 1",
     arch: "Vortex Architecture 1",
     socket: "PCIe 5.0 x16",
-    tdp: "Missing Data",
-    ai: "MatrixCore 4",
-    mem: "24GB HyperVRAM",
-    pcie: "PCIe 5.0, x16",
-    perf: "Next-gen 4K/8K flagship"
+    tdp: "300–330W (ICS-efficient)",
+    ai: "MatrixCore 4 + HyperShader 4",
+    mem: "24GB HyperVRAM (1024 GB/s)",
+    pcie: "PCIe 5.0 x16",
+    perf: "≈ RTX 4090 (slightly lower raster, higher AI/RT efficiency)"
   },
 
   // REAL-WORLD AMD RYZEN X3D & OTHERS
@@ -431,11 +521,11 @@ const products = [
     cache: "145MB total (incl. 128MB 3D V-Cache)",
     arch: "Zen 5 \"Granite Ridge\" + 2nd-gen 3D V-Cache",
     socket: "AM5",
-    tdp: "170W (up to ~230W)",
-    ai: "Missing Data",
-    mem: "DDR5, up to 256GB",
-    pcie: "Missing Data",
-    perf: "Marketed as top CPU for gamers & creators"
+    tdp: "170W (230W PPT)",
+    ai: "Ryzen AI 2.0 (around 50 TOPS)",
+    mem: "DDR5-6400, up to 256GB",
+    pcie: "PCIe 5.0, 28 lanes",
+    perf: "Excellent hybrid chip: slightly behind 9800X3D in pure gaming, much stronger in multi-core workloads"
   },
   {
     name: "AMD Ryzen 7 9800X3D",
@@ -449,10 +539,10 @@ const products = [
     arch: "Zen 5",
     socket: "AM5",
     tdp: "120W",
-    ai: "Missing Data",
-    mem: "DDR5",
-    pcie: "Missing Data",
-    perf: "Missing Data"
+    ai: "Ryzen AI 2.0 (around 40 TOPS)",
+    mem: "DDR5-6400",
+    pcie: "PCIe 5.0, 24 lanes",
+    perf: "One of the best gaming CPUs; ~6–8% ahead of 9950X3D in average FPS and up to ~20% in 1% lows"
   },
   {
     name: "AMD Ryzen 7 7800X3D",
@@ -465,11 +555,11 @@ const products = [
     cache: "96MB 3D V-Cache",
     arch: "Zen 4",
     socket: "AM5",
-    tdp: "Missing Data",
-    ai: "Missing Data",
-    mem: "DDR5",
-    pcie: "Missing Data",
-    perf: "Missing Data"
+    tdp: "120W",
+    ai: "No dedicated NPU",
+    mem: "DDR5-6000 (sweet spot)",
+    pcie: "PCIe 5.0, 24 lanes",
+    perf: "Top-tier gaming CPU of its generation with excellent efficiency"
   },
 
   // REAL-WORLD INTEL
@@ -484,11 +574,11 @@ const products = [
     cache: "32MB L2 + 36MB L3",
     arch: "Raptor Lake Refresh (Intel 7)",
     socket: "LGA 1700",
-    tdp: "Missing Data",
-    ai: "Missing Data",
-    mem: "DDR4 / DDR5",
-    pcie: "PCIe 5.0, 16 lanes GPU + 4 NVMe",
-    perf: "Missing Data"
+    tdp: "125W base / 253W turbo",
+    ai: "No dedicated NPU on desktop variant",
+    mem: "DDR4-3200 / DDR5-5600",
+    pcie: "PCIe 5.0, 16 GPU + 4 NVMe",
+    perf: "Slight uplift over 13900K; strong all-rounder for gaming and creation"
   },
   {
     name: "Intel Core i9-13900K",
@@ -496,16 +586,16 @@ const products = [
     family: "Intel Core i9 13th Gen",
     segment: "High-End Desktop",
     cores: "24C / 32T (8P + 16E)",
-    base: "3.0 GHz (P-cores)",
+    base: "3.0 GHz P / 2.2 GHz E",
     boost: "Up to 5.8 GHz",
     cache: "32MB L2 + 36MB L3",
     arch: "Raptor Lake (Intel 7)",
     socket: "LGA 1700",
-    tdp: "Missing Data",
-    ai: "Missing Data",
-    mem: "DDR4 / DDR5",
-    pcie: "PCIe 5.0, 16 lanes",
-    perf: "Missing Data"
+    tdp: "125W base / 253W turbo",
+    ai: "No dedicated NPU",
+    mem: "DDR4-3200 / DDR5-5600",
+    pcie: "PCIe 5.0, 16 GPU + 4 NVMe",
+    perf: "Very strong gaming and productivity CPU; ~10–15% over 12900K"
   },
   {
     name: "Intel Core i5-12400F",
@@ -518,11 +608,11 @@ const products = [
     cache: "7.5MB L2 + 18MB L3",
     arch: "Alder Lake-S (Golden Cove)",
     socket: "LGA 1700",
-    tdp: "Missing Data",
-    ai: "Missing Data",
-    mem: "DDR4 / DDR5",
+    tdp: "65W base / 117W turbo",
+    ai: "No dedicated NPU",
+    mem: "DDR4-3200 / DDR5-4800",
     pcie: "PCIe 5.0, 16 lanes",
-    perf: "Missing Data"
+    perf: "Legendary value gaming CPU; excellent 1080p/1440p performance"
   },
 
   // REAL-WORLD APPLE M-SERIES
@@ -531,51 +621,150 @@ const products = [
     type: "CPU",
     family: "Apple M Series",
     segment: "Notebook SoC",
-    cores: "9C / 9T (3P + 6E)",
+    cores: "9C / 9T (3 performance + 6 efficiency)",
     base: "0.9–4.61 GHz P / 0.9–3.05 GHz E",
     boost: "Up to 4.61 GHz (P-cores)",
     cache: "28MB L2 (no disclosed L3)",
     arch: "Apple M5 (3 nm, hybrid)",
     socket: "SoC (soldered)",
-    tdp: "Missing Data",
-    ai: "16-core Neural Engine (Missing detailed TOPS)",
-    mem: "Unified memory",
-    pcie: "Missing Data",
-    perf: "Missing Data"
+    tdp: "Around 30W under sustained load",
+    ai: "16-core Neural Engine (~38 TOPS)",
+    mem: "Unified memory (high bandwidth)",
+    pcie: "Integrated PCIe / Thunderbolt fabric",
+    perf: "Balanced efficiency-focused SoC for thin-and-light notebooks"
   },
   {
     name: "Apple M5 Pro",
     type: "CPU",
     family: "Apple M Series",
     segment: "Pro Notebook SoC",
-    cores: "18C / 18T (6 super + 12 performance)",
-    base: "Missing Data",
-    boost: "Missing Data",
-    cache: "Missing Data",
+    cores: "18C / 18T (6 performance + 12 efficiency)",
+    base: "Approx. 1.0–4.3 GHz P / 1.0–3.2 GHz E",
+    boost: "Up to ~4.3 GHz (P-cores)",
+    cache: "Larger shared L2/L3-style unified cache (undisclosed size)",
     arch: "Apple Fusion Architecture (M5 Pro)",
     socket: "SoC (soldered)",
-    tdp: "Missing Data",
-    ai: "16-core Neural Engine",
-    mem: "Unified memory (high bandwidth)",
+    tdp: "Around 45–55W sustained",
+    ai: "16-core Neural Engine (higher throughput than base M5)",
+    mem: "Unified memory (high bandwidth, higher capacity options)",
     pcie: "Integrated Thunderbolt 5 controllers",
-    perf: "Up to ~2.5x multithread vs M1 Pro (approx.)"
+    perf: "Up to ~2.5x multi-core vs M1 Pro; strong for mobile creation"
   },
   {
     name: "Apple M5 Max",
     type: "CPU",
     family: "Apple M Series",
     segment: "Max Notebook SoC",
-    cores: "18C / 18T (6 super + 12 performance)",
-    base: "Missing Data",
-    boost: "Missing Data",
-    cache: "Missing Data",
+    cores: "18C / 18T (6 performance + 12 efficiency, higher GPU config)",
+    base: "Approx. 1.0–4.4 GHz P / 1.0–3.2 GHz E",
+    boost: "Up to ~4.4 GHz (P-cores)",
+    cache: "Large unified cache pool (undisclosed size)",
     arch: "Apple Fusion Architecture (M5 Max)",
     socket: "SoC (soldered)",
-    tdp: "Missing Data",
-    ai: "16-core Neural Engine",
-    mem: "Unified memory (high bandwidth, larger capacity)",
+    tdp: "Around 60–80W sustained depending on chassis",
+    ai: "16-core Neural Engine (high AI throughput)",
+    mem: "Unified memory (very high bandwidth, large capacity options)",
     pcie: "Integrated Thunderbolt 5 controllers",
-    perf: "Missing Data"
+    perf: "High-end mobile SoC; strong multi-core and GPU for pro workflows"
+  },
+  // ICS Regent GX / SR — New CPUs
+
+  {
+    name: "Regent GX 9-9875RX3",
+    type: "CPU",
+    family: "ICS GX Series",
+    segment: "Upper Enthusiast Gaming",
+    cores: "16C / 32T",
+    base: "5.0 GHz",
+    boost: "Up to 6.32 GHz",
+    cache: "152MB HyperCache X3",
+    arch: "Regent Dot",
+    socket: "LGA-1851",
+    tdp: "175W",
+    ai: "Dual NMA-2",
+    mem: "DDR5-8500",
+    pcie: "PCIe 5.0, 32 lanes",
+    perf: "≈ 9900X3D-class; between GX 9-9850RX3 and GX 9-9950RX3"
+  },
+
+  {
+    name: "Regent GX 9-9920RX3",
+    type: "CPU",
+    family: "ICS GX Series",
+    segment: "Pro Gaming & Creation",
+    cores: "16C / 32T",
+    base: "5.05 GHz",
+    boost: "Up to 6.34 GHz",
+    cache: "168MB HyperCache X3",
+    arch: "Regent Dot (Enhanced)",
+    socket: "LGA-1851",
+    tdp: "180W",
+    ai: "Dual NMA-2",
+    mem: "DDR5-8600",
+    pcie: "PCIe 5.0, 32 lanes",
+    perf: "≈ 9950X3D in multi-core, slightly better in gaming"
+  },  
+  // =========================
+  // NEW REAL-WORLD AMD CPUs
+  // =========================
+
+  {
+    name: "AMD Ryzen 5 9600X",
+    type: "CPU",
+    family: "AMD Ryzen 9000",
+    segment: "Enthusiast Desktop",
+    cores: "6C / 12T",
+    base: "3.9 GHz",
+    boost: "Up to 5.4 GHz",
+    cache: "480KB L1 + 6MB L2 + 32MB L3",
+    arch: "Zen 5 (TSMC 4nm)",
+    socket: "AM5",
+    tdp: "65W",
+    ai: "Ryzen AI 2.0",
+    mem: "DDR5-6000+ EXPO",
+    pcie: "PCIe 5.0, 20 lanes",
+    perf: "Strong midrange CPU; excellent gaming value"
+  },
+
+  {
+    name: "AMD Ryzen 9 9900X3D",
+    type: "CPU",
+    family: "AMD Ryzen 9000",
+    segment: "High-End Gaming",
+    cores: "12C / 24T",
+      base: "4.6 GHz",
+    boost: "Up to 5.6 GHz",
+    cache: "128MB 3D V-Cache",
+    arch: "Zen 5",
+    socket: "AM5",
+    tdp: "120W",
+    ai: "Ryzen AI 2.0",
+      mem: "DDR5-6400",
+    pcie: "PCIe 5.0, 24 lanes",
+    perf: "≈ 9800X3D but stronger multi-core"
+  },
+
+
+  // =========================
+  // NEW REAL-WORLD INTEL CPUs
+  // =========================
+
+  {
+    name: "Intel Core i5-14600KF",
+    type: "CPU",
+    family: "Intel Core i5 14th Gen",
+    segment: "Mainstream Desktop",
+    cores: "14C / 20T (6P + 8E)",
+    base: "3.5 GHz P / 2.6 GHz E",
+    boost: "Up to 5.3 GHz",
+    cache: "20MB L2 + 24MB L3",
+    arch: "Raptor Lake Refresh",
+    socket: "LGA 1700",
+    tdp: "125W base / 181W turbo",
+    ai: "None",
+    mem: "DDR4-3200 / DDR5-5600",
+    pcie: "PCIe 5.0, 20 lanes",
+    perf: "Excellent midrange gaming CPU"
   }
 ];
 
