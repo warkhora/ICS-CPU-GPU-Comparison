@@ -770,7 +770,12 @@ const products = [
 ];
 
 function load() {
-  const selects = [p1, p2, p3];
+  const selects = [
+    document.getElementById("p1"),
+    document.getElementById("p2"),
+    document.getElementById("p3")
+  ];
+
   selects.forEach(sel => {
     const placeholder = document.createElement("option");
     placeholder.textContent = "Select product...";
@@ -787,18 +792,25 @@ function load() {
 }
 
 function compare() {
-  const chosen = [p1.value, p2.value, p3.value]
+  const p1Sel = document.getElementById("p1");
+  const p2Sel = document.getElementById("p2");
+  const p3Sel = document.getElementById("p3");
+  const resultTable = document.getElementById("result");
+
+  const chosen = [p1Sel.value, p2Sel.value, p3Sel.value]
     .map(name => products.find(p => p.name === name))
     .filter(Boolean);
 
   if (chosen.length === 0) {
-    result.innerHTML = "<tr><td>No products selected.</td></tr>";
+    resultTable.innerHTML = "<tr><td>No products selected.</td></tr>";
     return;
   }
 
-  const col = (fn) => chosen.map(c => `<td>${fn(c) || "Missing Data"}</td>`).join("");
+  const col = (fn) => chosen
+    .map(c => `<td>${fn(c) || "Missing Data"}</td>`)
+    .join("");
 
-  result.innerHTML = `
+  resultTable.innerHTML = `
     <tr>
       <th></th>
       ${chosen.map(c => `<th>${c.name}<br><span class="product-type">${c.family}</span></th>`).join("")}
