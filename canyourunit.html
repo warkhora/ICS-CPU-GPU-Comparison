@@ -185,6 +185,15 @@
   <a href="canyourunit.html">Can You Run It?</a>
 </div>
 
+  <script>
+  const current = window.location.pathname.split("/").pop().toLowerCase();
+  document.querySelectorAll(".nav-link").forEach(link => {
+    if (current.includes(link.getAttribute("data-page"))) {
+      link.classList.add("active");
+    }
+  });
+</script>
+
 <div class="ics-container">
 
   <div class="ics-header">
