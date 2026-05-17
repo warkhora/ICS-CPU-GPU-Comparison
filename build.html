@@ -2,50 +2,109 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Build Your PC</title>
+<title>ICS Regent – Build Your PC</title>
 
 <style>
   body {
     margin: 0;
     padding: 40px;
-    background: radial-gradient(circle at top, #101010, #000);
+    background: linear-gradient(135deg, #050505, #000000);
     color: #e6e6e6;
     font-family: "Segoe UI", system-ui, sans-serif;
   }
 
   .ics-container {
-    max-width: 900px;
+    max-width: 1100px;
     margin: auto;
+    backdrop-filter: blur(18px);
   }
 
-  h1 {
+  .ics-header {
     text-align: center;
-    color: gold;
-    letter-spacing: 2px;
+    margin-bottom: 30px;
   }
 
-  .frame {
-    background: rgba(20,20,20,0.85);
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #333;
-    margin-bottom: 25px;
+  .ics-logo {
+    font-size: 32px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #ffd700;
+    font-weight: 600;
+  }
+
+  .ics-subtitle {
+    color: #bbb;
+    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  /* ICS NAV */
+  .ics-nav {
+    width: 100%;
+    background: rgba(0,0,0,0.65);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 16px 24px;
+    display: flex;
+    gap: 30px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    backdrop-filter: blur(12px);
+    margin: -40px -40px 40px -40px;
+  }
+
+  .ics-nav a {
+    color: #ffd700;
+    text-decoration: none;
+    font-size: 16px;
+    letter-spacing: 1px;
+    transition: 0.2s;
+  }
+
+  .ics-nav a:hover {
+    color: white;
+    text-shadow: 0 0 10px #ffd700;
+  }
+
+  /* ICS FRAME */
+  .ics-frame {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 18px;
+    transition: 0.3s ease;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
+  }
+
+  .ics-frame:hover {
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25);
+    transform: translateY(-3px);
   }
 
   select, input, button {
-    background: #111;
-    color: #eee;
-    border: 1px solid #444;
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin: 5px 0;
     width: 100%;
-    font-size: 14px;
+    background: rgba(20, 20, 20, 0.85);
+    color: #eee;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 12px;
+    border-radius: 10px;
+    margin: 10px 0;
+    transition: 0.2s;
+    font-size: 15px;
+    backdrop-filter: blur(12px);
   }
 
-  button:hover {
-    border-color: gold;
+  select:hover, button:hover {
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+  }
+
+  button {
     cursor: pointer;
+    background: rgba(255, 215, 0, 0.15);
+    font-weight: 600;
   }
 
   table {
@@ -56,22 +115,37 @@
 
   th, td {
     padding: 10px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
   }
 
   th {
-    color: gold;
+    color: #ffd700;
     text-align: left;
   }
 </style>
 </head>
 
 <body>
+
+<!-- NAVIGATION -->
+<div class="ics-nav">
+  <a href="index.html">CPU/GPU Comparison</a>
+  <a href="fps.html">FPS Estimator</a>
+  <a href="canyourunit.html">Can You Run It?</a>
+  <a href="build.html">Build Your PC</a>
+</div>
+
 <div class="ics-container">
 
-  <h1>Build Your PC</h1>
+  <div class="ics-header">
+    <div class="ics-logo">ICS REGENT</div>
+    <div class="ics-subtitle">Build Your PC — Smart Budget-Based System Generator</div>
+  </div>
 
-  <div class="frame">
+  <!-- INPUT FRAME -->
+  <div class="ics-frame">
+    <h2>Build Settings</h2>
+
     <label>Budget (USD)</label>
     <input type="number" id="budget" placeholder="Enter your budget...">
 
@@ -93,7 +167,8 @@
     <button onclick="build()">Generate Build</button>
   </div>
 
-  <div class="frame">
+  <!-- RESULT FRAME -->
+  <div class="ics-frame">
     <h2>Your PC Build</h2>
     <table id="result"></table>
   </div>
@@ -104,11 +179,8 @@
 // =========================
 // PRICE CONVERSION (NOK → USD)
 // =========================
-const NOK_TO_USD = 0.095; // approx conversion
-
-function usd(nok) {
-  return Math.round(nok * NOK_TO_USD);
-}
+const NOK_TO_USD = 0.095;
+function usd(nok) { return Math.round(nok * NOK_TO_USD); }
 
 // =========================
 // GPU DATABASE (RTX 50 SERIES)
@@ -176,32 +248,24 @@ function build() {
     return;
   }
 
-  // 1. Choose GPU based on budget
   let gpu = [...gpus].reverse().find(g => g.price <= budget * 0.55);
   if (!gpu) gpu = gpus[0];
 
-  // 2. Choose CPU matching GPU tier
   let cpu = cpus.find(c => c.tier >= gpu.tier - 1) || cpus[0];
 
-  // 3. Choose RAM
   let ram = ramOptions[0];
   if (budget > 1500) ram = ramOptions[1];
   if (budget > 2500) ram = ramOptions[2];
 
-  // 4. Choose SSD
   let ssd = ssds[0];
   if (budget > 2000) ssd = ssds[1];
 
-  // 5. Choose PSU
   let psu = psus[0];
   if (gpu.tier >= 4) psu = psus[1];
   if (gpu.tier >= 6) psu = psus[2];
 
-  // 6. Total price
-  const total =
-    gpu.price + cpu.price + ram.price + ssd.price + psu.price;
+  const total = gpu.price + cpu.price + ram.price + ssd.price + psu.price;
 
-  // 7. Output
   document.getElementById("result").innerHTML = `
     <tr><th>Component</th><th>Selection</th><th>Price (USD)</th></tr>
     <tr><td>GPU</td><td>${gpu.name}</td><td>$${gpu.price}</td></tr>
