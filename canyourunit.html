@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Regent – Can You Run It? v2.1</title>
+<title>ICS Regent – Build Your PC</title>
 
 <style>
   body {
@@ -38,81 +38,7 @@
     font-size: 15px;
   }
 
-  .ics-frame {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 25px;
-    margin-bottom: 30px;
-    border-radius: 18px;
-    transition: 0.3s ease;
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
-  }
-
-  .ics-frame:hover {
-    border-color: rgba(255, 215, 0, 0.6);
-    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25);
-    transform: translateY(-3px);
-  }
-
-  select, button {
-    width: 100%;
-    background: rgba(20, 20, 20, 0.85);
-    color: #eee;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 12px;
-    border-radius: 10px;
-    margin: 10px 0;
-    transition: 0.2s;
-    font-size: 15px;
-    backdrop-filter: blur(12px);
-  }
-
-  select:hover, button:hover {
-    border-color: #ffd700;
-    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
-  }
-
-  select option {
-    background: #111;
-    color: #eee;
-  }
-
-  button {
-    cursor: pointer;
-    background: rgba(255, 215, 0, 0.15);
-    font-weight: 600;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-  }
-
-  .result-box {
-    margin-top: 20px;
-    padding: 25px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    text-align: center;
-    font-size: 26px;
-    font-weight: 700;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(14px);
-    transition: 0.3s ease;
-  }
-
-  .res-no    { color: #ff4d4d; text-shadow: 0 0 12px rgba(255, 0, 0, 0.6); }
-  .res-yesok { color: #ffae42; text-shadow: 0 0 12px rgba(255, 165, 0, 0.6); }
-  .res-yes   { color: #7CFC00; text-shadow: 0 0 12px rgba(124, 252, 0, 0.6); }
-
-  .details {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #ccc;
-    line-height: 1.6;
-  }
-
+  /* ICS NAV */
   .ics-nav {
     width: 100%;
     background: rgba(0,0,0,0.65);
@@ -140,514 +66,214 @@
     text-shadow: 0 0 10px #ffd700;
   }
 
-  .category-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-bottom: 25px;
+  /* ICS FRAME */
+  .ics-frame {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 18px;
+    transition: 0.3s ease;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
   }
 
-  .cat-btn {
-    background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
-    border: 2px solid #2ecc71;
-    color: #e6e6e6;
-    padding: 14px 22px;
-    font-size: 18px;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: 0.25s ease;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .cat-btn:hover {
-    background: #2ecc71;
-    color: #000;
+  .ics-frame:hover {
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25);
     transform: translateY(-3px);
-    box-shadow: 0 0 18px rgba(46, 204, 113, 0.7);
   }
 
-  .cat-btn.active {
-    background: #2ecc71;
-    color: #000;
-    box-shadow: 0 0 18px rgba(46, 204, 113, 0.9);
+  select, input, button {
+    width: 100%;
+    background: rgba(20, 20, 20, 0.85);
+    color: #eee;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 12px;
+    border-radius: 10px;
+    margin: 10px 0;
+    transition: 0.2s;
+    font-size: 15px;
+    backdrop-filter: blur(12px);
+  }
+
+  select:hover, button:hover {
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+  }
+
+  button {
+    cursor: pointer;
+    background: rgba(255, 215, 0, 0.15);
+    font-weight: 600;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+
+  th {
+    color: #ffd700;
+    text-align: left;
   }
 </style>
 </head>
+
 <body>
 
+<!-- NAVIGATION -->
 <div class="ics-nav">
   <a href="index.html">CPU/GPU Comparison</a>
   <a href="fps.html">FPS Estimator</a>
   <a href="canyourunit.html">Can You Run It?</a>
+  <a href="build.html">Build Your PC</a>
 </div>
-
-  <script>
-  const current = window.location.pathname.split("/").pop().toLowerCase();
-  document.querySelectorAll(".nav-link").forEach(link => {
-    if (current.includes(link.getAttribute("data-page"))) {
-      link.classList.add("active");
-    }
-  });
-</script>
 
 <div class="ics-container">
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Can You Run It? v2.1 — System Requirement Analyzer</div>
+    <div class="ics-subtitle">Build Your PC — Smart Budget-Based System Generator</div>
   </div>
 
-  <!-- USER HARDWARE -->
+  <!-- INPUT FRAME -->
   <div class="ics-frame">
-    <h2>Your Hardware</h2>
+    <h2>Build Settings</h2>
 
-    <div class="row">
-      <div>
-        <label>CPU</label>
-        <select id="cpu"></select>
-      </div>
-      <div>
-        <label>GPU</label>
-        <select id="gpu"></select>
-      </div>
-    </div>
+    <label>Budget (USD)</label>
+    <input type="number" id="budget" placeholder="Enter your budget...">
 
-    <div class="row">
-      <div>
-        <label>RAM amount</label>
-        <select id="ramAmount"></select>
-      </div>
-      <div>
-        <label>RAM speed / type</label>
-        <select id="ramSpeed">
-          <option value="ddr4-2133">DDR4-2133</option>
-          <option value="ddr4-2400">DDR4-2400</option>
-          <option value="ddr4-2666">DDR4-2666</option>
-          <option value="ddr4-3000">DDR4-3000</option>
-          <option value="ddr4-3200" selected>DDR4-3200</option>
-          <option value="ddr4-3600">DDR4-3600</option>
-          <option value="ddr5-4800">DDR5-4800</option>
-          <option value="ddr5-5200">DDR5-5200</option>
-          <option value="ddr5-5600">DDR5-5600</option>
-          <option value="ddr5-6000">DDR5-6000</option>
-          <option value="ddr5-6400">DDR5-6400</option>
-          <option value="ddr5-7200">DDR5-7200</option>
-          <option value="ddr5-8000">DDR5-8000</option>
-          <option value="ddr5-8800">DDR5-8800</option>
-          <option value="ddr5-9600">DDR5-9600</option>
-          <option value="lpddr5">LPDDR5</option>
-          <option value="lpddr5x">LPDDR5X</option>
-          <option value="lpddr6">LPDDR6</option>
-          <option value="lpddr6x">LPDDR6X</option>
-        </select>
-      </div>
-    </div>
+    <label>Resolution Target</label>
+    <select id="resolution">
+      <option value="1080">1080p</option>
+      <option value="1440">1440p</option>
+      <option value="2160">4K</option>
+    </select>
 
-    <div class="row">
-      <div>
-        <label>SSD size</label>
-        <select id="ssdSize">
-          <option value="64">64 GB</option>
-          <option value="128">128 GB</option>
-          <option value="256">256 GB</option>
-          <option value="512">512 GB</option>
-          <option value="1024" selected>1 TB</option>
-          <option value="2048">2 TB</option>
-          <option value="4096">4 TB</option>
-        </select>
-      </div>
-      <div></div>
-    </div>
+    <label>Priority</label>
+    <select id="priority">
+      <option value="fps">Highest FPS</option>
+      <option value="balanced">Balanced Build</option>
+      <option value="quiet">Quiet & Efficient</option>
+      <option value="future">Future-Proof</option>
+    </select>
+
+    <button onclick="build()">Generate Build</button>
   </div>
 
-  <!-- GAME SELECTION -->
+  <!-- RESULT FRAME -->
   <div class="ics-frame">
-    <h2>Game Selection</h2>
-
-    <div class="category-bar">
-      <button class="cat-btn" data-category="Racing Games">🏎 Racing</button>
-      <button class="cat-btn" data-category="Open World / AAA">🌆 Open World</button>
-      <button class="cat-btn" data-category="FPS Games">🔫 FPS</button>
-      <button class="cat-btn" data-category="Survival / Crafting">🧟 Survival</button>
-      <button class="cat-btn" data-category="Simulation">✈ Simulation</button>
-      <button class="cat-btn" data-category="Indie / Light Games">🎈 Indie</button>
-      <button class="cat-btn" data-category="Other / Mixed">🌀 Other</button>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Game</label>
-        <select id="game"></select>
-      </div>
-      <div>
-        <label>Target resolution (info only)</label>
-        <select id="resolution">
-          <option value="1080p">1080p</option>
-          <option value="1440p" selected>1440p</option>
-          <option value="4K">4K</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- RESULT -->
-  <div class="ics-frame">
-    <h2>Can You Run It?</h2>
-    <button onclick="checkRequirements()">Check</button>
-
-    <div id="result" class="result-box" style="display:none;"></div>
-    <div id="details" class="details"></div>
+    <h2>Your PC Build</h2>
+    <table id="result"></table>
   </div>
 
 </div>
 
 <script>
-/* CPU SCORES */
-const cpuScores = {
-  "Regent GX 9-9995RX4D": 26000,
-  "Regent GX 7-9750RX3": 21000,
-  "AMD Ryzen 7 9850X3D": 23300,
-  "AMD Ryzen 7 9800X3D": 23000,
-  "AMD Ryzen 9 9950X3D": 22000,
-  "AMD Ryzen 9 9900X3D": 21000,
-  "AMD Ryzen 5 7500F": 7600,
-  "AMD Ryzen Threadripper PRO 9955WX": 14700,
-  "AMD Ryzen Threadripper PRO 9995WX": 23500,
-  "Intel Core i9-14900K": 18500,
-  "Intel Core Ultra 9 285K": 17000,
-  "Intel Core Ultra 7 270K": 14000,
-  "Intel Core i5-12400F": 9000
-};
+// =========================
+// PRICE CONVERSION (NOK → USD)
+// =========================
+const NOK_TO_USD = 0.095;
+function usd(nok) { return Math.round(nok * NOK_TO_USD); }
 
-/* GPU SCORES */
-const gpuData = {
-  "Regent VX 6690": { score: 36000 },
-  "Regent VX 6670": { score: 30000 },
-  "NVIDIA RTX 5090": { score: 36000 },
-  "NVIDIA RTX 5080": { score: 32000 },
-  "NVIDIA RTX 5070 Ti": { score: 28000 },
-  "NVIDIA RTX 5070": { score: 25000 },
-  "NVIDIA RTX 5060 Ti": { score: 21000 },
-  "NVIDIA RTX 5060": { score: 18000 },
-  "NVIDIA RTX 5050": { score: 15000 },
-  "NVIDIA RTX 4090": { score: 32000 },
-  "NVIDIA RTX 4080 Super": { score: 27000 },
-  "NVIDIA RTX 4070 Ti Super": { score: 22000 },
-  "NVIDIA RTX 4070": { score: 18000 },
-  "AMD RX 9070 XT": { score: 25000 },
-  "AMD RX 9070": { score: 22000 },
-  "AMD RX 9060 XT": { score: 19000 },
-  "AMD RX 9060": { score: 16000 }
-};
+// =========================
+// GPU DATABASE (RTX 50 SERIES)
+// =========================
+const gpus = [
+  { name: "RTX 5050", price: usd(3200), tier: 1 },
+  { name: "RTX 5060", price: usd(3800), tier: 2 },
+  { name: "RTX 5060 Ti", price: usd(6400), tier: 3 },
+  { name: "RTX 5070", price: usd(7500), tier: 4 },
+  { name: "RTX 5070 Ti", price: usd(13400), tier: 5 },
+  { name: "RTX 5080", price: usd(14900), tier: 6 },
+  { name: "RTX 5090", price: usd(37900), tier: 7 }
+];
 
-/* RAM AMOUNTS */
-const ramAmounts = [4, 8, 12, 16, 32, 64, 128];
+// =========================
+// CPU DATABASE (REAL-WORLD)
+// =========================
+const cpus = [
+  { name: "Ryzen 5 9600X", price: usd(2130), tier: 2 },
+  { name: "Ryzen 7 7800X3D", price: usd(4200), tier: 4 },
+  { name: "Ryzen 7 9800X3D", price: usd(4920), tier: 5 },
+  { name: "Ryzen 7 9850X3D", price: usd(5490), tier: 5 },
+  { name: "Ryzen 9 9900X3D", price: usd(6204), tier: 6 },
+  { name: "Ryzen 9 9950X3D", price: usd(6950), tier: 7 },
 
-/* GAME REQUIREMENTS — CATEGORIZED */
-const gameCategories = {
-  "Racing Games": {
-    "Forza Horizon 5": {
-      minCpu: 6500, recCpu: 8000,
-      minGpu: 6000, recGpu: 9000,
-      minRam: 8, recRam: 16,
-      minSsd: 110, ssdRequiredMin: false, ssdRequiredRec: false
-    },
-    "Forza Horizon 6": {
-      minCpu: 8000, recCpu: 9000,
-      minGpu: 5500, recGpu: 15000,
-      minRam: 16, recRam: 16,
-      minSsd: 167, ssdRequiredMin: true, ssdRequiredRec: true
-    },
-    "Forza Motorsport": {
-      minCpu: 8000, recCpu: 12500,
-      minGpu: 7000, recGpu: 20000,
-      minRam: 8, recRam: 16,
-      minSsd: 130, ssdRequiredMin: true, ssdRequiredRec: true
-    }
-  },
+  { name: "Intel Core i5-14400F", price: usd(1942), tier: 2 },
+  { name: "Intel Core i7-14700K", price: usd(4480), tier: 4 },
+  { name: "Intel Core i9-14900K", price: usd(5520), tier: 6 },
 
-  "Open World / AAA": {
-    "GTA V": {
-      minCpu: 6500, recCpu: 9000,
-      minGpu: 4500, recGpu: 14000,
-      minRam: 8, recRam: 16,
-      minSsd: 105, ssdRequiredMin: true, ssdRequiredRec: true
-    },
-    "GTA VI (Estimated)": {
-      minCpu: 10500, recCpu: 15000,
-      minGpu: 14000, recGpu: 20000,
-      minRam: 16, recRam: 16,
-      minSsd: 150, ssdRequiredMin: true, ssdRequiredRec: true
-    },
-    "Cyberpunk 2077": {
-      minCpu: 7500, recCpu: 15000,
-      minGpu: 7000, recGpu: 13000,
-      minRam: 12, recRam: 16,
-      minSsd: 70, ssdRequiredMin: true, ssdRequiredRec: true
-    }
-  },
+  { name: "Ultra 7 270K", price: usd(3610), tier: 4 },
+  { name: "Ultra 9 285K", price: usd(6482), tier: 6 }
+];
 
-  "Simulation": {
-    "Microsoft Flight Simulator 2024": {
-      minCpu: 8000, recCpu: 14000,
-      minGpu: 11000, recGpu: 18000,
-      minRam: 16, recRam: 32,
-      minSsd: 50, ssdRequiredMin: false, ssdRequiredRec: false
-    },
-    "Farming Simulator 25": {
-      minCpu: 5000, recCpu: 14000,
-      minGpu: 4500, recGpu: 15000,
-      minRam: 8, recRam: 12,
-      minSsd: 45, ssdRequiredMin: false, ssdRequiredRec: false
-    }
-  },
+// =========================
+// RAM / SSD / PSU PRICES
+// =========================
+const ramOptions = [
+  { size: "16GB DDR5-6000", price: usd(3000) },
+  { size: "32GB DDR5-6000", price: usd(4500) },
+  { size: "64GB DDR5-6000", price: usd(8000) }
+];
 
-  "FPS Games": {
-    "CS2": {
-      minCpu: 2500, recCpu: 2500,
-      minGpu: 2000, recGpu: 2000,
-      minRam: 8, recRam: 8,
-      minSsd: 85, ssdRequiredMin: false, ssdRequiredRec: false
-    },
-    "Overwatch 2": {
-      minCpu: 3000, recCpu: 9000,
-      minGpu: 2000, recGpu: 7000,
-      minRam: 6, recRam: 8,
-      minSsd: 50, ssdRequiredMin: false, ssdRequiredRec: false
-    },
-    "Apex Legends": {
-      minCpu: 3500, recCpu: 9000,
-      minGpu: 3000, recGpu: 6000,
-      minRam: 6, recRam: 8,
-      minSsd: 75, ssdRequiredMin: false, ssdRequiredRec: false
-    },
-    "007: First Light": {
-      minCpu: 9000, recCpu: 15000,
-      minGpu: 8000, recGpu: 18000,
-      minRam: 16, recRam: 16,
-      minSsd: 80, ssdRequiredMin: true, ssdRequiredRec: true
-    }
-  },
+const ssds = [
+  { size: "1TB NVMe", price: usd(1500) },
+  { size: "2TB NVMe", price: usd(3000) }
+];
 
-  "Survival / Crafting": {
-    "Rust": {
-      minCpu: 6000, recCpu: 12000,
-      minGpu: 7000, recGpu: 14000,
-      minRam: 12, recRam: 16,
-      minSsd: 45, ssdRequiredMin: false, ssdRequiredRec: true
-    },
-    "ARK: Survival Ascended": {
-      minCpu: 8000, recCpu: 10500,
-      minGpu: 11000, recGpu: 20000,
-      minRam: 16, recRam: 32,
-      minSsd: 180, ssdRequiredMin: true, ssdRequiredRec: true
-    }
-  },
+const psus = [
+  { watt: "650W Gold", price: usd(1200) },
+  { watt: "750W Gold", price: usd(1500) },
+  { watt: "850W Gold", price: usd(1800) }
+];
 
-  "Indie / Light Games": {
-    "Geometry Dash": {
-      minCpu: 1500, recCpu: 2000,
-      minGpu: 1000, recGpu: 1500,
-      minRam: 0.5, recRam: 1,
-      minSsd: 0.1, ssdRequiredMin: false, ssdRequiredRec: false
-    },
-    "Bloons TD 6": {
-      minCpu: 2000, recCpu: 3000,
-      minGpu: 1500, recGpu: 2000,
-      minRam: 4, recRam: 8,
-      minSsd: 2, ssdRequiredMin: false, ssdRequiredRec: false
-    },
-    "TABS": {
-      minCpu: 3500, recCpu: 6500,
-      minGpu: 3500, recGpu: 6000,
-      minRam: 8, recRam: 8,
-      minSsd: 4, ssdRequiredMin: false, ssdRequiredRec: false
-    }
-  },
+// =========================
+// BUILD LOGIC
+// =========================
+function build() {
+  const budget = Number(document.getElementById("budget").value);
+  const resolution = document.getElementById("resolution").value;
+  const priority = document.getElementById("priority").value;
 
-  "Other / Mixed": {
-    "Pragmata": {
-      minCpu: 9000, recCpu: 12000,
-      minGpu: 8000, recGpu: 12000,
-      minRam: 16, recRam: 16,
-      minSsd: 40, ssdRequiredMin: false, ssdRequiredRec: false
-    },
-    "Roblox": {
-      minCpu: 2000, recCpu: 6000,
-      minGpu: 1500, recGpu: 5000,
-      minRam: 4, recRam: 8,
-      minSsd: 5, ssdRequiredMin: false, ssdRequiredRec: false
-    }
-  }
-};
-
-/* Populate selectors */
-function loadSelectors() {
-  const cpuSel  = document.getElementById("cpu");
-  const gpuSel  = document.getElementById("gpu");
-  const gameSel = document.getElementById("game");
-  const ramSel  = document.getElementById("ramAmount");
-
-  Object.keys(cpuScores).forEach(c => cpuSel.innerHTML += `<option>${c}</option>`);
-  Object.keys(gpuData).forEach(g => gpuSel.innerHTML += `<option>${g}</option>`);
-  ramAmounts.forEach(r => ramSel.innerHTML += `<option value="${r}">${r} GB</option>`);
-
-  cpuSel.value  = "AMD Ryzen 7 9800X3D";
-  gpuSel.value  = "NVIDIA RTX 5070";
-  ramSel.value  = 16;
-
-  setupCategoryButtons();
-}
-loadSelectors();
-
-/* Category buttons → refill game list */
-function setupCategoryButtons() {
-  const buttons = document.querySelectorAll(".cat-btn");
-  const gameSel = document.getElementById("game");
-
-  function fillGamesForCategory(catName) {
-    gameSel.innerHTML = "";
-    const games = gameCategories[catName];
-    Object.keys(games).forEach(gameName => {
-      const opt = document.createElement("option");
-      opt.value = gameName;
-      opt.textContent = gameName;
-      gameSel.appendChild(opt);
-    });
-  }
-
-  buttons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      buttons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const cat = btn.getAttribute("data-category");
-      fillGamesForCategory(cat);
-    });
-  });
-
-  // default: Racing Games
-  const defaultBtn = document.querySelector('.cat-btn[data-category="Racing Games"]');
-  if (defaultBtn) defaultBtn.click();
-}
-
-/* Helper: find game requirements by name */
-function findGameRequirements(gameName) {
-  for (const cat of Object.keys(gameCategories)) {
-    if (gameCategories[cat][gameName]) return gameCategories[cat][gameName];
-  }
-  return null;
-}
-
-/* Result class */
-function getResultClass(status) {
-  if (status === "no") return "res-no";
-  if (status === "yes-ok") return "res-yesok";
-  return "res-yes";
-}
-
-/* Main check */
-function checkRequirements() {
-  const cpuName = document.getElementById("cpu").value;
-  const gpuName = document.getElementById("gpu").value;
-  const gameName = document.getElementById("game").value;
-  const ramGb = parseFloat(document.getElementById("ramAmount").value);
-  const ssdGb = parseInt(document.getElementById("ssdSize").value);
-  const res = document.getElementById("resolution").value;
-
-  const cpuScore = cpuScores[cpuName] || 0;
-  const gpuScore = (gpuData[gpuName] && gpuData[gpuName].score) || 0;
-  const gameReq = findGameRequirements(gameName);
-
-  const resultEl = document.getElementById("result");
-  const detailsEl = document.getElementById("details");
-
-  if (!gameReq) {
-    resultEl.style.display = "block";
-    resultEl.className = "result-box res-no";
-    resultEl.innerText = "Unknown game requirements.";
-    detailsEl.innerHTML = "";
+  if (!budget || budget < 300) {
+    document.getElementById("result").innerHTML =
+      "<tr><td>Please enter a valid budget.</td></tr>";
     return;
   }
 
-  const meetsCpuMin = cpuScore >= gameReq.minCpu;
-  const meetsGpuMin = gpuScore >= gameReq.minGpu;
-  const meetsRamMin = ramGb >= gameReq.minRam;
-  const meetsSsdMin = ssdGb >= gameReq.minSsd;
+  let gpu = [...gpus].reverse().find(g => g.price <= budget * 0.55);
+  if (!gpu) gpu = gpus[0];
 
-  const meetsCpuRec = cpuScore >= gameReq.recCpu;
-  const meetsGpuRec = gpuScore >= gameReq.recGpu;
-  const meetsRamRec = ramGb >= gameReq.recRam;
-  const meetsSsdRec = ssdGb >= gameReq.minSsd;
+  let cpu = cpus.find(c => c.tier >= gpu.tier - 1) || cpus[0];
 
-  let status;
-  let headline;
-  let explanation = [];
+  let ram = ramOptions[0];
+  if (budget > 1500) ram = ramOptions[1];
+  if (budget > 2500) ram = ramOptions[2];
 
-  if (!meetsCpuMin || !meetsGpuMin || !meetsRamMin || !meetsSsdMin) {
-    status = "no";
-    headline = "NO – Your PC does not meet minimum requirements.";
+  let ssd = ssds[0];
+  if (budget > 2000) ssd = ssds[1];
 
-    if (!meetsCpuMin) explanation.push("• CPU is below minimum requirement.");
-    if (!meetsGpuMin) explanation.push("• GPU is below minimum requirement.");
-    if (!meetsRamMin) explanation.push("• RAM is below minimum requirement.");
-    if (!meetsSsdMin) explanation.push(`• Not enough SSD space (requires at least ${gameReq.minSsd} GB).`);
+  let psu = psus[0];
+  if (gpu.tier >= 4) psu = psus[1];
+  if (gpu.tier >= 6) psu = psus[2];
 
-    if (gameReq.ssdRequiredMin) {
-      explanation.push("• This game requires an SSD – HDD is not recommended.");
-    }
-  } else if (meetsCpuRec && meetsGpuRec && meetsRamRec && meetsSsdRec) {
-    status = "yes";
-    headline = "YES – You can run it comfortably (recommended or better).";
+  const total = gpu.price + cpu.price + ram.price + ssd.price + psu.price;
 
-    explanation.push("• Your CPU meets or exceeds the recommended requirement.");
-    explanation.push("• Your GPU meets or exceeds the recommended requirement.");
-    explanation.push("• Your RAM is at or above the recommended amount.");
-    explanation.push("• You have enough SSD space for the game.");
-
-    if (gameReq.ssdRequiredRec) {
-      explanation.push("• SSD is recommended/required for best loading times.");
-    }
-
-    explanation.push(`• At ${res}, you should be able to play on high settings (depends on the game).`);
-  } else {
-    status = "yes-ok";
-    headline = "YES – But you may need to lower some settings.";
-
-    if (meetsCpuMin && !meetsCpuRec) explanation.push("• CPU meets minimum but is below recommended.");
-    if (meetsGpuMin && !meetsGpuRec) explanation.push("• GPU meets minimum but is below recommended.");
-    if (meetsRamMin && !meetsRamRec) explanation.push("• RAM meets minimum but is below recommended.");
-    if (meetsSsdMin && !meetsSsdRec) explanation.push("• You have enough SSD space, but not much headroom.");
-
-    if (gameReq.ssdRequiredMin) {
-      explanation.push("• SSD is required – you have enough space, but avoid filling the drive completely.");
-    }
-
-    explanation.push(`• You can play the game, but medium/low settings are recommended at ${res}.`);
-  }
-
-  if (gameName === "Roblox" && (status === "yes" || status === "yes-ok")) {
-    explanation.push("• Roblox is very light – high/ultra graphics is often possible on decent hardware.");
-  }
-
-  if (["Microsoft Flight Simulator 2024", "GTA VI (Estimated)", "Cyberpunk 2077"].includes(gameName)) {
-    explanation.push("• This is a very demanding title – even above recommended specs, FPS can vary a lot.");
-  }
-
-  resultEl.style.display = "block";
-  resultEl.className = "result-box " + getResultClass(status);
-  resultEl.innerText = headline;
-
-  detailsEl.innerHTML = `
-    <strong>Game:</strong> ${gameName}<br>
-    <strong>Your CPU score:</strong> ${cpuScore} (min ${gameReq.minCpu}, rec ${gameReq.recCpu})<br>
-    <strong>Your GPU score:</strong> ${gpuScore} (min ${gameReq.minGpu}, rec ${gameReq.recGpu})<br>
-    <strong>Your RAM:</strong> ${ramGb} GB (min ${gameReq.minRam}, rec ${gameReq.recRam})<br>
-    <strong>Your SSD:</strong> ${ssdGb} GB (min ${gameReq.minSsd} GB)<br><br>
-    ${explanation.join("<br>")}
+  document.getElementById("result").innerHTML = `
+    <tr><th>Component</th><th>Selection</th><th>Price (USD)</th></tr>
+    <tr><td>GPU</td><td>${gpu.name}</td><td>$${gpu.price}</td></tr>
+    <tr><td>CPU</td><td>${cpu.name}</td><td>$${cpu.price}</td></tr>
+    <tr><td>RAM</td><td>${ram.size}</td><td>$${ram.price}</td></tr>
+    <tr><td>Storage</td><td>${ssd.size}</td><td>$${ssd.price}</td></tr>
+    <tr><td>Power Supply</td><td>${psu.watt}</td><td>$${psu.price}</td></tr>
+    <tr><th>Total</th><th></th><th>$${total}</th></tr>
   `;
 }
 </script>
