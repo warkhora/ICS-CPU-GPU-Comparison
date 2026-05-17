@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Regent – Can You Run It? v2.0</title>
+<title>ICS Regent – Can You Run It? v2.1</title>
 
 <style>
   body {
@@ -140,10 +140,40 @@
     text-shadow: 0 0 10px #ffd700;
   }
 
-  .optgroup-label {
-    font-weight: bold;
-    color: #ffd700;
-    background: #222;
+  .category-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 25px;
+  }
+
+  .cat-btn {
+    background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+    border: 2px solid #2ecc71;
+    color: #e6e6e6;
+    padding: 14px 22px;
+    font-size: 18px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cat-btn:hover {
+    background: #2ecc71;
+    color: #000;
+    transform: translateY(-3px);
+    box-shadow: 0 0 18px rgba(46, 204, 113, 0.7);
+  }
+
+  .cat-btn.active {
+    background: #2ecc71;
+    color: #000;
+    box-shadow: 0 0 18px rgba(46, 204, 113, 0.9);
   }
 </style>
 </head>
@@ -159,10 +189,10 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Can You Run It? v2.0 — System Requirement Analyzer</div>
+    <div class="ics-subtitle">Can You Run It? v2.1 — System Requirement Analyzer</div>
   </div>
 
-  <!-- User hardware -->
+  <!-- USER HARDWARE -->
   <div class="ics-frame">
     <h2>Your Hardware</h2>
 
@@ -225,9 +255,19 @@
     </div>
   </div>
 
-  <!-- Game selection -->
+  <!-- GAME SELECTION -->
   <div class="ics-frame">
     <h2>Game Selection</h2>
+
+    <div class="category-bar">
+      <button class="cat-btn" data-category="Racing Games">🏎 Racing</button>
+      <button class="cat-btn" data-category="Open World / AAA">🌆 Open World</button>
+      <button class="cat-btn" data-category="FPS Games">🔫 FPS</button>
+      <button class="cat-btn" data-category="Survival / Crafting">🧟 Survival</button>
+      <button class="cat-btn" data-category="Simulation">✈ Simulation</button>
+      <button class="cat-btn" data-category="Indie / Light Games">🎈 Indie</button>
+      <button class="cat-btn" data-category="Other / Mixed">🌀 Other</button>
+    </div>
 
     <div class="row">
       <div>
@@ -245,7 +285,7 @@
     </div>
   </div>
 
-  <!-- Result -->
+  <!-- RESULT -->
   <div class="ics-frame">
     <h2>Can You Run It?</h2>
     <button onclick="checkRequirements()">Check</button>
@@ -445,28 +485,45 @@ function loadSelectors() {
 
   Object.keys(cpuScores).forEach(c => cpuSel.innerHTML += `<option>${c}</option>`);
   Object.keys(gpuData).forEach(g => gpuSel.innerHTML += `<option>${g}</option>`);
-
-  // categorized dropdown
-  Object.keys(gameCategories).forEach(cat => {
-    const optgroup = document.createElement("optgroup");
-    optgroup.label = cat;
-    Object.keys(gameCategories[cat]).forEach(gameName => {
-      const opt = document.createElement("option");
-      opt.value = gameName;
-      opt.textContent = gameName;
-      optgroup.appendChild(opt);
-    });
-    gameSel.appendChild(optgroup);
-  });
-
   ramAmounts.forEach(r => ramSel.innerHTML += `<option value="${r}">${r} GB</option>`);
 
   cpuSel.value  = "AMD Ryzen 7 9800X3D";
   gpuSel.value  = "NVIDIA RTX 5070";
   ramSel.value  = 16;
-  gameSel.value = "Forza Horizon 6";
+
+  setupCategoryButtons();
 }
 loadSelectors();
+
+/* Category buttons → refill game list */
+function setupCategoryButtons() {
+  const buttons = document.querySelectorAll(".cat-btn");
+  const gameSel = document.getElementById("game");
+
+  function fillGamesForCategory(catName) {
+    gameSel.innerHTML = "";
+    const games = gameCategories[catName];
+    Object.keys(games).forEach(gameName => {
+      const opt = document.createElement("option");
+      opt.value = gameName;
+      opt.textContent = gameName;
+      gameSel.appendChild(opt);
+    });
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const cat = btn.getAttribute("data-category");
+      fillGamesForCategory(cat);
+    });
+  });
+
+  // default: Racing Games
+  const defaultBtn = document.querySelector('.cat-btn[data-category="Racing Games"]');
+  if (defaultBtn) defaultBtn.click();
+}
 
 /* Helper: find game requirements by name */
 function findGameRequirements(gameName) {
@@ -585,3 +642,6 @@ function checkRequirements() {
   `;
 }
 </script>
+
+</body>
+</html>
