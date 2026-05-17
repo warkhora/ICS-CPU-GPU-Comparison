@@ -413,3 +413,175 @@ const gameCategories = {
       minSsd: 2, ssdRequiredMin: false, ssdRequiredRec: false
     },
     "TABS": {
+      minCpu: 3500, recCpu: 6500,
+      minGpu: 3500, recGpu: 6000,
+      minRam: 8, recRam: 8,
+      minSsd: 4, ssdRequiredMin: false, ssdRequiredRec: false
+    }
+  },
+
+  "Other / Mixed": {
+    "Pragmata": {
+      minCpu: 9000, recCpu: 12000,
+      minGpu: 8000, recGpu: 12000,
+      minRam: 16, recRam: 16,
+      minSsd: 40, ssdRequiredMin: false, ssdRequiredRec: false
+    },
+    "Roblox": {
+      minCpu: 2000, recCpu: 6000,
+      minGpu: 1500, recGpu: 5000,
+      minRam: 4, recRam: 8,
+      minSsd: 5, ssdRequiredMin: false, ssdRequiredRec: false
+    }
+  }
+};
+
+/* Populate selectors */
+function loadSelectors() {
+  const cpuSel  = document.getElementById("cpu");
+  const gpuSel  = document.getElementById("gpu");
+  const gameSel = document.getElementById("game");
+  const ramSel  = document.getElementById("ramAmount");
+
+  Object.keys(cpuScores).forEach(c => cpuSel.innerHTML += `<option>${c}</option>`);
+  Object.keys(gpuData).forEach(g => gpuSel.innerHTML += `<option>${g}</option>`);
+
+  // categorized dropdown
+  Object.keys(gameCategories).forEach(cat => {
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = cat;
+    Object.keys(gameCategories[cat]).forEach(gameName => {
+      const opt = document.createElement("option");
+      opt.value = gameName;
+      opt.textContent = gameName;
+      optgroup.appendChild(opt);
+    });
+    gameSel.appendChild(optgroup);
+  });
+
+  ramAmounts.forEach(r => ramSel.innerHTML += `<option value="${r}">${r} GB</option>`);
+
+  cpuSel.value  = "AMD Ryzen 7 9800X3D";
+  gpuSel.value  = "NVIDIA RTX 5070";
+  ramSel.value  = 16;
+  gameSel.value = "Forza Horizon 6";
+}
+loadSelectors();
+
+/* Helper: find game requirements by name */
+function findGameRequirements(gameName) {
+  for (const cat of Object.keys(gameCategories)) {
+    if (gameCategories[cat][gameName]) return gameCategories[cat][gameName];
+  }
+  return null;
+}
+
+/* Result class */
+function getResultClass(status) {
+  if (status === "no") return "res-no";
+  if (status === "yes-ok") return "res-yesok";
+  return "res-yes";
+}
+
+/* Main check */
+function checkRequirements() {
+  const cpuName = document.getElementById("cpu").value;
+  const gpuName = document.getElementById("gpu").value;
+  const gameName = document.getElementById("game").value;
+  const ramGb = parseFloat(document.getElementById("ramAmount").value);
+  const ssdGb = parseInt(document.getElementById("ssdSize").value);
+  const res = document.getElementById("resolution").value;
+
+  const cpuScore = cpuScores[cpuName] || 0;
+  const gpuScore = (gpuData[gpuName] && gpuData[gpuName].score) || 0;
+  const gameReq = findGameRequirements(gameName);
+
+  const resultEl = document.getElementById("result");
+  const detailsEl = document.getElementById("details");
+
+  if (!gameReq) {
+    resultEl.style.display = "block";
+    resultEl.className = "result-box res-no";
+    resultEl.innerText = "Unknown game requirements.";
+    detailsEl.innerHTML = "";
+    return;
+  }
+
+  const meetsCpuMin = cpuScore >= gameReq.minCpu;
+  const meetsGpuMin = gpuScore >= gameReq.minGpu;
+  const meetsRamMin = ramGb >= gameReq.minRam;
+  const meetsSsdMin = ssdGb >= gameReq.minSsd;
+
+  const meetsCpuRec = cpuScore >= gameReq.recCpu;
+  const meetsGpuRec = gpuScore >= gameReq.recGpu;
+  const meetsRamRec = ramGb >= gameReq.recRam;
+  const meetsSsdRec = ssdGb >= gameReq.minSsd;
+
+  let status;
+  let headline;
+  let explanation = [];
+
+  if (!meetsCpuMin || !meetsGpuMin || !meetsRamMin || !meetsSsdMin) {
+    status = "no";
+    headline = "NO – Your PC does not meet minimum requirements.";
+
+    if (!meetsCpuMin) explanation.push("• CPU is below minimum requirement.");
+    if (!meetsGpuMin) explanation.push("• GPU is below minimum requirement.");
+    if (!meetsRamMin) explanation.push("• RAM is below minimum requirement.");
+    if (!meetsSsdMin) explanation.push(`• Not enough SSD space (requires at least ${gameReq.minSsd} GB).`);
+
+    if (gameReq.ssdRequiredMin) {
+      explanation.push("• This game requires an SSD – HDD is not recommended.");
+    }
+  } else if (meetsCpuRec && meetsGpuRec && meetsRamRec && meetsSsdRec) {
+    status = "yes";
+    headline = "YES – You can run it comfortably (recommended or better).";
+
+    explanation.push("• Your CPU meets or exceeds the recommended requirement.");
+    explanation.push("• Your GPU meets or exceeds the recommended requirement.");
+    explanation.push("• Your RAM is at or above the recommended amount.");
+    explanation.push("• You have enough SSD space for the game.");
+
+    if (gameReq.ssdRequiredRec) {
+      explanation.push("• SSD is recommended/required for best loading times.");
+    }
+
+    explanation.push(`• At ${res}, you should be able to play on high settings (depends on the game).`);
+  } else {
+    status = "yes-ok";
+    headline = "YES – But you may need to lower some settings.";
+
+    if (meetsCpuMin && !meetsCpuRec) explanation.push("• CPU meets minimum but is below recommended.");
+    if (meetsGpuMin && !meetsGpuRec) explanation.push("• GPU meets minimum but is below recommended.");
+    if (meetsRamMin && !meetsRamRec) explanation.push("• RAM meets minimum but is below recommended.");
+    if (meetsSsdMin && !meetsSsdRec) explanation.push("• You have enough SSD space, but not much headroom.");
+
+    if (gameReq.ssdRequiredMin) {
+      explanation.push("• SSD is required – you have enough space, but avoid filling the drive completely.");
+    }
+
+    explanation.push(`• You can play the game, but medium/low settings are recommended at ${res}.`);
+  }
+
+  if (gameName === "Roblox" && (status === "yes" || status === "yes-ok")) {
+    explanation.push("• Roblox is very light – high/ultra graphics is often possible on decent hardware.");
+  }
+
+  if (["Microsoft Flight Simulator 2024", "GTA VI (Estimated)", "Cyberpunk 2077"].includes(gameName)) {
+    explanation.push("• This is a very demanding title – even above recommended specs, FPS can vary a lot.");
+  }
+
+  resultEl.style.display = "block";
+  resultEl.className = "result-box " + getResultClass(status);
+  resultEl.innerText = headline;
+
+  detailsEl.innerHTML = `
+    <strong>Game:</strong> ${gameName}<br>
+    <strong>Your CPU score:</strong> ${cpuScore} (min ${gameReq.minCpu}, rec ${gameReq.recCpu})<br>
+    <strong>Your GPU score:</strong> ${gpuScore} (min ${gameReq.minGpu}, rec ${gameReq.recGpu})<br>
+    <strong>Your RAM:</strong> ${ramGb} GB (min ${gameReq.minRam}, rec ${gameReq.recRam})<br>
+    <strong>Your SSD:</strong> ${ssdGb} GB (min ${gameReq.minSsd} GB)<br><br>
+    ${explanation.join("<br>")}
+  `;
+}
+</script>
