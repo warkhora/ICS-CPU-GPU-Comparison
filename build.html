@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Regent – Build Your PC</title>
+<title>ICS Regent – Build Your PC v2.0</title>
 
 <style>
   body {
     margin: 0;
     padding: 40px;
-    background: radial-gradient(circle at top, #101010, #000);
+    background: linear-gradient(135deg, #050505, #000000);
     color: #e6e6e6;
     font-family: "Segoe UI", system-ui, sans-serif;
   }
@@ -16,6 +16,7 @@
   .ics-container {
     max-width: 1100px;
     margin: auto;
+    backdrop-filter: blur(18px);
   }
 
   .ics-header {
@@ -24,32 +25,33 @@
   }
 
   .ics-logo {
-    font-size: 26px;
-    letter-spacing: 4px;
+    font-size: 32px;
+    letter-spacing: 6px;
     text-transform: uppercase;
-    color: gold;
+    color: #ffd700;
+    font-weight: 600;
   }
 
   .ics-subtitle {
-    color: #aaa;
+    color: #bbb;
     margin-top: 8px;
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .ics-frame {
-    background: linear-gradient(135deg, rgba(25,25,25,0.9), rgba(10,10,10,0.9));
-    border: 1px solid #333;
-    padding: 20px;
-    margin-bottom: 25px;
-    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 18px;
     transition: 0.3s ease;
-    backdrop-filter: blur(6px);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
   }
 
   .ics-frame:hover {
-    border-color: gold;
-    box-shadow: 0 0 22px rgba(255, 215, 0, 0.55);
-    transform: translateY(-2px);
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25);
+    transform: translateY(-3px);
   }
 
   h1, h2 {
@@ -64,31 +66,49 @@
     font-size: 14px;
   }
 
-  .selectors {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
+  label {
+    display: block;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-top: 10px;
+    margin-bottom: 4px;
   }
 
-  select, button, input {
-    background: #111;
+  input, select, button {
+    width: 100%;
+    background: rgba(20, 20, 20, 0.85);
     color: #eee;
-    border: 1px solid #444;
+    border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 10px 14px;
-    border-radius: 8px;
-    margin: 5px 0;
+    border-radius: 10px;
+    margin: 6px 0 10px 0;
     transition: 0.2s;
     font-size: 14px;
+    box-sizing: border-box;
+    backdrop-filter: blur(12px);
   }
 
-  select:hover, button:hover {
-    border-color: gold;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  input:hover, select:hover, button:hover {
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
   }
 
   button {
     cursor: pointer;
+    background: rgba(255, 215, 0, 0.15);
+    font-weight: 600;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .row-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
   }
 
   table {
@@ -99,34 +119,21 @@
   }
 
   th {
-    background: #111;
+    background: rgba(0,0,0,0.8);
     padding: 12px;
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid rgba(255,255,255,0.18);
     text-align: left;
     color: #f0f0f0;
   }
 
   td {
     padding: 10px;
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
     color: #ddd;
   }
 
   tr:nth-child(even) td {
-    background: rgba(255,255,255,0.01);
-  }
-
-  .spec-label {
-    font-weight: 600;
-    color: #f0f0f0;
-    width: 190px;
-    white-space: nowrap;
-  }
-
-  .product-type {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: #ffdd88;
+    background: rgba(255,255,255,0.02);
   }
 
   .note {
@@ -135,32 +142,57 @@
     margin-top: 6px;
   }
 
-  label {
-    display: block;
-    font-weight: 600;
-    color: #f0f0f0;
+  .tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    margin-right: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .tag-fps { color: #4dc3ff; border-color: #0ea5e9; }
+  .tag-balanced { color: #7CFC00; border-color: #22c55e; }
+  .tag-quiet { color: #f97373; border-color: #ef4444; }
+  .tag-future { color: #facc15; border-color: #eab308; }
+
+  .perf-box {
     margin-top: 10px;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    font-size: 14px;
   }
 
-  input {
-    width: 100%;
-    box-sizing: border-box;
+  .perf-title {
+    font-weight: 600;
+    color: #ffd700;
+    margin-bottom: 6px;
   }
-</style>
 
-</head>
+  .perf-tier {
+    font-size: 16px;
+    font-weight: 700;
+  }
 
-<body>
+  .perf-tier-1080 { color: #7CFC00; text-shadow: 0 0 10px rgba(124,252,0,0.6); }
+  .perf-tier-1440 { color: #4dc3ff; text-shadow: 0 0 10px rgba(0,170,255,0.6); }
+  .perf-tier-4k   { color: #ffae42; text-shadow: 0 0 10px rgba(255,165,0,0.6); }
+  .perf-tier-es   { color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.6); }
 
-<!-- ICS NAVIGATION BAR -->
-<div class="ics-nav">
-  <a href="index.html" class="nav-link" data-page="index">CPU/GPU Comparison</a>
-  <a href="fps.html" class="nav-link" data-page="fps">FPS Estimator</a>
-  <a href="canyourunit.html" class="nav-link" data-page="canyourunit">Can You Run It?</a>
-  <a href="build.html" class="nav-link" data-page="build">Build Your PC</a>
-</div>
+  .budget-warning {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #ffae42;
+  }
 
-<style>
+  .budget-error {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #ff4d4d;
+  }
+
   .ics-nav {
     width: 100%;
     background: rgba(0,0,0,0.65);
@@ -195,6 +227,15 @@
     text-shadow: 0 0 12px #ffd700;
   }
 </style>
+</head>
+<body>
+
+<div class="ics-nav">
+  <a href="index.html" class="nav-link" data-page="index">CPU/GPU Comparison</a>
+  <a href="fps.html" class="nav-link" data-page="fps">FPS Estimator</a>
+  <a href="canyourunit.html" class="nav-link" data-page="canyourunit">Can You Run It?</a>
+  <a href="build.html" class="nav-link" data-page="build">Build Your PC</a>
+</div>
 
 <script>
   const current = window.location.pathname.split("/").pop().toLowerCase();
@@ -209,37 +250,64 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Build Your PC — Smart Budget-Based System Generator</div>
+    <div class="ics-subtitle">Build Your PC v2.0 — Ultra Premium Budget-Based System Generator</div>
   </div>
 
   <!-- INPUT FRAME -->
   <div class="ics-frame">
     <h2>Build Settings</h2>
+    <p>Enter your budget and preferences. All prices are shown in USD.</p>
 
-    <label>Budget (USD)</label>
-    <input type="number" id="budget" placeholder="Enter your budget...">
+    <div class="row">
+      <div>
+        <label>Budget (USD)</label>
+        <input type="number" id="budget" placeholder="Enter your total budget...">
+      </div>
+      <div>
+        <label>Resolution Target</label>
+        <select id="resolution">
+          <option value="1080">1080p</option>
+          <option value="1440">1440p</option>
+          <option value="2160">4K (2160p)</option>
+        </select>
+      </div>
+    </div>
 
-    <label>Resolution Target</label>
-    <select id="resolution">
-      <option value="1080">1080p</option>
-      <option value="1440">1440p</option>
-      <option value="2160">4K</option>
-    </select>
+    <div class="row">
+      <div>
+        <label>Priority</label>
+        <select id="priority">
+          <option value="fps">Highest FPS</option>
+          <option value="balanced" selected>Balanced Build</option>
+          <option value="quiet">Quiet & Efficient</option>
+          <option value="future">Future-Proof</option>
+        </select>
+      </div>
+      <div>
+        <label>Usage Focus</label>
+        <select id="usage">
+          <option value="gaming" selected>Gaming</option>
+          <option value="creator">Gaming + Content Creation</option>
+          <option value="workstation">Workstation / Productivity</option>
+        </select>
+      </div>
+    </div>
 
-    <label>Priority</label>
-    <select id="priority">
-      <option value="fps">Highest FPS</option>
-      <option value="balanced">Balanced Build</option>
-      <option value="quiet">Quiet & Efficient</option>
-      <option value="future">Future-Proof</option>
-    </select>
+    <p class="note">
+      <span class="tag tag-fps">FPS Priority</span>
+      <span class="tag tag-balanced">Balanced</span>
+      <span class="tag tag-quiet">Quiet</span>
+      <span class="tag tag-future">Future-Proof</span>
+    </p>
 
     <button onclick="build()">Generate Build</button>
+    <div id="budgetInfo"></div>
   </div>
 
   <!-- RESULT FRAME -->
   <div class="ics-frame">
     <h2>Your PC Build</h2>
+    <div id="perfBox" class="perf-box" style="display:none;"></div>
     <table id="result"></table>
   </div>
 
@@ -247,101 +315,255 @@
 
 <script>
 // =========================
-// PRICE CONVERSION (NOK → USD)
+// PRICE CONVERSION (NOK → USD) – internal only
 // =========================
 const NOK_TO_USD = 0.095;
-function usd(nok) { return Math.round(nok * NOK_TO_USD); }
+function usdFromNok(nok) { return Math.round(nok * NOK_TO_USD); }
 
 // =========================
 // GPU DATABASE (RTX 50 SERIES)
 // =========================
 const gpus = [
-  { name: "RTX 5050", price: usd(3200), tier: 1 },
-  { name: "RTX 5060", price: usd(3800), tier: 2 },
-  { name: "RTX 5060 Ti", price: usd(6400), tier: 3 },
-  { name: "RTX 5070", price: usd(7500), tier: 4 },
-  { name: "RTX 5070 Ti", price: usd(13400), tier: 5 },
-  { name: "RTX 5080", price: usd(14900), tier: 6 },
-  { name: "RTX 5090", price: usd(37900), tier: 7 }
+  { name: "GeForce RTX 5050", price: usdFromNok(3200), tier: 2, tdp: 130 },
+  { name: "GeForce RTX 5060", price: usdFromNok(3800), tier: 3, tdp: 145 },
+  { name: "GeForce RTX 5060 Ti", price: usdFromNok(6400), tier: 4, tdp: 180 },
+  { name: "GeForce RTX 5070", price: usdFromNok(7500), tier: 5, tdp: 250 },
+  { name: "GeForce RTX 5070 Ti", price: usdFromNok(13400), tier: 6, tdp: 300 },
+  { name: "GeForce RTX 5080", price: usdFromNok(14900), tier: 7, tdp: 360 },
+  { name: "GeForce RTX 5090", price: usdFromNok(37900), tier: 8, tdp: 575 }
 ];
 
 // =========================
-// CPU DATABASE (REAL-WORLD)
+// CPU DATABASE (REAL-WORLD + ULTRA)
+// tier ~ performance level
 // =========================
 const cpus = [
-  { name: "Ryzen 5 9600X", price: usd(2130), tier: 2 },
-  { name: "Ryzen 7 7800X3D", price: usd(4200), tier: 4 },
-  { name: "Ryzen 7 9800X3D", price: usd(4920), tier: 5 },
-  { name: "Ryzen 7 9850X3D", price: usd(5490), tier: 5 },
-  { name: "Ryzen 9 9900X3D", price: usd(6204), tier: 6 },
-  { name: "Ryzen 9 9950X3D", price: usd(6950), tier: 7 },
+  { name: "Intel Core i5-14400F", price: usdFromNok(1942), tier: 3, tdp: 125, platform: "LGA1700" },
+  { name: "Intel Core i7-14700K", price: usdFromNok(4480), tier: 5, tdp: 190, platform: "LGA1700" },
+  { name: "Intel Core i9-14900K", price: usdFromNok(5520), tier: 7, tdp: 250, platform: "LGA1700" },
 
-  { name: "Intel Core i5-14400F", price: usd(1942), tier: 2 },
-  { name: "Intel Core i7-14700K", price: usd(4480), tier: 4 },
-  { name: "Intel Core i9-14900K", price: usd(5520), tier: 6 },
+  { name: "Ryzen 5 9600X", price: usdFromNok(2130), tier: 3, tdp: 120, platform: "AM5" },
+  { name: "Ryzen 7 7800X3D", price: usdFromNok(4200), tier: 5, tdp: 120, platform: "AM5" },
+  { name: "Ryzen 7 9800X3D", price: usdFromNok(4920), tier: 6, tdp: 130, platform: "AM5" },
+  { name: "Ryzen 7 9850X3D", price: usdFromNok(5490), tier: 6, tdp: 130, platform: "AM5" },
+  { name: "Ryzen 9 9900X3D", price: usdFromNok(6204), tier: 7, tdp: 170, platform: "AM5" },
+  { name: "Ryzen 9 9950X3D", price: usdFromNok(6950), tier: 8, tdp: 200, platform: "AM5" },
 
-  { name: "Ultra 7 270K", price: usd(3610), tier: 4 },
-  { name: "Ultra 9 285K", price: usd(6482), tier: 6 }
+  { name: "Ultra 7 270K", price: usdFromNok(3610), tier: 5, tdp: 170, platform: "ULTRA" },
+  { name: "Ultra 9 285K", price: usdFromNok(6482), tier: 7, tdp: 220, platform: "ULTRA" }
 ];
 
 // =========================
-// RAM / SSD / PSU PRICES
+// MOTHERBOARDS
+// =========================
+const motherboards = [
+  { platform: "AM5", name: "AM5 ATX Gaming Motherboard", price: usdFromNok(2200) },
+  { platform: "LGA1700", name: "LGA1700 ATX Z790 Motherboard", price: usdFromNok(2400) },
+  { platform: "ULTRA", name: "Ultra-Series X Chipset Motherboard", price: usdFromNok(2800) }
+];
+
+// =========================
+// RAM / SSD / PSU / CASE / COOLER
 // =========================
 const ramOptions = [
-  { size: "16GB DDR5-6000", price: usd(3000) },
-  { size: "32GB DDR5-6000", price: usd(4500) },
-  { size: "64GB DDR5-6000", price: usd(8000) }
+  { size: "16GB DDR5-6000", price: usdFromNok(3000), tier: 1 },
+  { size: "32GB DDR5-6000", price: usdFromNok(4500), tier: 2 },
+  { size: "64GB DDR5-6000", price: usdFromNok(8000), tier: 3 }
 ];
 
 const ssds = [
-  { size: "1TB NVMe", price: usd(1500) },
-  { size: "2TB NVMe", price: usd(3000) }
+  { size: "1TB NVMe SSD", price: usdFromNok(1500) },
+  { size: "2TB NVMe SSD", price: usdFromNok(3000) }
 ];
 
 const psus = [
-  { watt: "650W Gold", price: usd(1200) },
-  { watt: "750W Gold", price: usd(1500) },
-  { watt: "850W Gold", price: usd(1800) }
+  { watt: "650W 80+ Gold", price: usdFromNok(1200), max: 650 },
+  { watt: "750W 80+ Gold", price: usdFromNok(1500), max: 750 },
+  { watt: "850W 80+ Gold", price: usdFromNok(1800), max: 850 },
+  { watt: "1000W 80+ Gold", price: usdFromNok(2300), max: 1000 }
+];
+
+const coolers = [
+  { name: "120mm Tower Air Cooler", price: usdFromNok(700), level: 1 },
+  { name: "240mm AIO Liquid Cooler", price: usdFromNok(1300), level: 2 },
+  { name: "360mm AIO Liquid Cooler", price: usdFromNok(1900), level: 3 }
+];
+
+const cases = [
+  { name: "ATX High-Airflow Case", price: usdFromNok(1200), level: 2 },
+  { name: "ATX Silent Case", price: usdFromNok(1400), level: 2 },
+  { name: "Premium ATX Tempered Glass Case", price: usdFromNok(1800), level: 3 }
 ];
 
 // =========================
-// BUILD LOGIC
+// HELPER: choose best under budget fraction
+// =========================
+function chooseBestUnder(list, maxPrice) {
+  let best = null;
+  for (const item of list) {
+    if (item.price <= maxPrice) {
+      if (!best || item.price > best.price) best = item;
+    }
+  }
+  return best || list[0];
+}
+
+// =========================
+// PERFORMANCE TIER
+// =========================
+function getPerformanceTier(gpu, resolution) {
+  const tier = gpu.tier;
+  if (resolution === 1080) {
+    if (tier >= 7) return { label: "Esports Monster (1080p+)", cls: "perf-tier-es" };
+    if (tier >= 5) return { label: "1080p Ultra Ready", cls: "perf-tier-1080" };
+    if (tier >= 3) return { label: "1080p High/Ultra Capable", cls: "perf-tier-1080" };
+    return { label: "1080p Medium Recommended", cls: "perf-tier-1080" };
+  }
+  if (resolution === 1440) {
+    if (tier >= 7) return { label: "1440p Ultra Ready", cls: "perf-tier-1440" };
+    if (tier >= 5) return { label: "1440p High/Ultra Capable", cls: "perf-tier-1440" };
+    if (tier >= 3) return { label: "1440p Medium/High Recommended", cls: "perf-tier-1440" };
+    return { label: "1440p Low/Medium Recommended", cls: "perf-tier-1440" };
+  }
+  // 4K
+  if (tier >= 8) return { label: "4K Ultra Ready", cls: "perf-tier-4k" };
+  if (tier >= 6) return { label: "4K High/Ultra Capable", cls: "perf-tier-4k" };
+  if (tier >= 4) return { label: "4K Medium Recommended", cls: "perf-tier-4k" };
+  return { label: "4K Not Recommended – consider 1440p", cls: "perf-tier-4k" };
+}
+
+// =========================
+// MAIN BUILD FUNCTION
 // =========================
 function build() {
   const budget = Number(document.getElementById("budget").value);
-  const resolution = document.getElementById("resolution").value;
+  const resolution = Number(document.getElementById("resolution").value);
   const priority = document.getElementById("priority").value;
+  const usage = document.getElementById("usage").value;
 
-  if (!budget || budget < 300) {
-    document.getElementById("result").innerHTML =
-      "<tr><td>Please enter a valid budget.</td></tr>";
+  const budgetInfo = document.getElementById("budgetInfo");
+  const resultTable = document.getElementById("result");
+  const perfBox = document.getElementById("perfBox");
+
+  if (!budget || budget < 400) {
+    resultTable.innerHTML = "";
+    perfBox.style.display = "none";
+    budgetInfo.innerHTML = '<div class="budget-error">Please enter a valid budget (at least $400).</div>';
     return;
   }
 
-  let gpu = [...gpus].reverse().find(g => g.price <= budget * 0.55);
-  if (!gpu) gpu = gpus[0];
+  budgetInfo.innerHTML = "";
 
-  let cpu = cpus.find(c => c.tier >= gpu.tier - 1) || cpus[0];
+  // Budget fractions based on priority
+  let gpuFrac = 0.45;
+  let cpuFrac = 0.22;
+  let restFrac = 0.33;
 
-  let ram = ramOptions[0];
-  if (budget > 1500) ram = ramOptions[1];
-  if (budget > 2500) ram = ramOptions[2];
+  if (priority === "fps") {
+    gpuFrac = 0.5;
+    cpuFrac = 0.2;
+    restFrac = 0.3;
+  } else if (priority === "quiet") {
+    gpuFrac = 0.4;
+    cpuFrac = 0.22;
+    restFrac = 0.38;
+  } else if (priority === "future") {
+    gpuFrac = 0.47;
+    cpuFrac = 0.25;
+    restFrac = 0.28;
+  }
 
-  let ssd = ssds[0];
-  if (budget > 2000) ssd = ssds[1];
+  // Choose GPU
+  const maxGpuPrice = budget * gpuFrac;
+  let gpu = chooseBestUnder(gpus, maxGpuPrice);
 
-  let psu = psus[0];
-  if (gpu.tier >= 4) psu = psus[1];
-  if (gpu.tier >= 6) psu = psus[2];
+  // Choose CPU: try to match GPU tier
+  const targetCpuTier = Math.max(3, gpu.tier - 1);
+  let cpuCandidates = cpus
+    .filter(c => c.tier >= targetCpuTier - 1 && c.tier <= targetCpuTier + 1)
+    .sort((a,b) => a.price - b.price);
 
-  const total = gpu.price + cpu.price + ram.price + ssd.price + psu.price;
+  let cpu = cpuCandidates.find(c => c.price <= budget * cpuFrac) || chooseBestUnder(cpus, budget * cpuFrac);
 
-  document.getElementById("result").innerHTML = `
+  // Motherboard based on platform
+  let mobo = motherboards.find(m => m.platform === cpu.platform) || motherboards[0];
+
+  // RAM choice based on usage + budget
+  let ram;
+  if (usage === "gaming") {
+    if (budget < 1200) ram = ramOptions[0];
+    else if (budget < 2000) ram = ramOptions[1];
+    else ram = ramOptions[2];
+  } else if (usage === "creator" || usage === "workstation") {
+    if (budget < 1500) ram = ramOptions[1];
+    else ram = ramOptions[2];
+  } else {
+    ram = ramOptions[1];
+  }
+
+  // SSD choice
+  let ssd = budget > 1800 ? ssds[1] : ssds[0];
+
+  // Cooler based on CPU TDP
+  let cooler;
+  if (cpu.tdp <= 130) cooler = coolers[0];
+  else if (cpu.tdp <= 190) cooler = coolers[1];
+  else cooler = coolers[2];
+
+  // Case based on priority
+  let pcCase;
+  if (priority === "quiet") pcCase = cases[1];
+  else if (priority === "future") pcCase = cases[2];
+  else pcCase = cases[0];
+
+  // Power calculation
+  const estimatedLoad = cpu.tdp + gpu.tdp + 150; // rest of system + headroom
+  let psu = psus.find(p => p.max >= estimatedLoad + 100) || psus[psus.length - 1];
+
+  // Total price
+  const total =
+    gpu.price +
+    cpu.price +
+    mobo.price +
+    ram.price +
+    ssd.price +
+    cooler.price +
+    pcCase.price +
+    psu.price;
+
+  // Budget info
+  if (total > budget * 1.1) {
+    budgetInfo.innerHTML =
+      '<div class="budget-error">Warning: This build is significantly above your budget. Consider lowering resolution or priority.</div>';
+  } else if (total > budget) {
+    budgetInfo.innerHTML =
+      '<div class="budget-warning">Note: This build is slightly above your budget. Small adjustments may be needed.</div>';
+  } else {
+    budgetInfo.innerHTML =
+      '<div class="note">This build fits within your budget with some room for peripherals or OS.</div>';
+  }
+
+  // Performance tier
+  const perf = getPerformanceTier(gpu, resolution);
+  perfBox.style.display = "block";
+  perfBox.innerHTML = `
+    <div class="perf-title">Estimated Performance Tier</div>
+    <div class="perf-tier ${perf.cls}">${perf.label}</div>
+    <div class="note">
+      Based on GPU tier, resolution target and overall system balance. For detailed FPS estimates, use the FPS Estimator page.
+    </div>
+  `;
+
+  // Result table
+  resultTable.innerHTML = `
     <tr><th>Component</th><th>Selection</th><th>Price (USD)</th></tr>
     <tr><td>GPU</td><td>${gpu.name}</td><td>$${gpu.price}</td></tr>
     <tr><td>CPU</td><td>${cpu.name}</td><td>$${cpu.price}</td></tr>
+    <tr><td>Motherboard</td><td>${mobo.name}</td><td>$${mobo.price}</td></tr>
     <tr><td>RAM</td><td>${ram.size}</td><td>$${ram.price}</td></tr>
     <tr><td>Storage</td><td>${ssd.size}</td><td>$${ssd.price}</td></tr>
+    <tr><td>CPU Cooler</td><td>${cooler.name}</td><td>$${cooler.price}</td></tr>
+    <tr><td>Case</td><td>${pcCase.name}</td><td>$${pcCase.price}</td></tr>
     <tr><td>Power Supply</td><td>${psu.watt}</td><td>$${psu.price}</td></tr>
     <tr><th>Total</th><th></th><th>$${total}</th></tr>
   `;
