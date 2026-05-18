@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Regent – Build Your PC</title>
+<title>ICS Regent – Can You Run It? v3.0</title>
 
 <style>
   body {
@@ -38,42 +38,6 @@
     font-size: 15px;
   }
 
-  /* ICS NAV */
-  .ics-nav {
-    width: 100%;
-    background: rgba(0,0,0,0.65);
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-    padding: 16px 24px;
-    display: flex;
-    gap: 30px;
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    backdrop-filter: blur(12px);
-    margin: -40px -40px 40px -40px;
-  }
-
-  .ics-nav a {
-    color: #ffd700;
-    text-decoration: none;
-    font-size: 16px;
-    letter-spacing: 1px;
-    transition: 0.25s ease;
-    padding-bottom: 4px;
-  }
-
-  .ics-nav a:hover {
-    color: white;
-    text-shadow: 0 0 10px #ffd700;
-  }
-
-  .ics-nav a.active {
-    color: white;
-    border-bottom: 2px solid #ffd700;
-    text-shadow: 0 0 12px #ffd700;
-  }
-
-  /* ICS FRAME */
   .ics-frame {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -108,78 +72,118 @@
     box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
   }
 
+  select option {
+    background: #111;
+    color: #eee;
+  }
+
   button {
     cursor: pointer;
     background: rgba(255, 215, 0, 0.15);
     font-weight: 600;
   }
 
-  table {
+  .row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .result-box {
+    margin-top: 20px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px);
+    transition: 0.3s ease;
+  }
+
+  .res-bad    { color: #ff4d4d; text-shadow: 0 0 12px rgba(255, 0, 0, 0.6); }
+  .res-ok     { color: #ffae42; text-shadow: 0 0 12px rgba(255, 165, 0, 0.6); }
+  .res-good   { color: #7CFC00; text-shadow: 0 0 12px rgba(124, 252, 0, 0.6); }
+  .res-elite  { color: #4dc3ff; text-shadow: 0 0 12px rgba(0, 170, 255, 0.6); }
+
+  .details {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.6;
+  }
+
+  .meter-bar {
+    margin-top: 18px;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+
+  .meter-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ff4d4d, #ffae42, #7CFC00, #4dc3ff);
+    transition: width 0.5s ease;
+  }
+
+  .ics-nav {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-  }
-
-  th, td {
-    padding: 10px;
+    background: rgba(0,0,0,0.65);
     border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 16px 24px;
+    display: flex;
+    gap: 30px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    backdrop-filter: blur(12px);
+    margin: -40px -40px 40px -40px;
   }
 
-  th {
+  .ics-nav a {
     color: #ffd700;
-    text-align: left;
+    text-decoration: none;
+    font-size: 16px;
+    letter-spacing: 1px;
+    transition: 0.2s;
   }
+
+  .ics-nav a:hover {
+    color: white;
+    text-shadow: 0 0 10px #ffd700;
+  }
+
+  .ics-nav a.active {
+    color: white;
+    border-bottom: 2px solid #ffd700;
+    text-shadow: 0 0 12px #ffd700;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    margin-right: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .tag-heavy { color: #f97373; border-color: #ef4444; }
+  .tag-light { color: #7CFC00; border-color: #22c55e; }
+  .tag-spec  { color: #facc15; border-color: #eab308; }
 </style>
 </head>
-
 <body>
 
-<!-- NAVIGATION -->
 <div class="ics-nav">
   <a href="index.html" class="nav-link" data-page="index">CPU/GPU Comparison</a>
   <a href="fps.html" class="nav-link" data-page="fps">FPS Estimator</a>
   <a href="canyourunit.html" class="nav-link" data-page="canyourunit">Can You Run It?</a>
   <a href="build.html" class="nav-link" data-page="build">Build Your PC</a>
-</div>
-
-<div class="ics-container">
-
-  <div class="ics-header">
-    <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Build Your PC — Smart Budget-Based System Generator</div>
-  </div>
-
-  <!-- INPUT FRAME -->
-  <div class="ics-frame">
-    <h2>Build Settings</h2>
-
-    <label>Budget (USD)</label>
-    <input type="number" id="budget" placeholder="Enter your budget...">
-
-    <label>Resolution Target</label>
-    <select id="resolution">
-      <option value="1080">1080p</option>
-      <option value="1440">1440p</option>
-      <option value="2160">4K</option>
-    </select>
-
-    <label>Priority</label>
-    <select id="priority">
-      <option value="fps">Highest FPS</option>
-      <option value="balanced">Balanced Build</option>
-      <option value="quiet">Quiet & Efficient</option>
-      <option value="future">Future-Proof</option>
-    </select>
-
-    <button onclick="build()">Generate Build</button>
-  </div>
-
-  <!-- RESULT FRAME -->
-  <div class="ics-frame">
-    <h2>Your PC Build</h2>
-    <table id="result"></table>
-  </div>
-
 </div>
 
 <script>
@@ -191,105 +195,390 @@
   });
 </script>
 
+<div class="ics-container">
+
+  <div class="ics-header">
+    <div class="ics-logo">ICS REGENT</div>
+    <div class="ics-subtitle">Can You Run It? v3.0 — Ultra Premium Requirement Analyzer</div>
+  </div>
+
+  <!-- USER HARDWARE -->
+  <div class="ics-frame">
+    <h2>Your Hardware</h2>
+    <div class="row">
+      <div>
+        <label>CPU (performance class)</label>
+        <select id="cpu">
+          <option value="1">Very Low – old dual/quad core (i3-6100 / FX-6300)</option>
+          <option value="2">Low – older i5 / Ryzen 3–5 (i5-2500K / R5 1600)</option>
+          <option value="3" selected>Mid – modern 6-core (i5-12400F / R5 3600X)</option>
+          <option value="4">High – strong gaming CPU (i7-12700 / R7 7800X3D)</option>
+          <option value="5">Enthusiast – high-end (i9-14900K / R9 9900X3D)</option>
+          <option value="6">Extreme – top-tier (R9 9950X3D / future flagships)</option>
+        </select>
+      </div>
+      <div>
+        <label>GPU (performance class)</label>
+        <select id="gpu">
+          <option value="1">Very Low – GTX 960 / R9 280 / Intel HD</option>
+          <option value="2">Low – GTX 1060 / RX 580 / GTX 970</option>
+          <option value="3" selected>Mid – RTX 2060 / RX 5700 / GTX 1080 Ti</option>
+          <option value="4">High – RTX 3060 / RX 6600 XT / RTX 2080</option>
+          <option value="5">Enthusiast – RTX 4070 / RX 7800 XT</option>
+          <option value="6">Extreme – RTX 5090 / ICS VX 6690 class</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Installed RAM</label>
+        <select id="ram">
+          <option value="4">4 GB</option>
+          <option value="6">6 GB</option>
+          <option value="8">8 GB</option>
+          <option value="12">12 GB</option>
+          <option value="16" selected>16 GB</option>
+          <option value="24">24 GB</option>
+          <option value="32">32 GB</option>
+          <option value="64">64 GB</option>
+        </select>
+      </div>
+      <div>
+        <label>Storage type</label>
+        <select id="storage">
+          <option value="hdd">HDD only</option>
+          <option value="mix">HDD + SSD</option>
+          <option value="ssd" selected>SSD only</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME SELECTION -->
+  <div class="ics-frame">
+    <h2>Game & Requirements</h2>
+    <p>Select a game to see if your PC meets minimum or recommended specs.</p>
+
+    <div class="row">
+      <div>
+        <label>Game</label>
+        <select id="game"></select>
+      </div>
+      <div>
+        <label>Target level</label>
+        <select id="target">
+          <option value="min">Just run it (minimum)</option>
+          <option value="rec" selected>Comfortable (recommended)</option>
+        </select>
+      </div>
+    </div>
+
+    <button onclick="analyze()">Analyze Compatibility</button>
+
+    <div id="resultBox" class="result-box">
+      Select your hardware and a game, then click “Analyze Compatibility”.
+    </div>
+  </div>
+
+  <!-- DETAILS -->
+  <div class="ics-frame">
+    <h2>Details & Upgrade Suggestions</h2>
+    <div id="details" class="details">
+      Here you will see minimum & recommended specs, your hardware vs requirements, and suggested upgrades if needed.
+    </div>
+  </div>
+
+</div>
+
 <script>
 // =========================
-// PRICE CONVERSION (NOK → USD)
+// GAME REQUIREMENTS (BASED ON YOUR LIST)
+// Scores: 1–6 scale for CPU/GPU heaviness
 // =========================
-const NOK_TO_USD = 0.095;
-function usd(nok) { return Math.round(nok * NOK_TO_USD); }
-
-// =========================
-// GPU DATABASE (RTX 50 SERIES)
-// =========================
-const gpus = [
-  { name: "RTX 5050", price: usd(3200), tier: 1 },
-  { name: "RTX 5060", price: usd(3800), tier: 2 },
-  { name: "RTX 5060 Ti", price: usd(6400), tier: 3 },
-  { name: "RTX 5070", price: usd(7500), tier: 4 },
-  { name: "RTX 5070 Ti", price: usd(13400), tier: 5 },
-  { name: "RTX 5080", price: usd(14900), tier: 6 },
-  { name: "RTX 5090", price: usd(37900), tier: 7 }
+const games = [
+  {
+    id: "cyberpunk",
+    name: "Cyberpunk 2077: Phantom Liberty",
+    tags: ["Heavy"],
+    min: { cpuScore: 2, gpuScore: 2, ram: 12, storage: "ssd-or-hdd" },
+    rec: { cpuScore: 4, gpuScore: 3, ram: 16, storage: "ssd" },
+    minText: {
+      cpu: "Intel Core i7-6700 / Ryzen 5 1600",
+      gpu: "GTX 1060 6GB / RX 580 8GB / Arc A380",
+      ram: "12 GB"
+    },
+    recText: {
+      cpu: "Intel Core i7-12700 / Ryzen 7 7800X3D",
+      gpu: "RTX 2060 SUPER / RX 5700 XT / Arc A770",
+      ram: "16 GB"
+    }
+  },
+  {
+    id: "mw3",
+    name: "Call of Duty: Modern Warfare III",
+    tags: ["Heavy", "SSD"],
+    min: { cpuScore: 1, gpuScore: 2, ram: 8, storage: "ssd" },
+    rec: { cpuScore: 3, gpuScore: 4, ram: 16, storage: "ssd" },
+    minText: {
+      cpu: "Intel Core i3-6100 / Ryzen 3 1200",
+      gpu: "Entry DX11 GPU",
+      ram: "8 GB"
+    },
+    recText: {
+      cpu: "Intel Core i7-6700K / Ryzen 5 1600X",
+      gpu: "GTX 1080 Ti / RTX 3060 / RX 6600 XT / Arc A770",
+      ram: "16 GB"
+    }
+  },
+  {
+    id: "fortnite",
+    name: "Fortnite (UEFN / Nanite)",
+    tags: ["Heavy"],
+    min: { cpuScore: 2, gpuScore: 2, ram: 16, storage: "ssd-or-hdd" },
+    rec: { cpuScore: 3, gpuScore: 3, ram: 32, storage: "ssd-or-hdd" },
+    minText: {
+      cpu: "Quad-core Intel/AMD 2.5 GHz",
+      gpu: "GTX 960 / R9 280 (DX11)",
+      ram: "16 GB"
+    },
+    recText: {
+      cpu: "Modern 6-core CPU",
+      gpu: "DX12-capable GPU, 8 GB VRAM",
+      ram: "32 GB"
+    }
+  },
+  {
+    id: "gtavi",
+    name: "GTA VI (speculative PC requirements)",
+    tags: ["Speculative", "Heavy"],
+    min: { cpuScore: 3, gpuScore: 3, ram: 16, storage: "ssd" },
+    rec: { cpuScore: 4, gpuScore: 4, ram: 24, storage: "ssd" },
+    minText: {
+      cpu: "Likely modern 6-core (Ryzen 5 / i5)",
+      gpu: "Mid-range RTX / RX GPU",
+      ram: "16 GB (speculative)"
+    },
+    recText: {
+      cpu: "High-end 8-core (Ryzen 7 / i7)",
+      gpu: "Upper mid-range RTX / RX",
+      ram: "24–32 GB (speculative)"
+    }
+  },
+  {
+    id: "elden",
+    name: "Elden Ring: Shadow of the Erdtree",
+    tags: ["Heavy"],
+    min: { cpuScore: 2, gpuScore: 2, ram: 12, storage: "ssd-or-hdd" },
+    rec: { cpuScore: 3, gpuScore: 3, ram: 16, storage: "ssd-or-hdd" },
+    minText: {
+      cpu: "Intel Core i5-8400 / Ryzen 3 3300X",
+      gpu: "GTX 1060 3GB / RX 580 4GB",
+      ram: "12 GB"
+    },
+    recText: {
+      cpu: "Intel Core i7-8700K / Ryzen 5 3600X",
+      gpu: "GTX 1070 8GB / RX Vega 56 8GB",
+      ram: "16 GB"
+    }
+  },
+  {
+    id: "msfs2024",
+    name: "Microsoft Flight Simulator 2024",
+    tags: ["Very Heavy", "SSD"],
+    min: { cpuScore: 3, gpuScore: 3, ram: 16, storage: "ssd" },
+    rec: { cpuScore: 4, gpuScore: 4, ram: 32, storage: "ssd" },
+    minText: {
+      cpu: "Ryzen 5 2600X / Intel Core i7-6800K",
+      gpu: "RX 5700 / GTX 970",
+      ram: "16 GB"
+    },
+    recText: {
+      cpu: "Ryzen 7 2700X / Intel Core i7-10700K",
+      gpu: "RX 5700 XT / RTX 2080",
+      ram: "32 GB"
+    }
+  },
+  {
+    id: "starfield",
+    name: "Starfield",
+    tags: ["Very Heavy", "SSD"],
+    min: { cpuScore: 3, gpuScore: 3, ram: 16, storage: "ssd" },
+    rec: { cpuScore: 4, gpuScore: 4, ram: 16, storage: "ssd" },
+    minText: {
+      cpu: "Ryzen 5 2600X / Intel Core i7-6800K",
+      gpu: "RX 5700 / GTX 1070 Ti",
+      ram: "16 GB"
+    },
+    recText: {
+      cpu: "Ryzen 5 3600X / Intel i5-10600K",
+      gpu: "Upper mid-range GPU",
+      ram: "16 GB"
+    }
+  },
+  {
+    id: "rdr2",
+    name: "Red Dead Redemption 2",
+    tags: ["Heavy"],
+    min: { cpuScore: 1, gpuScore: 2, ram: 8, storage: "ssd-or-hdd" },
+    rec: { cpuScore: 2, gpuScore: 3, ram: 12, storage: "ssd-or-hdd" },
+    minText: {
+      cpu: "Intel Core i5-2500K / AMD FX-6300",
+      gpu: "GTX 770 2GB / R9 280 3GB",
+      ram: "8 GB"
+    },
+    recText: {
+      cpu: "Intel Core i7-4770K / Ryzen 5 1500X",
+      gpu: "GTX 1060 6GB / RX 480 4GB",
+      ram: "12 GB"
+    }
+  },
+  {
+    id: "valorant",
+    name: "Valorant",
+    tags: ["Light"],
+    min: { cpuScore: 1, gpuScore: 1, ram: 4, storage: "ssd-or-hdd" },
+    rec: { cpuScore: 2, gpuScore: 2, ram: 8, storage: "ssd-or-hdd" },
+    minText: {
+      cpu: "Intel Core 2 Duo E8400 / Athlon 200GE",
+      gpu: "Intel HD 4000 / Radeon R5 200",
+      ram: "4 GB"
+    },
+    recText: {
+      cpu: "Modern low-end CPU",
+      gpu: "Entry-level discrete GPU",
+      ram: "8 GB"
+    }
+  },
+  {
+    id: "apex",
+    name: "Apex Legends",
+    tags: ["Medium"],
+    min: { cpuScore: 1, gpuScore: 2, ram: 6, storage: "ssd-or-hdd" },
+    rec: { cpuScore: 2, gpuScore: 3, ram: 8, storage: "ssd-or-hdd" },
+    minText: {
+      cpu: "AMD FX 4350 / Intel Core i3-6300",
+      gpu: "Radeon HD 7790 2GB / GTX 950",
+      ram: "6 GB"
+    },
+    recText: {
+      cpu: "Ryzen 5 / modern i5",
+      gpu: "GTX 970 / R9 290",
+      ram: "8 GB"
+    }
+  }
 ];
 
-// =========================
-// CPU DATABASE (REAL-WORLD)
-// =========================
-const cpus = [
-  { name: "Ryzen 5 9600X", price: usd(2130), tier: 2 },
-  { name: "Ryzen 7 7800X3D", price: usd(4200), tier: 4 },
-  { name: "Ryzen 7 9800X3D", price: usd(4920), tier: 5 },
-  { name: "Ryzen 7 9850X3D", price: usd(5490), tier: 5 },
-  { name: "Ryzen 9 9900X3D", price: usd(6204), tier: 6 },
-  { name: "Ryzen 9 9950X3D", price: usd(6950), tier: 7 },
+// populate game dropdown
+const gameSelect = document.getElementById("game");
+games.forEach(g => {
+  const opt = document.createElement("option");
+  opt.value = g.id;
+  opt.textContent = g.name;
+  gameSelect.appendChild(opt);
+});
+gameSelect.value = "cyberpunk";
 
-  { name: "Intel Core i5-14400F", price: usd(1942), tier: 2 },
-  { name: "Intel Core i7-14700K", price: usd(4480), tier: 4 },
-  { name: "Intel Core i9-14900K", price: usd(5520), tier: 6 },
+function analyze() {
+  const cpuScore = Number(document.getElementById("cpu").value);
+  const gpuScore = Number(document.getElementById("gpu").value);
+  const ram = Number(document.getElementById("ram").value);
+  const storage = document.getElementById("storage").value;
+  const target = document.getElementById("target").value;
+  const gameId = document.getElementById("game").value;
 
-  { name: "Ultra 7 270K", price: usd(3610), tier: 4 },
-  { name: "Ultra 9 285K", price: usd(6482), tier: 6 }
-];
+  const game = games.find(g => g.id === gameId);
+  if (!game) return;
 
-// =========================
-// RAM / SSD / PSU PRICES
-// =========================
-const ramOptions = [
-  { size: "16GB DDR5-6000", price: usd(3000) },
-  { size: "32GB DDR5-6000", price: usd(4500) },
-  { size: "64GB DDR5-6000", price: usd(8000) }
-];
+  const req = target === "min" ? game.min : game.rec;
+  const reqText = target === "min" ? game.minText : game.recText;
 
-const ssds = [
-  { size: "1TB NVMe", price: usd(1500) },
-  { size: "2TB NVMe", price: usd(3000) }
-];
+  let score = 0;
+  let maxScore = 3;
 
-const psus = [
-  { watt: "650W Gold", price: usd(1200) },
-  { watt: "750W Gold", price: usd(1500) },
-  { watt: "850W Gold", price: usd(1800) }
-];
+  if (cpuScore >= req.cpuScore) score++;
+  if (gpuScore >= req.gpuScore) score++;
+  if (ram >= req.ram) score++;
 
-// =========================
-// BUILD LOGIC
-// =========================
-function build() {
-  const budget = Number(document.getElementById("budget").value);
-  const resolution = document.getElementById("resolution").value;
-  const priority = document.getElementById("priority").value;
-
-  if (!budget || budget < 300) {
-    document.getElementById("result").innerHTML =
-      "<tr><td>Please enter a valid budget.</td></tr>";
-    return;
+  let storagePenalty = 0;
+  if (req.storage === "ssd" && storage !== "ssd") {
+    storagePenalty = 0.5;
   }
 
-  let gpu = [...gpus].reverse().find(g => g.price <= budget * 0.55);
-  if (!gpu) gpu = gpus[0];
+  const effectiveScore = score - storagePenalty;
 
-  let cpu = cpus.find(c => c.tier >= gpu.tier - 1) || cpus[0];
+  let cls = "res-bad";
+  let msg = "You cannot run this comfortably.";
+  let meter = Math.max(0, Math.min(100, (effectiveScore / maxScore) * 100));
 
-  let ram = ramOptions[0];
-  if (budget > 1500) ram = ramOptions[1];
-  if (budget > 2500) ram = ramOptions[2];
+  if (effectiveScore <= 1) {
+    cls = "res-bad";
+    msg = "Not recommended – your PC is below the requirements.";
+  } else if (effectiveScore > 1 && effectiveScore < 2.5) {
+    cls = "res-ok";
+    msg = "Borderline – you can probably run it with lowered settings.";
+  } else if (effectiveScore >= 2.5 && effectiveScore < 3) {
+    cls = "res-good";
+    msg = "You meet the requirements – good experience expected.";
+  } else if (effectiveScore >= 3) {
+    cls = "res-elite";
+    msg = "You are well above the requirements – excellent experience.";
+  }
 
-  let ssd = ssds[0];
-  if (budget > 2000) ssd = ssds[1];
+  const resultBox = document.getElementById("resultBox");
+  resultBox.className = "result-box " + cls;
+  resultBox.innerHTML = `
+    ${msg}
+    <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
+  `;
 
-  let psu = psus[0];
-  if (gpu.tier >= 4) psu = psus[1];
-  if (gpu.tier >= 6) psu = psus[2];
+  const meterFill = document.getElementById("meterFill");
+  requestAnimationFrame(() => {
+    meterFill.style.width = meter + "%";
+  });
 
-  const total = gpu.price + cpu.price + ram.price + ssd.price + psu.price;
+  const tagHtml = game.tags.map(t => {
+    if (t === "Very Heavy") return '<span class="tag tag-heavy">Very Heavy</span>';
+    if (t === "Heavy") return '<span class="tag tag-heavy">Heavy</span>';
+    if (t === "Light") return '<span class="tag tag-light">Light</span>';
+    if (t === "Speculative") return '<span class="tag tag-spec">Speculative</span>';
+    if (t === "SSD") return '<span class="tag tag-spec">SSD Recommended</span>';
+    return `<span class="tag">${t}</span>`;
+  }).join(" ");
 
-  document.getElementById("result").innerHTML = `
-    <tr><th>Component</th><th>Selection</th><th>Price (USD)</th></tr>
-    <tr><td>GPU</td><td>${gpu.name}</td><td>$${gpu.price}</td></tr>
-    <tr><td>CPU</td><td>${cpu.name}</td><td>$${cpu.price}</td></tr>
-    <tr><td>RAM</td><td>${ram.size}</td><td>$${ram.price}</td></tr>
-    <tr><td>Storage</td><td>${ssd.size}</td><td>$${ssd.price}</td></tr>
-    <tr><td>Power Supply</td><td>${psu.watt}</td><td>$${psu.price}</td></tr>
-    <tr><th>Total</th><th></th><th>$${total}</th></tr>
+  const details = document.getElementById("details");
+  details.innerHTML = `
+    <p>${tagHtml}</p>
+    <p><strong>Game:</strong> ${game.name}</p>
+    <p><strong>Target:</strong> ${target === "min" ? "Minimum (just run it)" : "Recommended (comfortable)"}</p>
+
+    <p><strong>Minimum specs:</strong><br>
+      CPU: ${game.minText.cpu}<br>
+      GPU: ${game.minText.gpu}<br>
+      RAM: ${game.minText.ram}
+    </p>
+
+    <p><strong>Recommended specs:</strong><br>
+      CPU: ${game.recText.cpu}<br>
+      GPU: ${game.recText.gpu}<br>
+      RAM: ${game.recText.ram}
+    </p>
+
+    <p><strong>Your hardware (abstracted):</strong><br>
+      CPU class: ${cpuScore} / 6<br>
+      GPU class: ${gpuScore} / 6<br>
+      RAM: ${ram} GB<br>
+      Storage: ${storage.toUpperCase()}
+    </p>
+
+    <p><strong>Upgrade suggestions:</strong><br>
+      ${cpuScore < req.cpuScore ? "• Consider a stronger CPU for this title.<br>" : ""}
+      ${gpuScore < req.gpuScore ? "• A more powerful GPU would help a lot here.<br>" : ""}
+      ${ram < req.ram ? "• Adding more RAM is highly recommended.<br>" : ""}
+      ${req.storage === "ssd" && storage !== "ssd" ? "• Install the game on an SSD for smoother loading and streaming.<br>" : ""}
+      ${cpuScore >= req.cpuScore && gpuScore >= req.gpuScore && ram >= req.ram && !(req.storage === "ssd" && storage !== "ssd")
+        ? "• Your system is well balanced for this game." : ""}
+    </p>
   `;
 }
 </script>
