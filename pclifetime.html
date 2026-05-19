@@ -374,6 +374,38 @@ const gpus = [
   { name: "GeForce RTX 5090", tier: 10 }
 ];
 
+  function loadFromURL() {
+  const params = new URLSearchParams(window.location.search);
+
+  const cpu = params.get("cpu");
+  const gpu = params.get("gpu");
+  const ram = params.get("ram");
+  const ssd = params.get("ssd");
+  const psu = params.get("psu");
+
+  // Vent til dropdowns er fylt
+  setTimeout(() => {
+    if (cpu) document.getElementById("cpu").value = cpu;
+    if (gpu) document.getElementById("gpu").value = gpu;
+    if (ram) document.getElementById("ram").value = ram;
+
+    if (ssd) {
+      if (ssd.includes("Gen3")) document.getElementById("ssd").value = "gen3";
+      else if (ssd.includes("Gen4")) document.getElementById("ssd").value = "gen4";
+      else document.getElementById("ssd").value = "gen5";
+    }
+
+    if (psu) document.getElementById("psu").value = psu;
+
+    // Hvis noen verdier ble sendt → kjør analyze automatisk
+    if (cpu || gpu || ram || ssd || psu) {
+      analyze();
+    }
+  }, 50);
+}
+
+window.onload = loadFromURL;
+
 // =========================
 // POPULATE SELECTS
 // =========================
