@@ -193,7 +193,7 @@
   <!-- User hardware -->
   <div class="ics-frame">
     <h2>Your Hardware</h2>
-    <p>Velg komponentene dine. Dette brukes kun til å sjekke om du kan kjøre spillet, ikke FPS.</p>
+    <p>Select Your Components. This is only used to check if you can run the game, not the FPS.</p>
 
     <div class="row">
       <div>
@@ -261,7 +261,7 @@
   <!-- Game selection -->
   <div class="ics-frame">
     <h2>Game Selection</h2>
-    <p>Velg spillet du vil sjekke.</p>
+    <p>Select Game!.</p>
 
     <div class="row">
       <div>
@@ -613,22 +613,22 @@ function checkRequirements() {
     if (meetsSsdMin && !meetsSsdRec) explanation.push("• You have enough SSD space, but not a lot of headroom.");
 
     if (gameReq.ssdRequiredMin) {
-      explanation.push("• SSD is required – du har nok plass, men pass på at disken ikke er helt full.");
+      explanation.push("• SSD is required – you have enough space, but make sure that your disk isn't full.");
     }
 
-    explanation.push(`• Du kan spille spillet, men bør bruke Medium/Low settings, spesielt i ${res}.`);
+    explanation.push(`• You can run the game, but you should use Medium/Low settings, specially in ${res}.`);
   }
 
   // ekstra info for Roblox
   if (gameName === "Roblox") {
     if (status === "yes" || status === "yes-ok") {
-      explanation.push("• Roblox er veldig lett – du kan ofte bruke High/Ultra graphics uten problemer.");
+      explanation.push("• Roblox is very light – in almost any cases, you can use High/Ultra graphics without any problems");
     }
   }
 
   // ekstra info for veldig tunge spill
   if (gameName === "Microsoft Flight Simulator 2024" || gameName.startsWith("GTA VI") || gameName.startsWith("Cyberpunk")) {
-    explanation.push("• Dette er et svært tungt spill – selv over anbefalt krav kan FPS variere mye.");
+    explanation.push("• This is a very heavy game – altough your PC can run this game, FPS may vary a lot");
   }
 
   resultEl.style.display = "block";
