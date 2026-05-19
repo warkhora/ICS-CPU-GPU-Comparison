@@ -236,6 +236,21 @@
     line-height: 1.6;
   }
 
+  .small-label {
+    font-size: 12px;
+    color: #ccc;
+  }
+
+  .pill-inline {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 11px;
+    margin-right: 6px;
+    margin-top: 4px;
+  }
+
   @media (max-width: 900px) {
     .row, .row-3, .result-grid {
       grid-template-columns: 1fr;
@@ -267,15 +282,16 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Thermal & Cooling Simulator — Temperature, Headroom & Throttle Risk</div>
+    <div class="ics-subtitle">Thermal & Cooling Simulator — Game-Aware Temperature & Throttle Analysis</div>
   </div>
 
   <!-- INPUT FRAME -->
   <div class="ics-frame">
-    <div class="tag tag-info">Experimental</div>
+    <div class="tag tag-info">Thermals v2</div>
     <h2 style="margin-top:10px;">Cooling Scenario</h2>
     <p style="font-size:13px;color:#ccc;margin-bottom:14px;">
-      Define your CPU, GPU, case and cooling setup. The simulator will estimate temperatures, headroom and throttle risk under gaming and heavy workloads.
+      Define your CPU, GPU, case airflow, cooler and game scenario. The simulator estimates CPU/GPU temperatures,
+      VRAM stress, thermal headroom, noise and throttle risk under realistic gaming workloads.
     </p>
 
     <div class="row">
@@ -315,11 +331,54 @@
         <input type="number" id="ambient" value="22">
       </div>
       <div>
-        <label>Workload Intensity</label>
+        <label>Workload Profile</label>
         <select id="intensity">
           <option value="gaming" selected>Gaming (mixed CPU/GPU)</option>
           <option value="cpuheavy">CPU-heavy (rendering, compiling)</option>
           <option value="gpuheavy">GPU-heavy (ray tracing, path tracing)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title">Game Scenario</div>
+    <div class="row-3">
+      <div>
+        <label>Game</label>
+        <select id="game">
+          <option value="cyberpunk">Cyberpunk 2077</option>
+          <option value="gta6">GTA VI</option>
+          <option value="starfield">Starfield</option>
+          <option value="helldivers2">Helldivers 2</option>
+          <option value="rdr2">Red Dead Redemption 2</option>
+          <option value="cod">Call of Duty</option>
+          <option value="eldenring">Elden Ring</option>
+          <option value="fortnite">Fortnite</option>
+          <option value="msfs2024">Flight Simulator 2024</option>
+          <option value="bg3">Baldur's Gate 3</option>
+          <option value="witcher4">The Witcher 4 (future)</option>
+          <option value="fh5">Forza Horizon 5</option>
+          <option value="fh6" selected>Forza Horizon 6</option>
+        </select>
+      </div>
+      <div>
+        <label>Graphics Preset</label>
+        <select id="preset">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="ultra">Ultra</option>
+          <option value="rt">Ray Tracing</option>
+          <option value="pt">Path Tracing</option>
+        </select>
+      </div>
+      <div>
+        <label>Resolution</label>
+        <select id="resolution">
+          <option value="1080">1080p</option>
+          <option value="1440" selected>1440p</option>
+          <option value="2160">4K</option>
+          <option value="3440x1440">Ultrawide 3440×1440</option>
+          <option value="8k">8K (extreme)</option>
         </select>
       </div>
     </div>
@@ -330,6 +389,8 @@
   <!-- RESULT FRAME -->
   <div class="ics-frame" id="resultFrame" style="display:none;">
     <h2>Thermal Outcome & Stability</h2>
+
+    <div class="small-label" id="scenarioLabel"></div>
 
     <div class="result-grid">
       <div class="result-pill">
@@ -353,13 +414,14 @@
       </div>
 
       <div class="result-pill">
-        <div class="result-label">Throttle & Noise Profile</div>
+        <div class="result-label">VRAM & Throttle / Noise</div>
         <div class="result-value" id="throttleLabel"></div>
         <div class="bar-outer">
           <div class="bar-inner" id="headroomBar"></div>
           <div class="bar-label" id="headroomBarLabel"></div>
         </div>
         <div class="note" id="noiseNote"></div>
+        <div class="note" id="vramNote"></div>
       </div>
     </div>
 
@@ -374,32 +436,121 @@
 
 <script>
 // =========================
-// CPU & GPU THERMAL PROFILES
+// CPU DATABASE
 // =========================
 const cpuDb = [
+  // Intel 14th gen
   { name: "Intel Core i5-14400F", tdp: 125, hotspot: 95 },
+  { name: "Intel Core i5-14600K", tdp: 165, hotspot: 100 },
   { name: "Intel Core i7-14700K", tdp: 200, hotspot: 100 },
   { name: "Intel Core i9-14900K", tdp: 250, hotspot: 105 },
 
+  // AMD Ryzen 9000 series
   { name: "Ryzen 5 9600X", tdp: 120, hotspot: 95 },
-  { name: "Ryzen 7 7800X3D", tdp: 130, hotspot: 90 },
+  { name: "Ryzen 7 9700X", tdp: 130, hotspot: 95 },
   { name: "Ryzen 7 9800X3D", tdp: 140, hotspot: 90 },
   { name: "Ryzen 9 9900X3D", tdp: 170, hotspot: 95 },
   { name: "Ryzen 9 9950X3D", tdp: 190, hotspot: 95 },
 
-  { name: "Ultra 7 270K", tdp: 180, hotspot: 100 },
-  { name: "Ultra 9 285K", tdp: 230, hotspot: 105 }
+  // Threadripper (workstation)
+  { name: "Threadripper 7960X", tdp: 270, hotspot: 95 },
+  { name: "Threadripper 7970X", tdp: 300, hotspot: 95 },
+  { name: "Threadripper 7980X", tdp: 350, hotspot: 95 },
+
+  // Intel Ultra series (fictional / ICS)
+  { name: "Intel Ultra 5", tdp: 140, hotspot: 100 },
+  { name: "Intel Ultra 7", tdp: 180, hotspot: 100 },
+  { name: "Intel Ultra 9", tdp: 230, hotspot: 105 }
 ];
 
+// =========================
+// GPU DATABASE
+// =========================
 const gpuDb = [
-  { name: "GeForce RTX 5050", tdp: 140, hotspot: 85 },
-  { name: "GeForce RTX 5060", tdp: 170, hotspot: 88 },
-  { name: "GeForce RTX 5060 Ti", tdp: 190, hotspot: 90 },
-  { name: "GeForce RTX 5070", tdp: 220, hotspot: 92 },
-  { name: "GeForce RTX 5070 Ti", tdp: 260, hotspot: 94 },
-  { name: "GeForce RTX 5080", tdp: 320, hotspot: 96 },
-  { name: "GeForce RTX 5090", tdp: 420, hotspot: 98 }
+  // RTX 30 series
+  { name: "GeForce RTX 3050 6GB", tdp: 115, hotspot: 82, vram: 6, arch: "ampere" },
+  { name: "GeForce RTX 3050 8GB", tdp: 130, hotspot: 84, vram: 8, arch: "ampere" },
+  { name: "GeForce RTX 3060", tdp: 170, hotspot: 86, vram: 12, arch: "ampere" },
+  { name: "GeForce RTX 3060 Ti", tdp: 200, hotspot: 88, vram: 8, arch: "ampere" },
+  { name: "GeForce RTX 3070", tdp: 220, hotspot: 90, vram: 8, arch: "ampere" },
+  { name: "GeForce RTX 3070 Ti", tdp: 290, hotspot: 92, vram: 8, arch: "ampere" },
+  { name: "GeForce RTX 3080", tdp: 320, hotspot: 94, vram: 10, arch: "ampere" },
+  { name: "GeForce RTX 3080 Ti", tdp: 350, hotspot: 96, vram: 12, arch: "ampere" },
+  { name: "GeForce RTX 3090", tdp: 350, hotspot: 98, vram: 24, arch: "ampere" },
+
+  // RTX 40 series
+  { name: "GeForce RTX 4050", tdp: 115, hotspot: 82, vram: 8, arch: "ada" },
+  { name: "GeForce RTX 4060", tdp: 140, hotspot: 84, vram: 8, arch: "ada" },
+  { name: "GeForce RTX 4060 Ti", tdp: 160, hotspot: 86, vram: 8, arch: "ada" },
+  { name: "GeForce RTX 4070", tdp: 200, hotspot: 88, vram: 12, arch: "ada" },
+  { name: "GeForce RTX 4070 Super", tdp: 220, hotspot: 90, vram: 12, arch: "ada" },
+  { name: "GeForce RTX 4070 Ti", tdp: 285, hotspot: 92, vram: 12, arch: "ada" },
+  { name: "GeForce RTX 4070 Ti Super", tdp: 295, hotspot: 93, vram: 16, arch: "ada" },
+  { name: "GeForce RTX 4080", tdp: 320, hotspot: 94, vram: 16, arch: "ada" },
+  { name: "GeForce RTX 4080 Super", tdp: 340, hotspot: 95, vram: 16, arch: "ada" },
+  { name: "GeForce RTX 4080 Ti", tdp: 360, hotspot: 96, vram: 20, arch: "ada" },
+  { name: "GeForce RTX 4080 Ti Super", tdp: 380, hotspot: 97, vram: 20, arch: "ada" },
+  { name: "GeForce RTX 4090", tdp: 450, hotspot: 98, vram: 24, arch: "ada" },
+
+  // RTX 50 series (ICS enhanced)
+  { name: "GeForce RTX 5050", tdp: 140, hotspot: 82, vram: 8, arch: "blackwell" },
+  { name: "GeForce RTX 5060", tdp: 170, hotspot: 84, vram: 12, arch: "blackwell" },
+  { name: "GeForce RTX 5060 Ti 8GB", tdp: 190, hotspot: 86, vram: 8, arch: "blackwell" },
+  { name: "GeForce RTX 5060 Ti 16GB", tdp: 210, hotspot: 87, vram: 16, arch: "blackwell" },
+  { name: "GeForce RTX 5070", tdp: 240, hotspot: 89, vram: 16, arch: "blackwell" },
+  { name: "GeForce RTX 5070 Ti", tdp: 280, hotspot: 91, vram: 16, arch: "blackwell" },
+  { name: "GeForce RTX 5080", tdp: 340, hotspot: 94, vram: 20, arch: "blackwell" },
+  { name: "GeForce RTX 5090", tdp: 480, hotspot: 100, vram: 32, arch: "blackwell", cuda: 27000 },
+
+  // AMD Radeon 9000 series (fictional / ICS)
+  { name: "Radeon RX 9060", tdp: 220, hotspot: 92, vram: 12, arch: "rdna4" },
+  { name: "Radeon RX 9060 XT", tdp: 250, hotspot: 94, vram: 16, arch: "rdna4" },
+  { name: "Radeon RX 9070", tdp: 280, hotspot: 95, vram: 16, arch: "rdna4" },
+  { name: "Radeon RX 9070 XT", tdp: 320, hotspot: 96, vram: 20, arch: "rdna4" },
+
+  // AMD Radeon 7000 series
+  { name: "Radeon RX 7900", tdp: 260, hotspot: 92, vram: 20, arch: "rdna3" },
+  { name: "Radeon RX 7900 XT", tdp: 300, hotspot: 94, vram: 20, arch: "rdna3" },
+  { name: "Radeon RX 7900 XTX", tdp: 355, hotspot: 96, vram: 24, arch: "rdna3" }
 ];
+
+// =========================
+// GAME / PRESET MODEL
+// =========================
+const gameDb = {
+  cyberpunk:   { baseGpu: 0.85, baseCpu: 0.65, vramHeavy: true, rtFriendly: true },
+  gta6:        { baseGpu: 0.8,  baseCpu: 0.7,  vramHeavy: true, rtFriendly: true },
+  starfield:   { baseGpu: 0.9,  baseCpu: 0.7,  vramHeavy: true, rtFriendly: true },
+  helldivers2: { baseGpu: 0.8,  baseCpu: 0.75, vramHeavy: false, rtFriendly: false },
+  rdr2:        { baseGpu: 0.75, baseCpu: 0.6,  vramHeavy: true, rtFriendly: false },
+  cod:         { baseGpu: 0.8,  baseCpu: 0.7,  vramHeavy: true, rtFriendly: true },
+  eldenring:   { baseGpu: 0.7,  baseCpu: 0.6,  vramHeavy: false, rtFriendly: false },
+  fortnite:    { baseGpu: 0.6,  baseCpu: 0.55, vramHeavy: false, rtFriendly: true },
+  msfs2024:    { baseGpu: 0.9,  baseCpu: 0.85, vramHeavy: true, rtFriendly: true },
+  bg3:         { baseGpu: 0.7,  baseCpu: 0.6,  vramHeavy: false, rtFriendly: false },
+  witcher4:    { baseGpu: 0.9,  baseCpu: 0.75, vramHeavy: true, rtFriendly: true },
+  fh5:         { baseGpu: 0.75, baseCpu: 0.6,  vramHeavy: true, rtFriendly: true },
+  fh6:         { baseGpu: 0.85, baseCpu: 0.65, vramHeavy: true, rtFriendly: true }
+};
+
+function presetMultiplier(preset) {
+  if (preset === "low")    return { gpu: 0.55, cpu: 0.55, vram: 0.5, rt: 0 };
+  if (preset === "medium") return { gpu: 0.7,  cpu: 0.6,  vram: 0.7, rt: 0.1 };
+  if (preset === "high")   return { gpu: 0.85, cpu: 0.7,  vram: 0.9, rt: 0.2 };
+  if (preset === "ultra")  return { gpu: 0.95, cpu: 0.8,  vram: 1.0, rt: 0.3 };
+  if (preset === "rt")     return { gpu: 1.05, cpu: 0.85, vram: 1.1, rt: 0.6 };
+  if (preset === "pt")     return { gpu: 1.15, cpu: 0.9,  vram: 1.2, rt: 0.9 };
+  return { gpu: 0.8, cpu: 0.7, vram: 1.0, rt: 0.2 };
+}
+
+function resolutionMultiplier(res) {
+  if (res === "1080")        return { gpu: 0.7, vram: 0.7 };
+  if (res === "1440")        return { gpu: 0.85, vram: 0.9 };
+  if (res === "2160")        return { gpu: 1.0, vram: 1.1 };
+  if (res === "3440x1440")   return { gpu: 0.95, vram: 1.0 };
+  if (res === "8k")          return { gpu: 1.25, vram: 1.4 };
+  return { gpu: 0.85, vram: 0.9 };
+}
 
 // =========================
 // POPULATE SELECTS
@@ -431,24 +582,24 @@ populateThermalSelects();
 // COOLING MODEL
 // =========================
 function coolerEfficiency(coolerType) {
-  if (coolerType === "stock") return 0.55;
-  if (coolerType === "tower") return 0.75;
+  if (coolerType === "stock")  return 0.55;
+  if (coolerType === "tower")  return 0.75;
   if (coolerType === "aio240") return 0.85;
   if (coolerType === "aio360") return 0.92;
   return 0.7;
 }
 
 function airflowModifier(airflow) {
-  if (airflow === "weak") return 0.85;
+  if (airflow === "weak")     return 0.85;
   if (airflow === "balanced") return 1.0;
-  if (airflow === "high") return 1.1;
+  if (airflow === "high")     return 1.1;
   return 1.0;
 }
 
 function intensityLoad(intensity) {
-  if (intensity === "gaming") return { cpu: 0.65, gpu: 0.8 };
+  if (intensity === "gaming")   return { cpu: 0.65, gpu: 0.8 };
   if (intensity === "cpuheavy") return { cpu: 0.95, gpu: 0.4 };
-  if (intensity === "gpuheavy") return { cpu: 0.5, gpu: 0.98 };
+  if (intensity === "gpuheavy") return { cpu: 0.5,  gpu: 0.98 };
   return { cpu: 0.7, gpu: 0.7 };
 }
 
@@ -456,6 +607,29 @@ function intensityLoad(intensity) {
 function estimateTemp(ambient, tdp, load, eff, airflowFactor) {
   const delta = (tdp * load) / (eff * airflowFactor * 4);
   return ambient + delta;
+}
+
+// =========================
+// VRAM USAGE MODEL
+// =========================
+function estimateVramUsage(gameKey, preset, res, gpu) {
+  const game = gameDb[gameKey];
+  const pMul = presetMultiplier(preset);
+  const rMul = resolutionMultiplier(res);
+
+  let base = game.vramHeavy ? 8 : 5; // GB baseline
+  if (gameKey === "msfs2024") base = 10;
+  if (gameKey === "fh6") base += 1;
+  if (preset === "ultra" || preset === "rt" || preset === "pt") base += 2;
+
+  let usage = base * pMul.vram * rMul.vram;
+  if (preset === "pt") usage += 2;
+  if (res === "8k") usage += 3;
+
+  // clamp to GPU VRAM
+  const used = Math.min(usage, gpu.vram);
+  const headroom = Math.max(0, gpu.vram - used);
+  return { used: Math.round(used * 10) / 10, headroom: Math.round(headroom * 10) / 10 };
 }
 
 // =========================
@@ -469,24 +643,48 @@ function simulateThermals() {
   const ambient = Number(document.getElementById("ambient").value || 22);
   const intensity = document.getElementById("intensity").value;
 
+  const gameKey = document.getElementById("game").value;
+  const preset = document.getElementById("preset").value;
+  const res = document.getElementById("resolution").value;
+
   const cpu = cpuDb.find(c => c.name === cpuName);
   const gpu = gpuDb.find(g => g.name === gpuName);
+  const game = gameDb[gameKey];
 
   const eff = coolerEfficiency(cooler);
   const airMod = airflowModifier(airflow);
-  const load = intensityLoad(intensity);
+  const baseLoad = intensityLoad(intensity);
+  const pMul = presetMultiplier(preset);
+  const rMul = resolutionMultiplier(res);
 
-  const cpuTemp = estimateTemp(ambient, cpu.tdp, load.cpu, eff, airMod);
-  const gpuTemp = estimateTemp(ambient, gpu.tdp, load.gpu, 0.9, airMod);
+  // Game-aware loads
+  const cpuLoad = Math.min(1.0, baseLoad.cpu * game.baseCpu * pMul.cpu);
+  let gpuLoad = Math.min(1.2, baseLoad.gpu * game.baseGpu * pMul.gpu * rMul.gpu);
+
+  // Path tracing / RT extra load
+  if (preset === "rt" || preset === "pt") {
+    if (game.rtFriendly) {
+      gpuLoad *= 1.05;
+    } else {
+      gpuLoad *= 1.0;
+    }
+  }
+
+  // RTX 5090 can handle insane loads more efficiently
+  if (gpu.name === "GeForce RTX 5090") {
+    gpuLoad *= 0.9;
+  }
+
+  const cpuTemp = estimateTemp(ambient, cpu.tdp, cpuLoad, eff, airMod);
+  const gpuTemp = estimateTemp(ambient, gpu.tdp, gpuLoad, 0.9, airMod);
 
   const cpuTempRounded = Math.round(cpuTemp);
   const gpuTempRounded = Math.round(gpuTemp);
 
-  // Headroom vs hotspot
   const cpuHeadroom = Math.max(0, cpu.hotspot - cpuTempRounded);
   const gpuHeadroom = Math.max(0, gpu.hotspot - gpuTempRounded);
 
-  // Simple throttle risk
+  // Throttle risk
   let throttleRisk = "Low";
   let headroomScore = (cpuHeadroom + gpuHeadroom) / 2;
   if (cpuTempRounded > cpu.hotspot - 5 || gpuTempRounded > gpu.hotspot - 5) {
@@ -503,8 +701,25 @@ function simulateThermals() {
     noiseNote = "Expect high fan speeds and noticeable noise to keep temperatures in check.";
   }
 
+  // VRAM usage
+  const vramStats = estimateVramUsage(gameKey, preset, res, gpu);
+  let vramNote = `Estimated VRAM usage: ~${vramStats.used}GB out of ${gpu.vram}GB.`;
+  if (vramStats.headroom < 1) {
+    vramNote += " Very little headroom — expect stutters or streaming hitches in heavy scenes.";
+  } else if (vramStats.headroom < 3) {
+    vramNote += " Limited headroom — some heavy scenes may push close to the limit.";
+  } else {
+    vramNote += " Healthy headroom for this scenario.";
+  }
+
   // Update main result frame
   document.getElementById("resultFrame").style.display = "block";
+
+  const scenarioLabel = `
+    Scenario: ${gameNameLabel(gameKey)} @ ${resolutionLabel(res)}, ${presetLabel(preset)} preset
+    on ${cpu.name} + ${gpu.name} in ${airflowLabel(airflow)}, cooled by ${coolerLabel(cooler)}.
+  `.replace(/\s+/g, " ").trim();
+  document.getElementById("scenarioLabel").textContent = scenarioLabel;
 
   // CPU temp UI
   document.getElementById("cpuTempLabel").textContent = cpuTempRounded + "°C";
@@ -534,16 +749,17 @@ function simulateThermals() {
   document.getElementById("headroomBar").style.width = headroomPercent + "%";
   document.getElementById("headroomBarLabel").textContent = headroomPercent.toFixed(0) + "% thermal headroom";
   document.getElementById("noiseNote").textContent = noiseNote;
+  document.getElementById("vramNote").textContent = vramNote;
 
   // Temperature curve table (idle / gaming / heavy)
   const idleCpu = ambient + (cpu.tdp * 0.15) / (eff * airMod * 4);
   const idleGpu = ambient + (gpu.tdp * 0.1) / (0.9 * airMod * 4);
 
-  const gamingCpu = estimateTemp(ambient, cpu.tdp, 0.65, eff, airMod);
-  const gamingGpu = estimateTemp(ambient, gpu.tdp, 0.8, 0.9, airMod);
+  const gamingCpu = estimateTemp(ambient, cpu.tdp, Math.min(0.7, cpuLoad), eff, airMod);
+  const gamingGpu = estimateTemp(ambient, gpu.tdp, Math.min(0.85, gpuLoad), 0.9, airMod);
 
-  const heavyCpu = estimateTemp(ambient, cpu.tdp, 0.95, eff, airMod);
-  const heavyGpu = estimateTemp(ambient, gpu.tdp, 0.98, 0.9, airMod);
+  const heavyCpu = estimateTemp(ambient, cpu.tdp, Math.min(1.0, cpuLoad * 1.1), eff, airMod);
+  const heavyGpu = estimateTemp(ambient, gpu.tdp, Math.min(1.1, gpuLoad * 1.1), 0.9, airMod);
 
   let rows = `
     <tr>
@@ -557,7 +773,7 @@ function simulateThermals() {
       <td>${Math.round(idleGpu)}°C</td>
     </tr>
     <tr>
-      <td>Gaming Load</td>
+      <td>Gaming Load (${gameNameLabel(gameKey)})</td>
       <td>${Math.round(gamingCpu)}°C</td>
       <td>${Math.round(gamingGpu)}°C</td>
     </tr>
@@ -570,30 +786,75 @@ function simulateThermals() {
   document.getElementById("tempTable").innerHTML = rows;
 
   // Cooling narrative
-  const airflowLabel =
-    airflow === "weak" ? "a restricted, low-airflow case" :
-    airflow === "balanced" ? "a balanced airflow case" :
-    "a high-airflow, mesh-front case";
-
-  const coolerLabel =
-    cooler === "stock" ? "a basic stock cooler" :
-    cooler === "tower" ? "a tower-style air cooler" :
-    cooler === "aio240" ? "a 240mm AIO liquid cooler" :
-    "a 360mm AIO liquid cooler";
-
   const intensityLabel =
-    intensity === "gaming" ? "typical gaming workloads" :
+    intensity === "gaming"   ? "typical gaming workloads" :
     intensity === "cpuheavy" ? "heavy CPU-bound workloads" :
     "extreme GPU-bound workloads";
 
   const summary = `
-    This thermal scenario combines ${cpu.name} and ${gpu.name} inside ${airflowLabel},
-    cooled by ${coolerLabel}. Under ${intensityLabel}, the CPU is expected to reach around
-    ${cpuTempRounded}°C and the GPU around ${gpuTempRounded}°C, relative to their typical
-    hotspot limits of ${cpu.hotspot}°C and ${gpu.hotspot}°C. ${noiseNote}
+    This thermal scenario combines ${cpu.name} and ${gpu.name} running ${gameNameLabel(gameKey)} at
+    ${resolutionLabel(res)} using the ${presetLabel(preset)} preset. Under ${intensityLabel}, the CPU is
+    expected to reach around ${cpuTempRounded}°C and the GPU around ${gpuTempRounded}°C, relative to their
+    typical hotspot limits of ${cpu.hotspot}°C and ${gpu.hotspot}°C. ${noiseNote} ${vramNote}
   `.replace(/\s+/g, " ").trim();
 
   document.getElementById("coolingSummary").textContent = summary;
+}
+
+// =========================
+// LABEL HELPERS
+// =========================
+function gameNameLabel(key) {
+  const map = {
+    cyberpunk: "Cyberpunk 2077",
+    gta6: "GTA VI",
+    starfield: "Starfield",
+    helldivers2: "Helldivers 2",
+    rdr2: "Red Dead Redemption 2",
+    cod: "Call of Duty",
+    eldenring: "Elden Ring",
+    fortnite: "Fortnite",
+    msfs2024: "Flight Simulator 2024",
+    bg3: "Baldur's Gate 3",
+    witcher4: "The Witcher 4",
+    fh5: "Forza Horizon 5",
+    fh6: "Forza Horizon 6"
+  };
+  return map[key] || key;
+}
+
+function presetLabel(p) {
+  if (p === "low") return "Low";
+  if (p === "medium") return "Medium";
+  if (p === "high") return "High";
+  if (p === "ultra") return "Ultra";
+  if (p === "rt") return "Ray Tracing";
+  if (p === "pt") return "Path Tracing";
+  return p;
+}
+
+function resolutionLabel(r) {
+  if (r === "1080") return "1080p";
+  if (r === "1440") return "1440p";
+  if (r === "2160") return "4K";
+  if (r === "3440x1440") return "Ultrawide 3440×1440";
+  if (r === "8k") return "8K";
+  return r;
+}
+
+function airflowLabel(a) {
+  if (a === "weak") return "a restricted, low-airflow case";
+  if (a === "balanced") return "a balanced airflow case";
+  if (a === "high") return "a high-airflow, mesh-front case";
+  return "a standard case";
+}
+
+function coolerLabel(c) {
+  if (c === "stock") return "a basic stock cooler";
+  if (c === "tower") return "a tower-style air cooler";
+  if (c === "aio240") return "a 240mm AIO liquid cooler";
+  if (c === "aio360") return "a 360mm AIO liquid cooler";
+  return "a standard cooler";
 }
 </script>
 
