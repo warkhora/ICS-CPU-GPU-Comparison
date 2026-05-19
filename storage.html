@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ICS Regent – Storage Speed & Load Time Analyzer</title>
+
+<style>
+  body {
+    margin: 0;
+    padding: 40px;
+    background: linear-gradient(135deg, #050505, #000000);
+    color: #e6e6e6;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+
+  .ics-container {
+    max-width: 1100px;
+    margin: auto;
+    backdrop-filter: blur(18px);
+  }
+
+  .ics-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .ics-logo {
+    font-size: 32px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #ffd700;
+    font-weight: 600;
+  }
+
+  .ics-subtitle {
+    color: #bbb;
+    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  .ics-frame {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 18px;
+    transition: 0.3s ease;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
+  }
+
+  .ics-frame:hover {
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25);
+    transform: translateY(-3px);
+  }
+
+  select, button, input {
+    width: 100%;
+    background: rgba(20, 20, 20, 0.85);
+    color: #eee;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 12px;
+    border-radius: 10px;
+    margin: 10px 0;
+    transition: 0.2s;
+    font-size: 15px;
+    backdrop-filter: blur(12px);
+    box-sizing: border-box;
+  }
+
+  select:hover, button:hover, input:hover {
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+  }
+
+  select option {
+    background: #111;
+    color: #eee;
+  }
+
+  button {
+    cursor: pointer;
+    background: rgba(255, 215, 0, 0.15);
+    font-weight: 600;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .row-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .ics-nav {
+    width: 100%;
+    background: rgba(0,0,0,0.65);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 16px 24px;
+    display: flex;
+    gap: 30px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    backdrop-filter: blur(12px);
+    margin: -40px -40px 40px -40px;
+  }
+
+  .ics-nav a {
+    color: #ffd700;
+    text-decoration: none;
+    font-size: 16px;
+    letter-spacing: 1px;
+    transition: 0.25s ease;
+    padding-bottom: 4px;
+  }
+
+  .ics-nav a:hover {
+    color: white;
+    text-shadow: 0 0 10px #ffd700;
+  }
+
+  .ics-nav a.active {
+    color: white;
+    border-bottom: 2px solid #ffd700;
+    text-shadow: 0 0 12px #ffd700;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    margin-right: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .tag-info { color: #7dd3fc; border-color: #0ea5e9; }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    color: #f5f5f5;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  .result-pill {
+    background: rgba(0,0,0,0.7);
+    border-radius: 14px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.18);
+    font-size: 13px;
+  }
+
+  .result-label {
+    font-weight: 600;
+    color: #ffd700;
+    margin-bottom: 4px;
+  }
+
+  .result-value {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .note {
+    font-size: 12px;
+    color: #cfcfcf;
+    margin-top: 4px;
+  }
+
+  .bar-outer {
+    width: 100%;
+    height: 26px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.85);
+    border: 1px solid rgba(255,255,255,0.18);
+    overflow: hidden;
+    position: relative;
+    margin-top: 6px;
+  }
+
+  .bar-inner {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #00ff9d, #ffd700, #ff4b4b);
+    transition: width 0.4s ease;
+  }
+
+  .bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-shadow: 0 0 6px rgba(0,0,0,0.9);
+  }
+
+  .storage-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 13px;
+  }
+
+  .storage-table th {
+    background: rgba(0,0,0,0.85);
+    padding: 10px;
+    border-bottom: 2px solid rgba(255,255,255,0.18);
+    text-align: left;
+  }
+
+  .storage-table td {
+    padding: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .ai-summary {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #d0d0d0;
+    line-height: 1.6;
+  }
+
+  .small-label {
+    font-size: 12px;
+    color: #ccc;
+  }
+
+  @media (max-width: 900px) {
+    .row, .row-3, .result-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="ics-nav">
+  <a href="index.html" class="nav-link" data-page="index">CPU/GPU Comparison</a>
+  <a href="fps.html" class="nav-link" data-page="fps">FPS Estimator</a>
+  <a href="canyourunit.html" class="nav-link" data-page="canyourunit">Can You Run It?</a>
+  <a href="build.html" class="nav-link" data-page="build">Build Your PC</a>
+  <a href="pclifetime.html" class="nav-link" data-page="pclifetime">PC Lifespan</a>
+  <a href="thermals.html" class="nav-link" data-page="thermals">Thermal & Cooling</a>
+  <a href="consumption.html" class="nav-link" data-page="consumption">Power Consumption</a>
+  <a href="storage.html" class="nav-link" data-page="storage">Storage & Load Times</a>
+</div>
+
+<script>
+  const current = window.location.pathname.split("/").pop().toLowerCase();
+  document.querySelectorAll(".nav-link").forEach(link => {
+    if (current.includes(link.getAttribute("data-page"))) {
+      link.classList.add("active");
+    }
+  });
+</script>
+
+<div class="ics-container">
+
+  <div class="ics-header">
+    <div class="ics-logo">ICS REGENT</div>
+    <div class="ics-subtitle">Storage Speed & Load Time Analyzer — SSD, HDD & DirectStorage Impact</div>
+  </div>
+
+  <!-- INPUT FRAME -->
+  <div class="ics-frame">
+    <div class="tag tag-info">Storage v1</div>
+    <h2 style="margin-top:10px;">Storage & Game Scenario</h2>
+    <p style="font-size:13px;color:#ccc;margin-bottom:14px;">
+      Select your storage type, game and DirectStorage options. The analyzer estimates initial load time,
+      shader compilation time and streaming stability, including the difference between HDD, SATA SSD,
+      NVMe Gen3/Gen4/Gen5 and DirectStorage.
+    </p>
+
+    <div class="row">
+      <div>
+        <label>Storage Type</label>
+        <select id="storageType">
+          <option value="hdd">HDD (spinning rust, for science)</option>
+          <option value="sata">SATA SSD</option>
+          <option value="nvme3">NVMe Gen3</option>
+          <option value="nvme4" selected>NVMe Gen4</option>
+          <option value="nvme5">NVMe Gen5</option>
+        </select>
+      </div>
+      <div>
+        <label>Drive Capacity</label>
+        <select id="capacity">
+          <option value="512">512 GB</option>
+          <option value="1000" selected>1 TB</option>
+          <option value="2000">2 TB</option>
+          <option value="4000">4 TB</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Game</label>
+        <select id="game">
+          <option value="cyberpunk">Cyberpunk 2077</option>
+          <option value="gta6">GTA VI</option>
+          <option value="starfield">Starfield</option>
+          <option value="helldivers2">Helldivers 2</option>
+          <option value="rdr2">Red Dead Redemption 2</option>
+          <option value="cod">Call of Duty</option>
+          <option value="eldenring">Elden Ring</option>
+          <option value="fortnite">Fortnite</option>
+          <option value="msfs2024">Flight Simulator 2024</option>
+          <option value="bg3">Baldur's Gate 3</option>
+          <option value="witcher4">The Witcher 4 (future)</option>
+          <option value="fh5">Forza Horizon 5</option>
+          <option value="fh6" selected>Forza Horizon 6</option>
+        </select>
+      </div>
+      <div>
+        <label>Game Install Size (approx)</label>
+        <select id="gameSize">
+          <option value="60">~60 GB</option>
+          <option value="80" selected>~80 GB</option>
+          <option value="100">~100 GB</option>
+          <option value="150">~150 GB</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row-3">
+      <div>
+        <label>DirectStorage</label>
+        <select id="directStorage">
+          <option value="off">Disabled / Not supported</option>
+          <option value="on" selected>Enabled</option>
+        </select>
+      </div>
+      <div>
+        <label>Shader Compilation Mode</label>
+        <select id="shaderMode">
+          <option value="startup" selected>Compile at startup</option>
+          <option value="background">Compile in background</option>
+          <option value="onfly">Compile on the fly</option>
+        </select>
+      </div>
+      <div>
+        <label>Open World Streaming Intensity</label>
+        <select id="streamIntensity">
+          <option value="low">Low (small maps, corridors)</option>
+          <option value="medium">Medium (hub worlds)</option>
+          <option value="high" selected>High (large open world)</option>
+          <option value="extreme">Extreme (flight sim, huge worlds)</option>
+        </select>
+      </div>
+    </div>
+
+    <button onclick="simulateStorage()">Analyze Storage & Load Times</button>
+  </div>
+
+  <!-- RESULT FRAME -->
+  <div class="ics-frame" id="resultFrame" style="display:none;">
+    <h2>Load Times, Shaders & Streaming Stability</h2>
+
+    <div class="small-label" id="scenarioLabel"></div>
+
+    <div class="result-grid">
+      <div class="result-pill">
+        <div class="result-label">Initial Load Time</div>
+        <div class="result-value" id="loadTimeLabel"></div>
+        <div class="bar-outer">
+          <div class="bar-inner" id="loadTimeBar"></div>
+          <div class="bar-label" id="loadTimeBarLabel"></div>
+        </div>
+        <div class="note" id="loadTimeNote"></div>
+      </div>
+
+      <div class="result-pill">
+        <div class="result-label">Shader Compilation Time</div>
+        <div class="result-value" id="shaderTimeLabel"></div>
+        <div class="bar-outer">
+          <div class="bar-inner" id="shaderTimeBar"></div>
+          <div class="bar-label" id="shaderTimeBarLabel"></div>
+        </div>
+        <div class="note" id="shaderNote"></div>
+      </div>
+
+      <div class="result-pill">
+        <div class="result-label">Streaming Stability</div>
+        <div class="result-value" id="streamScoreLabel"></div>
+        <div class="bar-outer">
+          <div class="bar-inner" id="streamScoreBar"></div>
+          <div class="bar-label" id="streamScoreBarLabel"></div>
+        </div>
+        <div class="note" id="streamNote"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Storage Capability & Game Profile</div>
+    <table class="storage-table" id="storageTable"></table>
+
+    <div class="section-title">Storage Narrative</div>
+    <div class="ai-summary" id="storageSummary"></div>
+  </div>
+
+</div>
+
+<script>
+// =========================
+// STORAGE DATABASE
+// =========================
+const storageDb = {
+  hdd:   { name: "HDD",      read: 150,   write: 150,   iops: 1000,  humor: "Yes, it still spins." },
+  sata:  { name: "SATA SSD", read: 550,   write: 500,   iops: 80000, humor: "Solid, but not NVMe fast." },
+  nvme3: { name: "NVMe Gen3",read: 3500,  write: 3000,  iops: 400000,humor: "The classic NVMe baseline." },
+  nvme4: { name: "NVMe Gen4",read: 7000,  write: 6500,  iops: 800000,humor: "Fast and very common in modern builds." },
+  nvme5: { name: "NVMe Gen5",read: 12000, write: 11000, iops: 1500000,humor: "Ridiculously fast, sometimes faster than games can use." }
+};
+
+// =========================
+// GAME DATABASE
+// =========================
+const gameDb = {
+  cyberpunk: { name: "Cyberpunk 2077",   assetGb: 12, shaderWeight: 1.0, streamWeight: 1.0 },
+  gta6:      { name: "GTA VI",           assetGb: 14, shaderWeight: 0.9, streamWeight: 1.1 },
+  starfield: { name: "Starfield",        assetGb: 20, shaderWeight: 1.0, streamWeight: 1.2 },
+  helldivers2:{name: "Helldivers 2",     assetGb: 8,  shaderWeight: 0.8, streamWeight: 0.9 },
+  rdr2:      { name: "Red Dead Redemption 2", assetGb: 10, shaderWeight: 0.9, streamWeight: 1.0 },
+  cod:       { name: "Call of Duty",     assetGb: 12, shaderWeight: 1.1, streamWeight: 1.0 },
+  eldenring: { name: "Elden Ring",       assetGb: 8,  shaderWeight: 0.8, streamWeight: 0.9 },
+  fortnite:  { name: "Fortnite",         assetGb: 5,  shaderWeight: 0.7, streamWeight: 0.8 },
+  msfs2024:  { name: "Flight Simulator 2024", assetGb: 40, shaderWeight: 0.7, streamWeight: 1.4 },
+  bg3:       { name: "Baldur's Gate 3",  assetGb: 9,  shaderWeight: 0.9, streamWeight: 0.8 },
+  witcher4:  { name: "The Witcher 4",    assetGb: 16, shaderWeight: 1.0, streamWeight: 1.1 },
+  fh5:       { name: "Forza Horizon 5",  assetGb: 10, shaderWeight: 0.8, streamWeight: 1.0 },
+  fh6:       { name: "Forza Horizon 6",  assetGb: 14, shaderWeight: 0.9, streamWeight: 1.1 }
+};
+
+function streamIntensityFactor(level) {
+  if (level === "low") return 0.7;
+  if (level === "medium") return 1.0;
+  if (level === "high") return 1.2;
+  if (level === "extreme") return 1.5;
+  return 1.0;
+}
+
+function shaderModeFactor(mode) {
+  if (mode === "startup") return { time: 1.0, hitch: 0.2 };
+  if (mode === "background") return { time: 0.7, hitch: 0.3 };
+  if (mode === "onfly") return { time: 0.4, hitch: 0.7 };
+  return { time: 1.0, hitch: 0.3 };
+}
+
+// =========================
+// MAIN SIMULATION
+// =========================
+function simulateStorage() {
+  const storageKey = document.getElementById("storageType").value;
+  const capacity = Number(document.getElementById("capacity").value);
+  const gameKey = document.getElementById("game").value;
+  const gameSizeSel = Number(document.getElementById("gameSize").value);
+  const directStorage = document.getElementById("directStorage").value;
+  const shaderMode = document.getElementById("shaderMode").value;
+  const streamLevel = document.getElementById("streamIntensity").value;
+
+  const storage = storageDb[storageKey];
+  const game = gameDb[gameKey];
+
+  const effectiveAssetGb = (game.assetGb + gameSizeSel / 10) * 0.8;
+  const readMbPerSec = storage.read;
+  let baseLoadSeconds = (effectiveAssetGb * 1024) / readMbPerSec;
+
+  if (storageKey === "hdd") baseLoadSeconds *= 2.2;
+  if (storageKey === "sata") baseLoadSeconds *= 1.4;
+
+  let dsFactor = 1.0;
+  if (directStorage === "on") {
+    if (storageKey === "nvme3") dsFactor = 0.75;
+    if (storageKey === "nvme4") dsFactor = 0.6;
+    if (storageKey === "nvme5") dsFactor = 0.5;
+    if (storageKey === "sata")  dsFactor = 0.85;
+    if (storageKey === "hdd")   dsFactor = 0.95;
+  }
+  const loadSeconds = baseLoadSeconds * dsFactor;
+
+  const shaderFactors = shaderModeFactor(shaderMode);
+  let shaderSeconds = game.shaderWeight * 12 * shaderFactors.time;
+  if (storageKey === "hdd") shaderSeconds *= 1.4;
+  if (storageKey === "nvme5") shaderSeconds *= 0.85;
+
+  const streamFactor = streamIntensityFactor(streamLevel);
+  let streamScore = 100;
+
+  if (storageKey === "hdd") streamScore -= 45 * streamFactor;
+  else if (storageKey === "sata") streamScore -= 25 * streamFactor;
+  else if (storageKey === "nvme3") streamScore -= 15 * streamFactor;
+  else if (storageKey === "nvme4") streamScore -= 8 * streamFactor;
+  else if (storageKey === "nvme5") streamScore -= 4 * streamFactor;
+
+  streamScore -= shaderFactors.hitch * 20;
+  streamScore -= (game.streamWeight - 1.0) * 15 * streamFactor;
+
+  streamScore = Math.max(0, Math.min(100, streamScore));
+
+  document.getElementById("resultFrame").style.display = "block";
+
+  const scenario = `
+    Scenario: ${game.name} on ${storage.name} (${capacity} GB),
+    DirectStorage ${directStorage === "on" ? "enabled" : "disabled"},
+    shader mode: ${shaderModeLabel(shaderMode)},
+    streaming intensity: ${streamLabel(streamLevel)}.
+  `.replace(/\s+/g, " ").trim();
+  document.getElementById("scenarioLabel").textContent = scenario;
+
+  // Load time pill
+  document.getElementById("loadTimeLabel").textContent = loadSeconds.toFixed(1) + " s";
+  const loadNorm = normalizeLoadTime(loadSeconds);
+  document.getElementById("loadTimeBar").style.width = loadNorm + "%";
+  document.getElementById("loadTimeBarLabel").textContent = loadSeconds.toFixed(1) + " s";
+
+  let loadNote = "Load time is very fast for this configuration.";
+  if (loadSeconds > 25) loadNote = "Load time is very slow — this is typical HDD territory.";
+  else if (loadSeconds > 15) loadNote = "Load time is on the slower side, but still acceptable.";
+  else if (loadSeconds > 9) loadNote = "Load time is decent, but faster NVMe could improve it.";
+  document.getElementById("loadTimeNote").textContent = loadNote;
+
+  // Shader pill
+  document.getElementById("shaderTimeLabel").textContent = shaderSeconds.toFixed(1) + " s";
+  const shaderNorm = normalizeShaderTime(shaderSeconds);
+  document.getElementById("shaderTimeBar").style.width = shaderNorm + "%";
+  document.getElementById("shaderTimeBarLabel").textContent = shaderSeconds.toFixed(1) + " s";
+
+  let shaderNote = "Shader compilation is mostly hidden and should not cause noticeable stutter.";
+  if (shaderMode === "onfly") shaderNote = "On-the-fly shader compilation may cause hitching during gameplay.";
+  else if (shaderMode === "background") shaderNote = "Background compilation may cause minor stutters early in a session.";
+  document.getElementById("shaderNote").textContent = shaderNote;
+
+  // Streaming pill
+  document.getElementById("streamScoreLabel").textContent = streamScore.toFixed(0) + " / 100";
+  document.getElementById("streamScoreBar").style.width = streamScore + "%";
+  document.getElementById("streamScoreBarLabel").textContent = streamScore.toFixed(0) + "% stability";
+
+  let streamNote = "Streaming should be smooth with minimal pop-in or stutter.";
+  if (streamScore < 40) streamNote = "Expect frequent streaming stutters, pop-in and asset loading delays.";
+  else if (streamScore < 65) streamNote = "Some stutter and pop-in may occur in heavy scenes.";
+  else if (streamScore < 80) streamNote = "Mostly smooth, with occasional minor hitches.";
+  document.getElementById("streamNote").textContent = streamNote;
+
+  // Table
+  const dsBenefit = (baseLoadSeconds - loadSeconds);
+  const dsPercent = baseLoadSeconds > 0 ? (dsBenefit / baseLoadSeconds) * 100 : 0;
+
+  const tableHtml = `
+    <tr>
+      <th>Metric</th>
+      <th>Value</th>
+    </tr>
+    <tr>
+      <td>Storage Type</td>
+      <td>${storage.name} (${capacity} GB)</td>
+    </tr>
+    <tr>
+      <td>Sequential Read (theoretical)</td>
+      <td>${storage.read.toLocaleString()} MB/s</td>
+    </tr>
+    <tr>
+      <td>Sequential Write (theoretical)</td>
+      <td>${storage.write.toLocaleString()} MB/s</td>
+    </tr>
+    <tr>
+      <td>Random IOPS (approx)</td>
+      <td>${storage.iops.toLocaleString()}</td>
+    </tr>
+    <tr>
+      <td>Game</td>
+      <td>${game.name}</td>
+    </tr>
+    <tr>
+      <td>Estimated Asset Volume</td>
+      <td>${effectiveAssetGb.toFixed(1)} GB</td>
+    </tr>
+    <tr>
+      <td>Initial Load Time</td>
+      <td>${loadSeconds.toFixed(1)} s</td>
+    </tr>
+    <tr>
+      <td>Shader Compilation Time</td>
+      <td>${shaderSeconds.toFixed(1)} s (${shaderModeLabel(shaderMode)})</td>
+    </tr>
+    <tr>
+      <td>Streaming Stability Score</td>
+      <td>${streamScore.toFixed(0)} / 100</td>
+    </tr>
+    <tr>
+      <td>DirectStorage</td>
+      <td>${directStorage === "on"
+        ? `Enabled (approx. ${dsPercent.toFixed(0)}% faster initial load vs. no DirectStorage)`
+        : "Disabled / Not supported"}</td>
+    </tr>
+    <tr>
+      <td>Drive Personality</td>
+      <td>${storage.humor}</td>
+    </tr>
+  `;
+  document.getElementById("storageTable").innerHTML = tableHtml;
+
+  // Narrative
+  const summary = `
+    This scenario uses a ${storage.name} (${capacity} GB) to run ${game.name}, with
+    ${directStorage === "on" ? "DirectStorage enabled" : "DirectStorage disabled"} and
+    ${streamLabel(streamLevel).toLowerCase()} streaming intensity. Initial load time is estimated at
+    around ${loadSeconds.toFixed(1)} seconds, with shader compilation taking roughly
+    ${shaderSeconds.toFixed(1)} seconds in the chosen mode (${shaderModeLabel(shaderMode)}).
+    Streaming stability is rated at ${streamScore.toFixed(0)} out of 100, meaning:
+    ${streamNote} On this drive, ${storage.humor}
+  `.replace(/\s+/g, " ").trim();
+
+  document.getElementById("storageSummary").textContent = summary;
+}
+
+// =========================
+// HELPERS
+// =========================
+function normalizeLoadTime(sec) {
+  if (sec <= 4) return 25;
+  if (sec >= 30) return 100;
+  return 25 + ((sec - 4) / (30 - 4)) * 75;
+}
+
+function normalizeShaderTime(sec) {
+  if (sec <= 3) return 20;
+  if (sec >= 25) return 100;
+  return 20 + ((sec - 3) / (25 - 3)) * 80;
+}
+
+function shaderModeLabel(mode) {
+  if (mode === "startup") return "Compile at startup";
+  if (mode === "background") return "Compile in background";
+  if (mode === "onfly") return "Compile on the fly";
+  return mode;
+}
+
+function streamLabel(level) {
+  if (level === "low") return "Low";
+  if (level === "medium") return "Medium";
+  if (level === "high") return "High";
+  if (level === "extreme") return "Extreme";
+  return level;
+}
+</script>
+
+</body>
+</html>
