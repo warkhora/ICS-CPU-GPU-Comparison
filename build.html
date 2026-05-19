@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Regent – Build Your PC v2.0</title>
+<title>ICS Regent – Build Your PC v3.0</title>
 
 <style>
   body {
@@ -54,7 +54,7 @@
     transform: translateY(-3px);
   }
 
-  h1, h2 {
+  h1, h2, h3 {
     font-weight: 600;
     letter-spacing: 1px;
     color: #f5f5f5;
@@ -193,6 +193,41 @@
     color: #ff4d4d;
   }
 
+  .score-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .score-pill {
+    flex: 1;
+    min-width: 180px;
+    background: rgba(0,0,0,0.55);
+    border-radius: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,0.18);
+    font-size: 13px;
+  }
+
+  .score-label {
+    font-weight: 600;
+    color: #ffd700;
+    margin-bottom: 4px;
+  }
+
+  .score-value {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .ai-summary {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #d0d0d0;
+    line-height: 1.5;
+  }
+
   .ics-nav {
     width: 100%;
     background: rgba(0,0,0,0.65);
@@ -250,7 +285,7 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">Build Your PC v2.0 — Ultra Premium Budget-Based System Generator</div>
+    <div class="ics-subtitle">Build Your PC v3.0 — Smart Budget-Based System Generator</div>
   </div>
 
   <!-- INPUT FRAME -->
@@ -304,11 +339,40 @@
     <div id="budgetInfo"></div>
   </div>
 
-  <!-- RESULT FRAME -->
+  <!-- FRAME 1: PERFORMANCE OVERVIEW -->
   <div class="ics-frame">
-    <h2>Your PC Build</h2>
+    <h2>Performance Overview</h2>
     <div id="perfBox" class="perf-box" style="display:none;"></div>
+    <div id="scoreRow" class="score-row" style="display:none;">
+      <div class="score-pill">
+        <div class="score-label">Value Score</div>
+        <div class="score-value" id="valueScore"></div>
+        <div class="note" id="valueNote"></div>
+      </div>
+      <div class="score-pill">
+        <div class="score-label">Future-Proof Score</div>
+        <div class="score-value" id="futureScore"></div>
+        <div class="note" id="futureNote"></div>
+      </div>
+      <div class="score-pill">
+        <div class="score-label">Bottlenecks</div>
+        <div class="note" id="bottleneckNote"></div>
+      </div>
+    </div>
+    <div class="ai-summary" id="aiSummary" style="display:none;"></div>
+  </div>
+
+  <!-- FRAME 2: COMPONENT BREAKDOWN -->
+  <div class="ics-frame">
+    <h2>Component Breakdown</h2>
     <table id="result"></table>
+    <div class="note" id="totalBox"></div>
+  </div>
+
+  <!-- FRAME 3: ANALYSIS & RECOMMENDATIONS -->
+  <div class="ics-frame">
+    <h2>Analysis & Recommendations</h2>
+    <div id="analysisBox" class="note"></div>
   </div>
 
 </div>
@@ -353,12 +417,12 @@ const cpus = [
 ];
 
 // =========================
-// MOTHERBOARDS
+– MOTHERBOARDS
 // =========================
 const motherboards = [
-  { platform: "AM5", name: "AM5 ATX Gaming Motherboard", price: usdFromNok(2200) },
-  { platform: "LGA1700", name: "LGA1700 ATX Z790 Motherboard", price: usdFromNok(2400) },
-  { platform: "ULTRA", name: "Ultra-Series X Chipset Motherboard", price: usdFromNok(2800) }
+  { platform: "AM5", name: "AM5 ATX Gaming Motherboard (WiFi)", price: usdFromNok(2200), wifi: true },
+  { platform: "LGA1700", name: "LGA1700 ATX Z790 Motherboard", price: usdFromNok(2400), wifi: false },
+  { platform: "ULTRA", name: "Ultra-Series X Chipset Motherboard (WiFi)", price: usdFromNok(2800), wifi: true }
 ];
 
 // =========================
@@ -371,7 +435,7 @@ const ramOptions = [
 ];
 
 // =========================
-// SSD / PSU / COOLER / CASE
+// SSD / PSU / COOLER / CASE / EXTRAS
 // =========================
 const ssds = [
   { size: "1TB NVMe SSD", price: usdFromNok(1500) },
@@ -397,6 +461,20 @@ const cases = [
   { name: "Premium ATX Tempered Glass Case", price: usdFromNok(1800), gpuMax: 360 }
 ];
 
+const caseFans = [
+  { name: "2x 120mm Case Fans", price: usdFromNok(400), level: 1 },
+  { name: "4x 120mm Case Fans", price: usdFromNok(800), level: 2 },
+  { name: "6x 120mm High-Airflow Fans", price: usdFromNok(1200), level: 3 }
+];
+
+const thermalPastes = [
+  { name: "Standard Thermal Paste", price: usdFromNok(150) },
+  { name: "Premium Thermal Paste", price: usdFromNok(300) }
+];
+
+const wifiCard = { name: "PCIe WiFi 6 Card", price: usdFromNok(500) };
+const osOption = { name: "Windows 11 Home (License)", price: 120 }; // USD direkte
+
 // =========================
 // HELPER
 // =========================
@@ -410,9 +488,6 @@ function chooseBestUnder(list, maxPrice) {
   return best || list[0];
 }
 
-// =========================
-// PERFORMANCE TIER
-// =========================
 function getPerformanceTier(gpu, resolution) {
   const tier = gpu.tier;
   if (resolution === 1080) {
@@ -445,37 +520,59 @@ function build() {
   const budgetInfo = document.getElementById("budgetInfo");
   const resultTable = document.getElementById("result");
   const perfBox = document.getElementById("perfBox");
+  const scoreRow = document.getElementById("scoreRow");
+  const valueScoreEl = document.getElementById("valueScore");
+  const valueNoteEl = document.getElementById("valueNote");
+  const futureScoreEl = document.getElementById("futureScore");
+  const futureNoteEl = document.getElementById("futureNote");
+  const bottleneckNoteEl = document.getElementById("bottleneckNote");
+  const aiSummaryEl = document.getElementById("aiSummary");
+  const totalBox = document.getElementById("totalBox");
+  const analysisBox = document.getElementById("analysisBox");
 
   if (!budget || budget < 400) {
     resultTable.innerHTML = "";
     perfBox.style.display = "none";
+    scoreRow.style.display = "none";
+    aiSummaryEl.style.display = "none";
+    totalBox.innerHTML = "";
+    analysisBox.innerHTML = "";
     budgetInfo.innerHTML = '<div class="budget-error">Please enter a valid budget (at least $400).</div>';
     return;
   }
 
   budgetInfo.innerHTML = "";
 
-  // Budget fractions
+  // Dynamic budget fractions based on usage/priority
   let gpuFrac = 0.45;
   let cpuFrac = 0.22;
 
-  if (priority === "fps") {
-    gpuFrac = 0.5;
-    cpuFrac = 0.2;
-  } else if (priority === "quiet") {
-    gpuFrac = 0.4;
+  if (usage === "gaming" && priority === "fps") {
+    gpuFrac = 0.52;
     cpuFrac = 0.22;
+  } else if (usage === "gaming" && priority === "balanced") {
+    gpuFrac = 0.48;
+    cpuFrac = 0.24;
+  } else if (usage === "creator") {
+    gpuFrac = 0.40;
+    cpuFrac = 0.28;
+  } else if (usage === "workstation") {
+    gpuFrac = 0.30;
+    cpuFrac = 0.32;
   } else if (priority === "future") {
     gpuFrac = 0.47;
-    cpuFrac = 0.25;
+    cpuFrac = 0.26;
+  } else if (priority === "quiet") {
+    gpuFrac = 0.42;
+    cpuFrac = 0.24;
   }
 
   // GPU
   const maxGpuPrice = budget * gpuFrac;
   let gpu = chooseBestUnder(gpus, maxGpuPrice);
 
-  // CPU
-  const targetCpuTier = Math.max(3, gpu.tier - 1);
+  // CPU – try to match GPU tier
+  const targetCpuTier = Math.max(3, gpu.tier - (usage === "creator" || usage === "workstation" ? 0 : 1));
   let cpuCandidates = cpus
     .filter(c => c.tier >= targetCpuTier - 1 && c.tier <= targetCpuTier + 1)
     .sort((a,b) => a.price - b.price);
@@ -485,19 +582,24 @@ function build() {
   // Motherboard
   let mobo = motherboards.find(m => m.platform === cpu.platform) || motherboards[0];
 
-  // RAM
+  // RAM – Smart RAM v3
   let ram;
   if (usage === "creator" || usage === "workstation") {
-    if (budget > 3000) ram = ramOptions[2];
-    else ram = ramOptions[1];
+    if (budget > 3000) ram = ramOptions[2]; // 64GB
+    else ram = ramOptions[1]; // 32GB
   } else {
-    if (budget < 1500) ram = ramOptions[0];
-    else if (budget < 3000) ram = ramOptions[1];
-    else ram = ramOptions[1];
+    if (budget < 1500) ram = ramOptions[0]; // 16GB
+    else ram = ramOptions[1]; // 32GB
   }
 
-  // SSD
+  // SSD – primary
   let ssd = budget > 1800 ? ssds[1] : ssds[0];
+
+  // Secondary SSD for high budget creator/workstation
+  let secondarySsd = null;
+  if ((usage === "creator" || usage === "workstation") && budget > 2500) {
+    secondarySsd = ssds[0];
+  }
 
   // Cooler
   let cooler;
@@ -517,12 +619,31 @@ function build() {
     if (biggerCase) pcCase = biggerCase;
   }
 
+  // Case fans – more for high TDP / future / fps
+  const thermalLoad = cpu.tdp + gpu.tdp;
+  let fans;
+  if (thermalLoad < 350) fans = caseFans[0];
+  else if (thermalLoad < 500) fans = caseFans[1];
+  else fans = caseFans[2];
+
+  // Thermal paste
+  let paste = thermalLoad > 350 ? thermalPastes[1] : thermalPastes[0];
+
   // PSU
   const estimatedLoad = cpu.tdp + gpu.tdp + 150;
   let psu = psus.find(p => p.max >= estimatedLoad + 100) || psus[psus.length - 1];
 
-  // Total
-  const total =
+  // WiFi card if needed
+  let wifi = null;
+  if (!mobo.wifi) {
+    wifi = wifiCard;
+  }
+
+  // OS – optional, for nå: alltid inkludert
+  let os = osOption;
+
+  // Total price
+  let total =
     gpu.price +
     cpu.price +
     mobo.price +
@@ -530,7 +651,13 @@ function build() {
     ssd.price +
     cooler.price +
     pcCase.price +
-    psu.price;
+    psu.price +
+    fans.price +
+    paste.price +
+    (wifi ? wifi.price : 0) +
+    os.price;
+
+  if (secondarySsd) total += secondarySsd.price;
 
   // Budget info
   if (total > budget * 1.1) {
@@ -544,55 +671,150 @@ function build() {
       '<div class="note">This build fits within your budget.</div>';
   }
 
+  const remaining = budget - total;
+
   // Performance tier
   const perf = getPerformanceTier(gpu, resolution);
   perfBox.style.display = "block";
   perfBox.innerHTML = `
     <div class="perf-title">Estimated Performance Tier</div>
     <div class="perf-tier ${perf.cls}">${perf.label}</div>
+    <div class="note">
+      Based on GPU tier, resolution target and overall system balance.
+    </div>
   `;
 
-  // VRAM
+  // VRAM analysis
   let vramNote = "";
   if (resolution === 1080) {
     if (gpu.vram < 6) vramNote = "VRAM is low for 1080p gaming.";
     else vramNote = "VRAM is sufficient for 1080p.";
-  }
-  if (resolution === 1440) {
+  } else if (resolution === 1440) {
     if (gpu.vram < 8) vramNote = "VRAM may limit 1440p performance.";
     else if (gpu.vram < 12) vramNote = "VRAM is acceptable for 1440p.";
     else vramNote = "VRAM is ideal for 1440p.";
-  }
-  if (resolution === 2160) {
+  } else if (resolution === 2160) {
     if (gpu.vram < 12) vramNote = "VRAM is low for 4K gaming.";
     else if (gpu.vram < 16) vramNote = "VRAM is acceptable for 4K.";
     else vramNote = "VRAM is ideal for 4K Ultra.";
   }
 
-  // Thermal
-  const thermalLoad = cpu.tdp + gpu.tdp;
+  // Thermal score
   let thermalNote = "";
   if (thermalLoad < 300) thermalNote = "Excellent thermal headroom.";
   else if (thermalLoad < 450) thermalNote = "Adequate cooling for gaming.";
-  else if (thermalLoad < 600) thermalNote = "Borderline — consider a 360mm AIO.";
-  else thermalNote = "Thermal bottleneck risk — cooling upgrade recommended.";
+  else if (thermalLoad < 600) thermalNote = "Borderline — consider a 360mm AIO and more case fans.";
+  else thermalNote = "Thermal bottleneck risk — high-end cooling strongly recommended.";
 
-  // Upgrade Path
+  // Upgrade path
   let upgradeNote = "";
   if (cpu.platform === "AM5") upgradeNote = "AM5 supports future Ryzen 9000/10000 CPUs.";
   if (cpu.platform === "LGA1700") upgradeNote = "LGA1700 is near end-of-life — limited CPU upgrades.";
   if (cpu.platform === "ULTRA") upgradeNote = "Ultra platform supports next-gen Ultra 9 CPUs.";
 
-  // Result table
-  resultTable.innerHTML = `
+  // Bottleneck detector
+  let bottlenecks = [];
+  if (gpu.tier > cpu.tier + 2) bottlenecks.push("CPU may bottleneck GPU in some titles.");
+  if (cpu.tier > gpu.tier + 2) bottlenecks.push("GPU may limit performance at this resolution.");
+  if (ram.size.startsWith("16GB") && (usage === "creator" || usage === "workstation")) {
+    bottlenecks.push("RAM capacity may limit heavy content creation workloads.");
+  }
+  if (resolution === 2160 && gpu.vram < 12) {
+    bottlenecks.push("VRAM may limit 4K performance.");
+  }
+  if (thermalLoad > 550) {
+    bottlenecks.push("High thermal load — cooling is critical.");
+  }
+  if (bottlenecks.length === 0) bottlenecks.push("No major bottlenecks detected for the chosen settings.");
+
+  // Value score (1–10)
+  let valueScore = 8;
+  if (total > budget * 1.1) valueScore -= 2;
+  else if (total > budget) valueScore -= 1;
+  if (gpu.tier >= 7 && budget < 2000) valueScore -= 1;
+  if (ram.size.startsWith("64GB") && usage === "gaming") valueScore -= 1;
+  if (valueScore < 1) valueScore = 1;
+  if (valueScore > 10) valueScore = 10;
+
+  let valueNote = "Strong balance between performance and cost.";
+  if (valueScore <= 4) valueNote = "This build is not cost-efficient. Consider lowering GPU/CPU tier or SSD size.";
+  else if (valueScore <= 6) valueNote = "Decent value, but there may be some overspending in certain areas.";
+  else if (valueScore >= 9) valueNote = "Excellent value for the performance level.";
+
+  // Future-proof score (1–10)
+  let futureScore = 7;
+  if (cpu.platform === "AM5" || cpu.platform === "ULTRA") futureScore += 1;
+  if (gpu.tier >= 6) futureScore += 1;
+  if (ram.size.startsWith("32GB")) futureScore += 1;
+  if (psu.max >= 850) futureScore += 1;
+  if (futureScore > 10) futureScore = 10;
+
+  let futureNote = "Good upgrade potential over the next few years.";
+  if (futureScore <= 5) futureNote = "Limited future-proofing. Platform or GPU may age quickly.";
+  else if (futureScore >= 9) futureNote = "Highly future-proof platform and component selection.";
+
+  // AI-style summary
+  let summary = `This build targets ${resolution === 1080 ? "1080p" : resolution === 1440 ? "1440p" : "4K"} gaming with a focus on `;
+  if (priority === "fps") summary += "maximum FPS, ";
+  else if (priority === "quiet") summary += "low noise and efficiency, ";
+  else if (priority === "future") summary += "future-proofing, ";
+  else summary += "balanced performance, ";
+
+  summary += `using a ${gpu.name} paired with ${cpu.name}. `;
+  summary += `With ${ram.size} and ${ssd.size} as primary storage${secondarySsd ? " plus an additional " + secondarySsd.size : ""}, `;
+  summary += `this configuration is well-suited for ${usage === "gaming" ? "modern gaming" : usage === "creator" ? "gaming and content creation" : "productivity and workstation tasks"}. `;
+  summary += `Cooling is handled by ${cooler.name} and ${fans.name}, which should provide ${thermalLoad < 450 ? "comfortable" : "adequate"} thermal performance.`;
+
+  // Update UI: scores + summary
+  scoreRow.style.display = "flex";
+  valueScoreEl.textContent = valueScore + "/10";
+  valueNoteEl.textContent = valueNote;
+  futureScoreEl.textContent = futureScore + "/10";
+  futureNoteEl.textContent = futureNote;
+  bottleneckNoteEl.textContent = bottlenecks.join(" ");
+
+  aiSummaryEl.style.display = "block";
+  aiSummaryEl.textContent = summary;
+
+  // Component table
+  let rows = `
     <tr><th>Component</th><th>Selection</th><th>Price (USD)</th></tr>
-    <tr><td>GPU</td><td>${gpu.name}</td><td>$${gpu.price}</td></tr>
+    <tr><td>GPU</td><td>${gpu.name} (${gpu.vram}GB VRAM)</td><td>$${gpu.price}</td></tr>
     <tr><td>CPU</td><td>${cpu.name}</td><td>$${cpu.price}</td></tr>
     <tr><td>Motherboard</td><td>${mobo.name}</td><td>$${mobo.price}</td></tr>
     <tr><td>RAM</td><td>${ram.size}</td><td>$${ram.price}</td></tr>
-    <tr><td>Storage</td><td>${ssd.size}</td><td>$${ssd.price}</td></tr>
+    <tr><td>Primary Storage</td><td>${ssd.size}</td><td>$${ssd.price}</td></tr>
+  `;
+  if (secondarySsd) {
+    rows += `<tr><td>Secondary Storage</td><td>${secondarySsd.size}</td><td>$${secondarySsd.price}</td></tr>`;
+  }
+  rows += `
     <tr><td>CPU Cooler</td><td>${cooler.name}</td><td>$${cooler.price}</td></tr>
     <tr><td>Case</td><td>${pcCase.name}</td><td>$${pcCase.price}</td></tr>
+    <tr><td>Case Fans</td><td>${fans.name}</td><td>$${fans.price}</td></tr>
+    <tr><td>Thermal Paste</td><td>${paste.name}</td><td>$${paste.price}</td></tr>
+    <tr><td>Power Supply</td><td>${psu.watt}</td><td>$${psu.price}</td></tr>
+  `;
+  if (wifi) {
+    rows += `<tr><td>WiFi</td><td>${wifi.name}</td><td>$${wifi.price}</td></tr>`;
+  }
+  rows += `<tr><td>Operating System</td><td>${os.name}</td><td>$${os.price}</td></tr>`;
+  rows += `<tr><th>Total</th><th></th><th>$${total}</th></tr>`;
+
+  resultTable.innerHTML = rows;
+
+  // Total box
+  totalBox.innerHTML = `
+    <strong>Total System Cost:</strong> $${total} &nbsp; | &nbsp;
+    <strong>Remaining Budget:</strong> $${remaining >= 0 ? remaining : 0}
+  `;
+
+  // Analysis frame
+  analysisBox.innerHTML = `
+    <div><strong>VRAM Analysis:</strong> ${vramNote}</div>
+    <div><strong>Thermal Score:</strong> ${thermalNote}</div>
+    <div><strong>Upgrade Path:</strong> ${upgradeNote}</div>
+    <div><strong>Bottleneck Notes:</strong> ${bottlenecks.join(" ")}</div>
   `;
 }
 </script>
