@@ -54,16 +54,11 @@
     transform: translateY(-3px);
   }
 
-  h1, h2, h3 {
+  h2 {
     font-weight: 600;
     letter-spacing: 1px;
     color: #f5f5f5;
     margin-top: 0;
-  }
-
-  p {
-    color: #b5b5b5;
-    font-size: 14px;
   }
 
   label {
@@ -104,56 +99,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
   }
-
-  .row-3 {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    font-size: 14px;
-  }
-
-  th {
-    background: rgba(0,0,0,0.8);
-    padding: 12px;
-    border-bottom: 2px solid rgba(255,255,255,0.18);
-    text-align: left;
-    color: #f0f0f0;
-  }
-
-  td {
-    padding: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    color: #ddd;
-  }
-
-  tr:nth-child(even) td {
-    background: rgba(255,255,255,0.02);
-  }
-
-  .note {
-    font-size: 12px;
-    color: #888;
-    margin-top: 6px;
-  }
-
-  .tag {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 11px;
-    margin-right: 6px;
-    border: 1px solid rgba(255,255,255,0.2);
-  }
-
-  .tag-life { color: #7CFC00; border-color: #22c55e; }
-  .tag-future { color: #facc15; border-color: #eab308; }
-  .tag-risk { color: #f97373; border-color: #ef4444; }
 
   .lifespan-box {
     margin-top: 20px;
@@ -208,6 +153,27 @@
     font-size: 13px;
     color: #d0d0d0;
     line-height: 1.5;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 14px;
+  }
+
+  th {
+    background: rgba(0,0,0,0.8);
+    padding: 12px;
+    border-bottom: 2px solid rgba(255,255,255,0.18);
+    text-align: left;
+    color: #f0f0f0;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: #ddd;
   }
 
   .ics-nav {
@@ -341,12 +307,6 @@
       </div>
     </div>
 
-    <p class="note">
-      <span class="tag tag-life">Lifespan</span>
-      <span class="tag tag-future">Future-Proof</span>
-      <span class="tag tag-risk">Bottlenecks</span>
-    </p>
-
     <button onclick="analyze()">Analyze Lifespan</button>
   </div>
 
@@ -387,31 +347,31 @@
 
 <script>
 // =========================
-// SIMPLE DATABASE (reuse tiers from build-logic style)
+// CPU & GPU DATABASE
 // =========================
 const cpus = [
-  { name: "Intel Core i5-14400F", tier: 3, platform: "LGA1700" },
-  { name: "Intel Core i7-14700K", tier: 5, platform: "LGA1700" },
-  { name: "Intel Core i9-14900K", tier: 7, platform: "LGA1700" },
+  { name: "Intel Core i5-14400F", tier: 3 },
+  { name: "Intel Core i7-14700K", tier: 5 },
+  { name: "Intel Core i9-14900K", tier: 7 },
 
-  { name: "Ryzen 5 9600X", tier: 3, platform: "AM5" },
-  { name: "Ryzen 7 7800X3D", tier: 5, platform: "AM5" },
-  { name: "Ryzen 7 9800X3D", tier: 6, platform: "AM5" },
-  { name: "Ryzen 9 9900X3D", tier: 7, platform: "AM5" },
-  { name: "Ryzen 9 9950X3D", tier: 8, platform: "AM5" },
+  { name: "Ryzen 5 9600X", tier: 3 },
+  { name: "Ryzen 7 7800X3D", tier: 5 },
+  { name: "Ryzen 7 9800X3D", tier: 6 },
+  { name: "Ryzen 9 9900X3D", tier: 7 },
+  { name: "Ryzen 9 9950X3D", tier: 8 },
 
-  { name: "Ultra 7 270K", tier: 5, platform: "ULTRA" },
-  { name: "Ultra 9 285K", tier: 7, platform: "ULTRA" }
+  { name: "Ultra 7 270K", tier: 5 },
+  { name: "Ultra 9 285K", tier: 7 }
 ];
 
 const gpus = [
-  { name: "GeForce RTX 5050", tier: 2, vram: 8 },
-  { name: "GeForce RTX 5060", tier: 3, vram: 8 },
-  { name: "GeForce RTX 5060 Ti", tier: 4, vram: 12 },
-  { name: "GeForce RTX 5070", tier: 5, vram: 12 },
-  { name: "GeForce RTX 5070 Ti", tier: 6, vram: 16 },
-  { name: "GeForce RTX 5080", tier: 7, vram: 16 },
-  { name: "GeForce RTX 5090", tier: 10, vram: 32 }
+  { name: "GeForce RTX 5050", tier: 2 },
+  { name: "GeForce RTX 5060", tier: 3 },
+  { name: "GeForce RTX 5060 Ti", tier: 4 },
+  { name: "GeForce RTX 5070", tier: 5 },
+  { name: "GeForce RTX 5070 Ti", tier: 6 },
+  { name: "GeForce RTX 5080", tier: 7 },
+  { name: "GeForce RTX 5090", tier: 10 }
 ];
 
 // =========================
@@ -450,7 +410,6 @@ function gpuLifespanYears(tier, usage, resolution) {
   else if (tier === 5) base = 5;
   else if (tier === 6) base = 6;
   else if (tier === 7) base = 7;
-  else if (tier === 8) base = 8;
   else base = 9;
 
   if (usage === "workstation") base += 1;
@@ -465,8 +424,7 @@ function cpuLifespanYears(tier, usage) {
   else if (tier === 4) base = 4;
   else if (tier === 5) base = 5;
   else if (tier === 6) base = 6;
-  else if (tier === 7) base = 7;
-  else base = 8;
+  else base = 7;
 
   if (usage === "workstation") base += 1;
   return base;
@@ -508,19 +466,13 @@ function analyze() {
   const cpu = cpus.find(c => c.name === cpuName);
   const gpu = gpus.find(g => g.name === gpuName);
 
-  if (!cpu || !gpu) {
-    alert("CPU or GPU selection is invalid.");
-    return;
-  }
-
-  // Lifespan per component
   const gpuYears = gpuLifespanYears(gpu.tier, usage, resolution);
   const cpuYears = cpuLifespanYears(cpu.tier, usage);
   const ramYears = ramLifespanYears(ramVal);
   const ssdYears = ssdLifespanYears(ssdVal);
   const psuYears = psuLifespanYears(psuVal);
 
-  const components = [
+    const components = [
     { type: "GPU", name: gpu.name, years: gpuYears },
     { type: "CPU", name: cpu.name, years: cpuYears },
     { type: "RAM", name: ramVal + "GB DDR5", years: ramYears },
@@ -543,7 +495,7 @@ function analyze() {
 
   if (futureScore > 10) futureScore = 10;
 
-  // Bottleneck risk (1–10, høyere = mer risiko)
+  // Bottleneck risk (1–10)
   let bottleneckScore = 3;
   if (gpu.tier > cpu.tier + 2) bottleneckScore += 3;
   if (cpu.tier > gpu.tier + 2) bottleneckScore += 2;
@@ -566,7 +518,7 @@ function analyze() {
     upgradeNote = "PSU lifespan may be the first reason to refresh the system.";
   }
 
-  // Bottleneck note text
+  // Bottleneck note
   let bottleneckNote;
   if (bottleneckScore <= 3) bottleneckNote = "Low bottleneck risk for your chosen combo.";
   else if (bottleneckScore <= 6) bottleneckNote = "Some risk of bottlenecks in demanding titles.";
@@ -605,31 +557,21 @@ function analyze() {
   // =========================
   // UPDATE UI
   // =========================
-  const lifespanBox = document.getElementById("lifespanBox");
-  const lifespanMain = document.getElementById("lifespanMain");
-  const lifespanSub = document.getElementById("lifespanSub");
-  const scoreRow = document.getElementById("scoreRow");
-  const futureScoreEl = document.getElementById("futureScore");
-  const futureNoteEl = document.getElementById("futureNote");
-  const bottleneckScoreEl = document.getElementById("bottleneckScore");
-  const bottleneckNoteEl = document.getElementById("bottleneckNote");
-  const upgradePriorityEl = document.getElementById("upgradePriority");
-  const upgradeNoteEl = document.getElementById("upgradeNote");
+  document.getElementById("lifespanBox").style.display = "block";
+  document.getElementById("lifespanMain").textContent =
+    `${totalYears} year${totalYears === 1 ? "" : "s"} of strong relevance`;
+  document.getElementById("lifespanSub").textContent =
+    `Limited by: ${weakestNames}`;
+
+  document.getElementById("scoreRow").style.display = "flex";
+  document.getElementById("futureScore").textContent = futureScore + "/10";
+  document.getElementById("futureNote").textContent = futureNote;
+  document.getElementById("bottleneckScore").textContent = bottleneckScore + "/10";
+  document.getElementById("bottleneckNote").textContent = bottleneckNote;
+  document.getElementById("upgradePriority").textContent = upgradePriority;
+  document.getElementById("upgradeNote").textContent = upgradeNote;
+
   const aiSummaryEl = document.getElementById("aiSummary");
-  const breakdownTable = document.getElementById("breakdownTable");
-
-  lifespanBox.style.display = "block";
-  lifespanMain.textContent = `${totalYears} year${totalYears === 1 ? "" : "s"} of strong relevance`;
-  lifespanSub.textContent = `Limited by: ${weakestNames}`;
-
-  scoreRow.style.display = "flex";
-  futureScoreEl.textContent = futureScore + "/10";
-  futureNoteEl.textContent = futureNote;
-  bottleneckScoreEl.textContent = bottleneckScore + "/10";
-  bottleneckNoteEl.textContent = bottleneckNote;
-  upgradePriorityEl.textContent = upgradePriority;
-  upgradeNoteEl.textContent = upgradeNote;
-
   aiSummaryEl.style.display = "block";
   aiSummaryEl.textContent = aiText;
 
@@ -640,9 +582,5 @@ function analyze() {
   components.forEach(c => {
     rows += `<tr><td>${c.type}</td><td>${c.name}</td><td>${c.years}</td></tr>`;
   });
-  breakdownTable.innerHTML = rows;
+  document.getElementById("breakdownTable").innerHTML = rows;
 }
-</script>
-
-</body>
-</html>
