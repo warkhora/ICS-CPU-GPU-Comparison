@@ -831,6 +831,18 @@ function build() {
     <tr><td>Primary Storage</td><td>${ssd.size}</td><td>$${ssd.price}</td></tr>
   `;
 
+  document.getElementById("lifespanBtn").onclick = function () {
+  const url = new URL("pclifetime.html", window.location.origin);
+
+  url.searchParams.set("cpu", cpu.name);
+  url.searchParams.set("gpu", gpu.name);
+  url.searchParams.set("ram", ram.size.replace("GB DDR5",""));
+  url.searchParams.set("ssd", ssd.size);
+  url.searchParams.set("psu", psu.watt.replace("W 80+ Gold",""));
+
+  window.location.href = url.toString();
+};
+
   if (secondarySsd) {
     rows += `<tr><td>Secondary Storage</td><td>${secondarySsd.size}</td><td>$${secondarySsd.price}</td></tr>`;
   }
@@ -850,13 +862,45 @@ function build() {
     rows += `<tr><td>Operating System</td><td>${os.name}</td><td>$${os.price}</td></tr>`;
   }
 
-  rows += `
+    rows += `
     <tr><td><strong>Total</strong></td><td></td><td><strong>$${total}</strong></td></tr>
   `;
 
   resultTable.innerHTML = rows;
+
+  // =========================
+  // LIFESPAN BUTTON HANDLER
+  // =========================
+  document.getElementById("lifespanBtn").onclick = function () {
+    const url = new URL("pclifetime.html", window.location.origin);
+
+    url.searchParams.set("cpu", cpu.name);
+    url.searchParams.set("gpu", gpu.name);
+    url.searchParams.set("ram", ram.size.replace("GB DDR5",""));
+    url.searchParams.set("ssd", ssd.size);
+    url.searchParams.set("psu", psu.watt.replace("W 80+ Gold",""));
+
+    window.location.href = url.toString();
+  };
 }
 </script>
+
+  <button id="lifespanBtn" style="
+  width:100%;
+  margin-top:20px;
+  padding:16px;
+  font-size:18px;
+  font-weight:700;
+  border-radius:14px;
+  background:rgba(255,215,0,0.18);
+  border:1px solid rgba(255,215,0,0.35);
+  color:#ffd700;
+  cursor:pointer;
+  transition:0.3s;
+">
+  Analyze Lifespan of This Build →
+</button>
+
 
 </body>
 </html>
