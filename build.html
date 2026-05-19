@@ -820,87 +820,43 @@ function build() {
   }
 
   // =========================
-  // RESULT TABLE
-  // =========================
-  let rows = `
-    <tr><th>Component</th><th>Selection</th><th>Price (USD)</th></tr>
-    <tr><td>GPU</td><td>${gpu.name} (${gpu.vram}GB VRAM)</td><td>$${gpu.price}</td></tr>
-    <tr><td>CPU</td><td>${cpu.name}</td><td>$${cpu.price}</td></tr>
-    <tr><td>Motherboard</td><td>${mobo.name}</td><td>$${mobo.price}</td></tr>
-    <tr><td>RAM</td><td>${ram.size}</td><td>$${ram.price}</td></tr>
-    <tr><td>Primary Storage</td><td>${ssd.size}</td><td>$${ssd.price}</td></tr>
-  `;
+// RESULT TABLE
+// =========================
+let rows = `
+  <tr><th>Component</th><th>Selection</th><th>Price (USD)</th></tr>
+  <tr><td>GPU</td><td>${gpu.name} (${gpu.vram}GB VRAM)</td><td>$${gpu.price}</td></tr>
+  <tr><td>CPU</td><td>${cpu.name}</td><td>$${cpu.price}</td></tr>
+  <tr><td>Motherboard</td><td>${mobo.name}</td><td>$${mobo.price}</td></tr>
+  <tr><td>RAM</td><td>${ram.size}</td><td>$${ram.price}</td></tr>
+  <tr><td>Primary Storage</td><td>${ssd.size}</td><td>$${ssd.price}</td></tr>
+`;
 
-  document.getElementById("lifespanBtn").onclick = function () {
-  const url = new URL("pclifetime.html", window.location.origin);
-
-  url.searchParams.set("cpu", cpu.name);
-  url.searchParams.set("gpu", gpu.name);
-  url.searchParams.set("ram", ram.size.replace("GB DDR5",""));
-  url.searchParams.set("ssd", ssd.size);
-  url.searchParams.set("psu", psu.watt.replace("W 80+ Gold",""));
-
-  window.location.href = url.toString();
-};
-
-  if (secondarySsd) {
-    rows += `<tr><td>Secondary Storage</td><td>${secondarySsd.size}</td><td>$${secondarySsd.price}</td></tr>`;
-  }
-
-  rows += `
-    <tr><td>CPU Cooler</td><td>${cooler.name}</td><td>$${cooler.price}</td></tr>
-    <tr><td>Case</td><td>${pcCase.name}</td><td>$${pcCase.price}</td></tr>
-    <tr><td>Case Fans</td><td>${fans.name}</td><td>$${fans.price}</td></tr>
-    <tr><td>Thermal Paste</td><td>${paste.name}</td><td>$${paste.price}</td></tr>
-    <tr><td>Power Supply</td><td>${psu.watt}</td><td>$${psu.price}</td></tr>
-  `;
-
-  if (wifi) {
-    rows += `<tr><td>WiFi</td><td>${wifi.name}</td><td>$${wifi.price}</td></tr>`;
-  }
-  if (os) {
-    rows += `<tr><td>Operating System</td><td>${os.name}</td><td>$${os.price}</td></tr>`;
-  }
-
-    rows += `
-    <tr><td><strong>Total</strong></td><td></td><td><strong>$${total}</strong></td></tr>
-  `;
-
-  resultTable.innerHTML = rows;
-
-  // =========================
-  // LIFESPAN BUTTON HANDLER
-  // =========================
-  document.getElementById("lifespanBtn").onclick = function () {
-    const url = new URL("pclifetime.html", window.location.origin);
-
-    url.searchParams.set("cpu", cpu.name);
-    url.searchParams.set("gpu", gpu.name);
-    url.searchParams.set("ram", ram.size.replace("GB DDR5",""));
-    url.searchParams.set("ssd", ssd.size);
-    url.searchParams.set("psu", psu.watt.replace("W 80+ Gold",""));
-
-    window.location.href = url.toString();
-  };
+if (secondarySsd) {
+  rows += `<tr><td>Secondary Storage</td><td>${secondarySsd.size}</td><td>$${secondarySsd.price}</td></tr>`;
 }
+
+rows += `
+  <tr><td>CPU Cooler</td><td>${cooler.name}</td><td>$${cooler.price}</td></tr>
+  <tr><td>Case</td><td>${pcCase.name}</td><td>$${pcCase.price}</td></tr>
+  <tr><td>Case Fans</td><td>${fans.name}</td><td>$${fans.price}</td></tr>
+  <tr><td>Thermal Paste</td><td>${paste.name}</td><td>$${paste.price}</td></tr>
+  <tr><td>Power Supply</td><td>${psu.watt}</td><td>$${psu.price}</td></tr>
+`;
+
+if (wifi) {
+  rows += `<tr><td>WiFi</td><td>${wifi.name}</td><td>$${wifi.price}</td></tr>`;
+}
+if (os) {
+  rows += `<tr><td>Operating System</td><td>${os.name}</td><td>$${os.price}</td></tr>`;
+}
+
+rows += `
+  <tr><td><strong>Total</strong></td><td></td><td><strong>$${total}</strong></td></tr>
+`;
+
+resultTable.innerHTML = rows;
+
+} // ← avslutter build()
 </script>
-
-  <button id="lifespanBtn" style="
-  width:100%;
-  margin-top:20px;
-  padding:16px;
-  font-size:18px;
-  font-weight:700;
-  border-radius:14px;
-  background:rgba(255,215,0,0.18);
-  border:1px solid rgba(255,215,0,0.35);
-  color:#ffd700;
-  cursor:pointer;
-  transition:0.3s;
-">
-  Analyze Lifespan of This Build →
-</button>
-
-
 </body>
 </html>
