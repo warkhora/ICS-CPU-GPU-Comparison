@@ -2,21 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Regent – PC Lifespan Analyzer v1.0</title>
+<title>ICS Regent – PC Lifespan Analyzer v2</title>
 
 <style>
   body {
     margin: 0;
     padding: 40px;
-    background: linear-gradient(135deg, #050505, #000000);
+    background: radial-gradient(circle at top, #151515 0, #000 55%, #000 100%);
     color: #e6e6e6;
     font-family: "Segoe UI", system-ui, sans-serif;
   }
 
   .ics-container {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: auto;
-    backdrop-filter: blur(18px);
   }
 
   .ics-header {
@@ -39,19 +38,13 @@
   }
 
   .ics-frame {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 25px;
-    margin-bottom: 30px;
+    padding: 24px;
+    margin-bottom: 26px;
     border-radius: 18px;
-    transition: 0.3s ease;
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
-  }
-
-  .ics-frame:hover {
-    border-color: rgba(255, 215, 0, 0.6);
-    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25);
-    transform: translateY(-3px);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
   }
 
   h2 {
@@ -59,6 +52,7 @@
     letter-spacing: 1px;
     color: #f5f5f5;
     margin-top: 0;
+    margin-bottom: 12px;
   }
 
   label {
@@ -71,7 +65,7 @@
 
   input, select, button {
     width: 100%;
-    background: rgba(20, 20, 20, 0.85);
+    background: rgba(15, 15, 15, 0.9);
     color: #eee;
     border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 10px 14px;
@@ -80,7 +74,6 @@
     transition: 0.2s;
     font-size: 14px;
     box-sizing: border-box;
-    backdrop-filter: blur(12px);
   }
 
   input:hover, select:hover, button:hover {
@@ -90,7 +83,7 @@
 
   button {
     cursor: pointer;
-    background: rgba(255, 215, 0, 0.15);
+    background: rgba(255, 215, 0, 0.16);
     font-weight: 600;
   }
 
@@ -100,19 +93,10 @@
     gap: 16px;
   }
 
-  .lifespan-box {
-    margin-top: 20px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(14px);
-  }
-
   .lifespan-main {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
 
   .lifespan-sub {
@@ -123,14 +107,14 @@
   .score-row {
     display: flex;
     gap: 16px;
-    margin-top: 10px;
+    margin-top: 14px;
     flex-wrap: wrap;
   }
 
   .score-pill {
     flex: 1;
-    min-width: 180px;
-    background: rgba(0,0,0,0.55);
+    min-width: 200px;
+    background: rgba(0,0,0,0.65);
     border-radius: 12px;
     padding: 10px 12px;
     border: 1px solid rgba(255,255,255,0.18);
@@ -148,37 +132,127 @@
     font-weight: 700;
   }
 
+  .note {
+    font-size: 12px;
+    color: #cfcfcf;
+    margin-top: 4px;
+  }
+
   .ai-summary {
-    margin-top: 12px;
+    margin-top: 14px;
     font-size: 13px;
     color: #d0d0d0;
     line-height: 1.5;
   }
 
-  table {
+  .timeline-wrapper {
+    margin-top: 10px;
+  }
+
+  .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #ccc;
+    margin-bottom: 6px;
+  }
+
+  .timeline-bar {
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: radial-gradient(circle at top, rgba(255,215,0,0.18), rgba(0,0,0,0.9));
+    border: 1px solid rgba(255,215,0,0.35);
+  }
+
+  .timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(11, minmax(0, 1fr)); /* 0–10 years */
+    gap: 8px;
+  }
+
+  .year-column {
+    text-align: center;
+    font-size: 11px;
+    color: #ccc;
+  }
+
+  .year-top-label {
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 4px;
+  }
+
+  .health-bar-outer {
+    width: 100%;
+    height: 32px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.85);
+    border: 1px solid rgba(255,255,255,0.18);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .health-bar-inner {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #00ff9d, #ffd700, #ff4b4b);
+    transition: width 0.4s ease;
+  }
+
+  .health-bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-shadow: 0 0 6px rgba(0,0,0,0.9);
+  }
+
+  .year-bottom-label {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #eee;
+  }
+
+  .year-description {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #cfcfcf;
+    min-height: 32px;
+  }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    color: #f5f5f5;
+  }
+
+  .breakdown-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
-    font-size: 14px;
+    margin-top: 10px;
+    font-size: 13px;
   }
 
-  th {
-    background: rgba(0,0,0,0.8);
-    padding: 12px;
+  .breakdown-table th {
+    background: rgba(0,0,0,0.85);
+    padding: 10px;
     border-bottom: 2px solid rgba(255,255,255,0.18);
     text-align: left;
-    color: #f0f0f0;
   }
 
-  td {
-    padding: 10px;
+  .breakdown-table td {
+    padding: 8px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
-    color: #ddd;
   }
 
   .ics-nav {
     width: 100%;
-    background: rgba(0,0,0,0.65);
+    background: rgba(0,0,0,0.7);
     border-bottom: 1px solid rgba(255,255,255,0.15);
     padding: 16px 24px;
     display: flex;
@@ -187,13 +261,13 @@
     top: 0;
     z-index: 999;
     backdrop-filter: blur(12px);
-    margin: -40px -40px 40px -40px;
+    margin: -40px -40px 30px -40px;
   }
 
   .ics-nav a {
     color: #ffd700;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 15px;
     letter-spacing: 1px;
     transition: 0.2s;
     padding-bottom: 4px;
@@ -209,6 +283,16 @@
     border-bottom: 2px solid #ffd700;
     text-shadow: 0 0 12px #ffd700;
   }
+
+  @media (max-width: 900px) {
+    .row {
+      grid-template-columns: 1fr;
+    }
+    .timeline-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      row-gap: 14px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -218,7 +302,7 @@
   <a href="fps.html" class="nav-link" data-page="fps">FPS Estimator</a>
   <a href="canyourunit.html" class="nav-link" data-page="canyourunit">Can You Run It?</a>
   <a href="build.html" class="nav-link" data-page="build">Build Your PC</a>
-  <a href="pclifetime.html" class="nav-link" data-page="pclifetime">PC Lifespan</a>
+  <a href="pclifetime_v2.html" class="nav-link" data-page="pclifetime_v2">PC Lifespan v2</a>
 </div>
 
 <script>
@@ -234,13 +318,15 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">PC Lifespan Analyzer v1.0 — How Long Will Your Rig Stay Relevant?</div>
+    <div class="ics-subtitle">PC Lifespan Analyzer v2 — Year‑by‑Year Future Projection</div>
   </div>
 
   <!-- INPUT FRAME -->
   <div class="ics-frame">
     <h2>System Profile</h2>
-    <p>Describe your current or planned PC. The analyzer estimates how many years it stays “good enough”.</p>
+    <p style="font-size:13px;color:#ccc;margin-bottom:14px;">
+      Describe your system. Lifespan v2 will simulate how it ages over the next decade, year by year.
+    </p>
 
     <div class="row">
       <div>
@@ -302,19 +388,19 @@
         </select>
       </div>
       <div>
-        <label>Planned Upgrade Budget (optional)</label>
-        <input type="number" id="budget" placeholder="e.g. 2000 (USD)">
+        <label>Upgrade Budget (optional, USD)</label>
+        <input type="number" id="budget" placeholder="e.g. 2000">
       </div>
     </div>
 
-    <button onclick="analyze()">Analyze Lifespan</button>
+    <button onclick="analyze()">Analyze Lifespan v2</button>
   </div>
 
   <!-- RESULT FRAME -->
   <div class="ics-frame">
-    <h2>Lifetime & Bottlenecks</h2>
+    <h2>Lifetime & Experience Forecast</h2>
 
-    <div id="lifespanBox" class="lifespan-box" style="display:none;">
+    <div id="lifespanBox" style="margin-bottom:10px;display:none;">
       <div class="lifespan-main" id="lifespanMain"></div>
       <div class="lifespan-sub" id="lifespanSub"></div>
     </div>
@@ -337,10 +423,24 @@
       </div>
     </div>
 
+    <div class="section-title">Timeline Projection (0–10 Years)</div>
+    <div class="timeline-wrapper">
+      <div class="timeline-header">
+        <span>Years from now</span>
+        <span>System health per year</span>
+      </div>
+      <div class="timeline-bar">
+        <div id="timelineGrid" class="timeline-grid">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Future Experience Narrative</div>
     <div class="ai-summary" id="aiSummary" style="display:none;"></div>
 
-    <h3 style="margin-top:20px;">Component Lifespan Breakdown</h3>
-    <table id="breakdownTable"></table>
+    <div class="section-title">Component Lifespan Breakdown</div>
+    <table class="breakdown-table" id="breakdownTable"></table>
   </div>
 
 </div>
@@ -373,38 +473,6 @@ const gpus = [
   { name: "GeForce RTX 5080", tier: 7 },
   { name: "GeForce RTX 5090", tier: 10 }
 ];
-
-  function loadFromURL() {
-  const params = new URLSearchParams(window.location.search);
-
-  const cpu = params.get("cpu");
-  const gpu = params.get("gpu");
-  const ram = params.get("ram");
-  const ssd = params.get("ssd");
-  const psu = params.get("psu");
-
-  // Vent til dropdowns er fylt
-  setTimeout(() => {
-    if (cpu) document.getElementById("cpu").value = cpu;
-    if (gpu) document.getElementById("gpu").value = gpu;
-    if (ram) document.getElementById("ram").value = ram;
-
-    if (ssd) {
-      if (ssd.includes("Gen3")) document.getElementById("ssd").value = "gen3";
-      else if (ssd.includes("Gen4")) document.getElementById("ssd").value = "gen4";
-      else document.getElementById("ssd").value = "gen5";
-    }
-
-    if (psu) document.getElementById("psu").value = psu;
-
-    // Hvis noen verdier ble sendt → kjør analyze automatisk
-    if (cpu || gpu || ram || ssd || psu) {
-      analyze();
-    }
-  }, 50);
-}
-
-window.onload = loadFromURL;
 
 // =========================
 // POPULATE SELECTS
@@ -445,6 +513,7 @@ function gpuLifespanYears(tier, usage, resolution) {
   else base = 9;
 
   if (usage === "workstation") base += 1;
+  if (usage === "creator") base += 0.5;
   if (resolution === 2160) base -= 1;
   if (base < 2) base = 2;
   return base;
@@ -459,6 +528,7 @@ function cpuLifespanYears(tier, usage) {
   else base = 7;
 
   if (usage === "workstation") base += 1;
+  if (usage === "creator") base += 0.5;
   return base;
 }
 
@@ -483,6 +553,19 @@ function psuLifespanYears(watt) {
 }
 
 // =========================
+// HEALTH CURVE (0–10 YEARS)
+// =========================
+function healthCurve(years, maxYears) {
+  // years: 0–10
+  // maxYears: expected strong relevance
+  const t = years;
+  const peak = maxYears;
+  // simple decay: 100% at t=0, ~0% at t ~ peak+4
+  const raw = Math.max(0, 1 - (t / (peak + 4)));
+  return Math.round(raw * 100);
+}
+
+// =========================
 // MAIN ANALYZE FUNCTION
 // =========================
 function analyze() {
@@ -504,7 +587,7 @@ function analyze() {
   const ssdYears = ssdLifespanYears(ssdVal);
   const psuYears = psuLifespanYears(psuVal);
 
-    const components = [
+  const components = [
     { type: "GPU", name: gpu.name, years: gpuYears },
     { type: "CPU", name: cpu.name, years: cpuYears },
     { type: "RAM", name: ramVal + "GB DDR5", years: ramYears },
@@ -562,28 +645,111 @@ function analyze() {
   else if (futureScore >= 7) futureNote = "Good future-proofing for the next few years.";
   else futureNote = "Limited future-proofing — expect earlier upgrades.";
 
-  // AI-like summary
+  // =========================
+  // TIMELINE (0–10 YEARS)
+// =========================
+  const now = new Date().getFullYear();
+  const timelineGrid = document.getElementById("timelineGrid");
+  timelineGrid.innerHTML = "";
+
+  const weakestNames = weakest.map(c => c.type).join(", ");
+
+  for (let yearOffset = 0; yearOffset <= 10; yearOffset++) {
+    const year = now + yearOffset;
+
+    // System health = min of component health that year
+    const gpuHealth = healthCurve(yearOffset, gpuYears);
+    const cpuHealth = healthCurve(yearOffset, cpuYears);
+    const ramHealth = healthCurve(yearOffset, ramYears);
+    const ssdHealth = healthCurve(yearOffset, ssdYears);
+    const psuHealth = healthCurve(yearOffset, psuYears);
+
+    const systemHealth = Math.min(gpuHealth, cpuHealth, ramHealth, ssdHealth, psuHealth);
+
+    let description = "";
+    if (yearOffset === 0) {
+      description = "System feels fresh and highly responsive.";
+    } else if (yearOffset === 1) {
+      description = "Still strong in modern titles; only ultra‑demanding games push it.";
+    } else if (yearOffset === 2) {
+      description = "You may start to lower some settings in new AAA releases.";
+    } else if (yearOffset === 3) {
+      description = "GPU begins to show strain in cutting‑edge engines.";
+    } else if (yearOffset === 4) {
+      description = "Noticeable compromises: lower presets or resolution scaling.";
+    } else if (yearOffset === 5) {
+      description = "System feels clearly older; mid‑range performance in new games.";
+    } else if (yearOffset === 6) {
+      description = "Recommended upgrade window for " + weakestNames.toLowerCase() + ".";
+    } else if (yearOffset === 7) {
+      description = "New titles may target features your hardware struggles with.";
+    } else if (yearOffset === 8) {
+      description = "System is now considered legacy for modern AAA experiences.";
+    } else if (yearOffset === 9) {
+      description = "Playable mostly in older or well‑optimized titles.";
+    } else {
+      description = "Strong candidate for a full platform refresh.";
+    }
+
+    const col = document.createElement("div");
+    col.className = "year-column";
+
+    const topLabel = document.createElement("div");
+    topLabel.className = "year-top-label";
+    topLabel.textContent = yearOffset + " yrs";
+
+    const barOuter = document.createElement("div");
+    barOuter.className = "health-bar-outer";
+
+    const barInner = document.createElement("div");
+    barInner.className = "health-bar-inner";
+    barInner.style.width = systemHealth + "%";
+
+    const barLabel = document.createElement("div");
+    barLabel.className = "health-bar-label";
+    barLabel.textContent = systemHealth + "%";
+
+    barOuter.appendChild(barInner);
+    barOuter.appendChild(barLabel);
+
+    const bottomLabel = document.createElement("div");
+    bottomLabel.className = "year-bottom-label";
+    bottomLabel.textContent = year;
+
+    const desc = document.createElement("div");
+    desc.className = "year-description";
+    desc.textContent = description;
+
+    col.appendChild(topLabel);
+    col.appendChild(barOuter);
+    col.appendChild(bottomLabel);
+    col.appendChild(desc);
+
+    timelineGrid.appendChild(col);
+  }
+
+  // =========================
+  // AI-LIKE SUMMARY
+  // =========================
   const usageLabel =
     usage === "gaming" ? "gaming" :
-    usage === "creator" ? "gaming + content creation" :
+    usage === "creator" ? "gaming plus content creation" :
     "workstation workloads";
 
   const resLabel =
     resolution === 1080 ? "1080p" :
     resolution === 1440 ? "1440p" : "4K";
 
-  const weakestNames = weakest.map(c => c.type).join(", ");
-
   let budgetLine = "";
   if (budget > 0) {
-    budgetLine = ` With an upgrade budget of around $${budget}, you could meaningfully extend the system's lifespan by targeting ${weakestNames.toLowerCase()} first.`;
+    budgetLine = ` With an upgrade budget of around $${budget}, targeting ${weakestNames.toLowerCase()} between year 4 and 6 would extend the system's relevance significantly.`;
   }
 
   const aiText = `
-    This system is tuned for ${resLabel} ${usageLabel}, built around ${cpu.name} and ${gpu.name}.
-    Based on current performance tiers and typical software evolution, the overall PC is expected
-    to feel "current" for about ${totalYears} year${totalYears === 1 ? "" : "s"} before the weakest
-    component (${weakestNames}) starts to hold it back. ${budgetLine}
+    This configuration is tuned for ${resLabel} ${usageLabel}, built around ${cpu.name} and ${gpu.name}
+    with ${ramVal}GB DDR5 and ${ssdVal.toUpperCase()} storage. Over the next ${totalYears} years, the system
+    is expected to feel "current" before ${weakestNames} become the primary limiting factor. Beyond that point,
+    you will gradually shift from ultra/high presets to more balanced or performance‑oriented settings in new titles.${budgetLine}
   `.replace(/\s+/g, " ").trim();
 
   // =========================
@@ -593,7 +759,7 @@ function analyze() {
   document.getElementById("lifespanMain").textContent =
     `${totalYears} year${totalYears === 1 ? "" : "s"} of strong relevance`;
   document.getElementById("lifespanSub").textContent =
-    `Limited by: ${weakestNames}`;
+    `Limited primarily by: ${weakestNames}`;
 
   document.getElementById("scoreRow").style.display = "flex";
   document.getElementById("futureScore").textContent = futureScore + "/10";
@@ -609,10 +775,14 @@ function analyze() {
 
   // Breakdown table
   let rows = `
-    <tr><th>Component</th><th>Selection</th><th>Estimated Years</th></tr>
+    <tr><th>Component</th><th>Selection</th><th>Estimated Strong Years</th></tr>
   `;
   components.forEach(c => {
     rows += `<tr><td>${c.type}</td><td>${c.name}</td><td>${c.years}</td></tr>`;
   });
   document.getElementById("breakdownTable").innerHTML = rows;
 }
+</script>
+
+</body>
+</html>
