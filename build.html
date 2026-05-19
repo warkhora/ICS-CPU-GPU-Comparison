@@ -315,7 +315,7 @@
 
 <script>
 // =========================
-// PRICE CONVERSION (NOK → USD) – internal only
+// PRICE CONVERSION
 // =========================
 const NOK_TO_USD = 0.095;
 function usdFromNok(nok) { return Math.round(nok * NOK_TO_USD); }
@@ -324,18 +324,17 @@ function usdFromNok(nok) { return Math.round(nok * NOK_TO_USD); }
 // GPU DATABASE (RTX 50 SERIES)
 // =========================
 const gpus = [
-  { name: "GeForce RTX 5050", price: usdFromNok(3200), tier: 2, tdp: 130 },
-  { name: "GeForce RTX 5060", price: usdFromNok(3800), tier: 3, tdp: 145 },
-  { name: "GeForce RTX 5060 Ti", price: usdFromNok(6400), tier: 4, tdp: 180 },
-  { name: "GeForce RTX 5070", price: usdFromNok(7500), tier: 5, tdp: 250 },
-  { name: "GeForce RTX 5070 Ti", price: usdFromNok(13400), tier: 6, tdp: 300 },
-  { name: "GeForce RTX 5080", price: usdFromNok(14900), tier: 7, tdp: 360 },
-  { name: "GeForce RTX 5090", price: usdFromNok(37900), tier: 8, tdp: 575 }
+  { name: "GeForce RTX 5050", price: usdFromNok(3200), tier: 2, tdp: 130, vram: 8, length: 240 },
+  { name: "GeForce RTX 5060", price: usdFromNok(3800), tier: 3, tdp: 145, vram: 8, length: 260 },
+  { name: "GeForce RTX 5060 Ti", price: usdFromNok(6400), tier: 4, tdp: 180, vram: 12, length: 280 },
+  { name: "GeForce RTX 5070", price: usdFromNok(7500), tier: 5, tdp: 250, vram: 12, length: 300 },
+  { name: "GeForce RTX 5070 Ti", price: usdFromNok(13400), tier: 6, tdp: 300, vram: 16, length: 320 },
+  { name: "GeForce RTX 5080", price: usdFromNok(14900), tier: 7, tdp: 360, vram: 16, length: 330 },
+  { name: "GeForce RTX 5090", price: usdFromNok(37900), tier: 8, tdp: 575, vram: 24, length: 360 }
 ];
 
 // =========================
-// CPU DATABASE (REAL-WORLD + ULTRA)
-// tier ~ performance level
+// CPU DATABASE
 // =========================
 const cpus = [
   { name: "Intel Core i5-14400F", price: usdFromNok(1942), tier: 3, tdp: 125, platform: "LGA1700" },
@@ -363,14 +362,17 @@ const motherboards = [
 ];
 
 // =========================
-// RAM / SSD / PSU / CASE / COOLER
+// RAM OPTIONS
 // =========================
 const ramOptions = [
-  { size: "16GB DDR5-6000", price: usdFromNok(3000), tier: 1 },
-  { size: "32GB DDR5-6000", price: usdFromNok(4500), tier: 2 },
-  { size: "64GB DDR5-6000", price: usdFromNok(8000), tier: 3 }
+  { size: "16GB DDR5-5600", price: usdFromNok(2600), tier: 1 },
+  { size: "32GB DDR5-6000", price: usdFromNok(4200), tier: 2 },
+  { size: "64GB DDR5-6400", price: usdFromNok(7800), tier: 3 }
 ];
 
+// =========================
+// SSD / PSU / COOLER / CASE
+// =========================
 const ssds = [
   { size: "1TB NVMe SSD", price: usdFromNok(1500) },
   { size: "2TB NVMe SSD", price: usdFromNok(3000) }
@@ -390,13 +392,13 @@ const coolers = [
 ];
 
 const cases = [
-  { name: "ATX High-Airflow Case", price: usdFromNok(1200), level: 2 },
-  { name: "ATX Silent Case", price: usdFromNok(1400), level: 2 },
-  { name: "Premium ATX Tempered Glass Case", price: usdFromNok(1800), level: 3 }
+  { name: "ATX High-Airflow Case", price: usdFromNok(1200), gpuMax: 380 },
+  { name: "ATX Silent Case", price: usdFromNok(1400), gpuMax: 300 },
+  { name: "Premium ATX Tempered Glass Case", price: usdFromNok(1800), gpuMax: 360 }
 ];
 
 // =========================
-// HELPER: choose best under budget fraction
+// HELPER
 // =========================
 function chooseBestUnder(list, maxPrice) {
   let best = null;
@@ -425,7 +427,6 @@ function getPerformanceTier(gpu, resolution) {
     if (tier >= 3) return { label: "1440p Medium/High Recommended", cls: "perf-tier-1440" };
     return { label: "1440p Low/Medium Recommended", cls: "perf-tier-1440" };
   }
-  // 4K
   if (tier >= 8) return { label: "4K Ultra Ready", cls: "perf-tier-4k" };
   if (tier >= 6) return { label: "4K High/Ultra Capable", cls: "perf-tier-4k" };
   if (tier >= 4) return { label: "4K Medium Recommended", cls: "perf-tier-4k" };
@@ -454,30 +455,26 @@ function build() {
 
   budgetInfo.innerHTML = "";
 
-  // Budget fractions based on priority
+  // Budget fractions
   let gpuFrac = 0.45;
   let cpuFrac = 0.22;
-  let restFrac = 0.33;
 
   if (priority === "fps") {
     gpuFrac = 0.5;
     cpuFrac = 0.2;
-    restFrac = 0.3;
   } else if (priority === "quiet") {
     gpuFrac = 0.4;
     cpuFrac = 0.22;
-    restFrac = 0.38;
   } else if (priority === "future") {
     gpuFrac = 0.47;
     cpuFrac = 0.25;
-    restFrac = 0.28;
   }
 
-  // Choose GPU
+  // GPU
   const maxGpuPrice = budget * gpuFrac;
   let gpu = chooseBestUnder(gpus, maxGpuPrice);
 
-  // Choose CPU: try to match GPU tier
+  // CPU
   const targetCpuTier = Math.max(3, gpu.tier - 1);
   let cpuCandidates = cpus
     .filter(c => c.tier >= targetCpuTier - 1 && c.tier <= targetCpuTier + 1)
@@ -485,42 +482,46 @@ function build() {
 
   let cpu = cpuCandidates.find(c => c.price <= budget * cpuFrac) || chooseBestUnder(cpus, budget * cpuFrac);
 
-  // Motherboard based on platform
+  // Motherboard
   let mobo = motherboards.find(m => m.platform === cpu.platform) || motherboards[0];
 
-  // RAM choice based on usage + budget
+  // RAM
   let ram;
-  if (usage === "gaming") {
-    if (budget < 1200) ram = ramOptions[0];
-    else if (budget < 2000) ram = ramOptions[1];
-    else ram = ramOptions[2];
-  } else if (usage === "creator" || usage === "workstation") {
-    if (budget < 1500) ram = ramOptions[1];
-    else ram = ramOptions[2];
+  if (usage === "creator" || usage === "workstation") {
+    if (budget > 3000) ram = ramOptions[2];
+    else ram = ramOptions[1];
   } else {
-    ram = ramOptions[1];
+    if (budget < 1500) ram = ramOptions[0];
+    else if (budget < 3000) ram = ramOptions[1];
+    else ram = ramOptions[1];
   }
 
-  // SSD choice
+  // SSD
   let ssd = budget > 1800 ? ssds[1] : ssds[0];
 
-  // Cooler based on CPU TDP
+  // Cooler
   let cooler;
   if (cpu.tdp <= 130) cooler = coolers[0];
   else if (cpu.tdp <= 190) cooler = coolers[1];
   else cooler = coolers[2];
 
-  // Case based on priority
+  // Case
   let pcCase;
   if (priority === "quiet") pcCase = cases[1];
   else if (priority === "future") pcCase = cases[2];
   else pcCase = cases[0];
 
-  // Power calculation
-  const estimatedLoad = cpu.tdp + gpu.tdp + 150; // rest of system + headroom
+  // Case compatibility
+  if (gpu.length > pcCase.gpuMax) {
+    const biggerCase = cases.find(c => c.gpuMax >= gpu.length);
+    if (biggerCase) pcCase = biggerCase;
+  }
+
+  // PSU
+  const estimatedLoad = cpu.tdp + gpu.tdp + 150;
   let psu = psus.find(p => p.max >= estimatedLoad + 100) || psus[psus.length - 1];
 
-  // Total price
+  // Total
   const total =
     gpu.price +
     cpu.price +
@@ -534,13 +535,13 @@ function build() {
   // Budget info
   if (total > budget * 1.1) {
     budgetInfo.innerHTML =
-      '<div class="budget-error">Warning: This build is significantly above your budget. Consider lowering resolution or priority.</div>';
+      '<div class="budget-error">Warning: This build is significantly above your budget.</div>';
   } else if (total > budget) {
     budgetInfo.innerHTML =
-      '<div class="budget-warning">Note: This build is slightly above your budget. Small adjustments may be needed.</div>';
+      '<div class="budget-warning">Note: This build is slightly above your budget.</div>';
   } else {
     budgetInfo.innerHTML =
-      '<div class="note">This build fits within your budget with some room for peripherals or OS.</div>';
+      '<div class="note">This build fits within your budget.</div>';
   }
 
   // Performance tier
@@ -549,10 +550,38 @@ function build() {
   perfBox.innerHTML = `
     <div class="perf-title">Estimated Performance Tier</div>
     <div class="perf-tier ${perf.cls}">${perf.label}</div>
-    <div class="note">
-      Based on GPU tier, resolution target and overall system balance. For detailed FPS estimates, use the FPS Estimator page.
-    </div>
   `;
+
+  // VRAM
+  let vramNote = "";
+  if (resolution === 1080) {
+    if (gpu.vram < 6) vramNote = "VRAM is low for 1080p gaming.";
+    else vramNote = "VRAM is sufficient for 1080p.";
+  }
+  if (resolution === 1440) {
+    if (gpu.vram < 8) vramNote = "VRAM may limit 1440p performance.";
+    else if (gpu.vram < 12) vramNote = "VRAM is acceptable for 1440p.";
+    else vramNote = "VRAM is ideal for 1440p.";
+  }
+  if (resolution === 2160) {
+    if (gpu.vram < 12) vramNote = "VRAM is low for 4K gaming.";
+    else if (gpu.vram < 16) vramNote = "VRAM is acceptable for 4K.";
+    else vramNote = "VRAM is ideal for 4K Ultra.";
+  }
+
+  // Thermal
+  const thermalLoad = cpu.tdp + gpu.tdp;
+  let thermalNote = "";
+  if (thermalLoad < 300) thermalNote = "Excellent thermal headroom.";
+  else if (thermalLoad < 450) thermalNote = "Adequate cooling for gaming.";
+  else if (thermalLoad < 600) thermalNote = "Borderline — consider a 360mm AIO.";
+  else thermalNote = "Thermal bottleneck risk — cooling upgrade recommended.";
+
+  // Upgrade Path
+  let upgradeNote = "";
+  if (cpu.platform === "AM5") upgradeNote = "AM5 supports future Ryzen 9000/10000 CPUs.";
+  if (cpu.platform === "LGA1700") upgradeNote = "LGA1700 is near end-of-life — limited CPU upgrades.";
+  if (cpu.platform === "ULTRA") upgradeNote = "Ultra platform supports next-gen Ultra 9 CPUs.";
 
   // Result table
   resultTable.innerHTML = `
@@ -564,8 +593,6 @@ function build() {
     <tr><td>Storage</td><td>${ssd.size}</td><td>$${ssd.price}</td></tr>
     <tr><td>CPU Cooler</td><td>${cooler.name}</td><td>$${cooler.price}</td></tr>
     <tr><td>Case</td><td>${pcCase.name}</td><td>$${pcCase.price}</td></tr>
-    <tr><td>Power Supply</td><td>${psu.watt}</td><td>$${psu.price}</td></tr>
-    <tr><th>Total</th><th></th><th>$${total}</th></tr>
   `;
 }
 </script>
