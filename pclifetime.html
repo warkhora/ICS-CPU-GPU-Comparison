@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICS Regent – PC Lifespan Analyzer v2</title>
+<title>ICS Regent – PC Lifespan</title>
 
 <style>
   body {
     margin: 0;
     padding: 40px;
-    background: radial-gradient(circle at top, #151515 0, #000 55%, #000 100%);
+    background: linear-gradient(135deg, #050505, #000000);
     color: #e6e6e6;
     font-family: "Segoe UI", system-ui, sans-serif;
   }
 
   .ics-container {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: auto;
+    backdrop-filter: blur(18px);
   }
 
   .ics-header {
@@ -38,52 +39,48 @@
   }
 
   .ics-frame {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 24px;
-    margin-bottom: 26px;
+    padding: 25px;
+    margin-bottom: 30px;
     border-radius: 18px;
-    backdrop-filter: blur(18px);
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+    transition: 0.3s ease;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
   }
 
-  h2 {
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: #f5f5f5;
-    margin-top: 0;
-    margin-bottom: 12px;
+  .ics-frame:hover {
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25);
+    transform: translateY(-3px);
   }
 
-  label {
-    display: block;
-    font-weight: 600;
-    color: #f0f0f0;
-    margin-top: 10px;
-    margin-bottom: 4px;
-  }
-
-  input, select, button {
+  select, button, input {
     width: 100%;
-    background: rgba(15, 15, 15, 0.9);
+    background: rgba(20, 20, 20, 0.85);
     color: #eee;
     border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 10px 14px;
+    padding: 12px;
     border-radius: 10px;
-    margin: 6px 0 10px 0;
+    margin: 10px 0;
     transition: 0.2s;
-    font-size: 14px;
+    font-size: 15px;
+    backdrop-filter: blur(12px);
     box-sizing: border-box;
   }
 
-  input:hover, select:hover, button:hover {
+  select:hover, button:hover, input:hover {
     border-color: #ffd700;
     box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
   }
 
+  select option {
+    background: #111;
+    color: #eee;
+  }
+
   button {
     cursor: pointer;
-    background: rgba(255, 215, 0, 0.16);
+    background: rgba(255, 215, 0, 0.15);
     font-weight: 600;
   }
 
@@ -92,6 +89,57 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
   }
+
+  .row-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .ics-nav {
+    width: 100%;
+    background: rgba(0,0,0,0.65);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 16px 24px;
+    display: flex;
+    gap: 30px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    backdrop-filter: blur(12px);
+    margin: -40px -40px 40px -40px;
+  }
+
+  .ics-nav a {
+    color: #ffd700;
+    text-decoration: none;
+    font-size: 16px;
+    letter-spacing: 1px;
+    transition: 0.25s ease;
+    padding-bottom: 4px;
+  }
+
+  .ics-nav a:hover {
+    color: white;
+    text-shadow: 0 0 10px #ffd700;
+  }
+
+  .ics-nav a.active {
+    color: white;
+    border-bottom: 2px solid #ffd700;
+    text-shadow: 0 0 12px #ffd700;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    margin-right: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .tag-info { color: #7dd3fc; border-color: #0ea5e9; }
 
   .lifespan-main {
     font-size: 26px;
@@ -113,10 +161,10 @@
 
   .score-pill {
     flex: 1;
-    min-width: 200px;
+    min-width: 220px;
     background: rgba(0,0,0,0.65);
-    border-radius: 12px;
-    padding: 10px 12px;
+    border-radius: 14px;
+    padding: 12px 14px;
     border: 1px solid rgba(255,255,255,0.18);
     font-size: 13px;
   }
@@ -128,7 +176,7 @@
   }
 
   .score-value {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
   }
 
@@ -138,11 +186,19 @@
     margin-top: 4px;
   }
 
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    color: #f5f5f5;
+  }
+
   .ai-summary {
-    margin-top: 14px;
+    margin-top: 10px;
     font-size: 13px;
     color: #d0d0d0;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   .timeline-wrapper {
@@ -158,16 +214,17 @@
   }
 
   .timeline-bar {
-    border-radius: 12px;
-    padding: 12px 14px;
+    border-radius: 14px;
+    padding: 14px 16px;
     background: radial-gradient(circle at top, rgba(255,215,0,0.18), rgba(0,0,0,0.9));
     border: 1px solid rgba(255,215,0,0.35);
+    box-shadow: 0 0 18px rgba(0,0,0,0.8);
   }
 
   .timeline-grid {
     display: grid;
     grid-template-columns: repeat(11, minmax(0, 1fr)); /* 0–10 years */
-    gap: 8px;
+    gap: 10px;
   }
 
   .year-column {
@@ -184,7 +241,7 @@
 
   .health-bar-outer {
     width: 100%;
-    height: 32px;
+    height: 30px;
     border-radius: 999px;
     background: rgba(0,0,0,0.85);
     border: 1px solid rgba(255,255,255,0.18);
@@ -223,14 +280,6 @@
     min-height: 32px;
   }
 
-  .section-title {
-    font-size: 15px;
-    font-weight: 600;
-    margin-top: 18px;
-    margin-bottom: 6px;
-    color: #f5f5f5;
-  }
-
   .breakdown-table {
     width: 100%;
     border-collapse: collapse;
@@ -250,42 +299,8 @@
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 
-  .ics-nav {
-    width: 100%;
-    background: rgba(0,0,0,0.7);
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-    padding: 16px 24px;
-    display: flex;
-    gap: 30px;
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    backdrop-filter: blur(12px);
-    margin: -40px -40px 30px -40px;
-  }
-
-  .ics-nav a {
-    color: #ffd700;
-    text-decoration: none;
-    font-size: 15px;
-    letter-spacing: 1px;
-    transition: 0.2s;
-    padding-bottom: 4px;
-  }
-
-  .ics-nav a:hover {
-    color: white;
-    text-shadow: 0 0 10px #ffd700;
-  }
-
-  .ics-nav a.active {
-    color: white;
-    border-bottom: 2px solid #ffd700;
-    text-shadow: 0 0 12px #ffd700;
-  }
-
   @media (max-width: 900px) {
-    .row {
+    .row, .row-3 {
       grid-template-columns: 1fr;
     }
     .timeline-grid {
@@ -302,7 +317,7 @@
   <a href="fps.html" class="nav-link" data-page="fps">FPS Estimator</a>
   <a href="canyourunit.html" class="nav-link" data-page="canyourunit">Can You Run It?</a>
   <a href="build.html" class="nav-link" data-page="build">Build Your PC</a>
-  <a href="pclifetime_v2.html" class="nav-link" data-page="pclifetime_v2">PC Lifespan v2</a>
+  <a href="pclifetime.html" class="nav-link" data-page="pclifetime">PC Lifespan</a>
 </div>
 
 <script>
@@ -318,12 +333,12 @@
 
   <div class="ics-header">
     <div class="ics-logo">ICS REGENT</div>
-    <div class="ics-subtitle">PC Lifespan Analyzer v2 — Year‑by‑Year Future Projection</div>
+    <div class="ics-subtitle">PC Lifespan — Year-by-Year Future Projection</div>
   </div>
 
-  <!-- INPUT FRAME -->
   <div class="ics-frame">
-    <h2>System Profile</h2>
+    <div class="tag tag-info">Lifespan v2</div>
+    <h2 style="margin-top:10px;">System Profile</h2>
     <p style="font-size:13px;color:#ccc;margin-bottom:14px;">
       Describe your system. Lifespan v2 will simulate how it ages over the next decade, year by year.
     </p>
@@ -396,7 +411,6 @@
     <button onclick="analyze()">Analyze Lifespan v2</button>
   </div>
 
-  <!-- RESULT FRAME -->
   <div class="ics-frame">
     <h2>Lifetime & Experience Forecast</h2>
 
@@ -556,11 +570,8 @@ function psuLifespanYears(watt) {
 // HEALTH CURVE (0–10 YEARS)
 // =========================
 function healthCurve(years, maxYears) {
-  // years: 0–10
-  // maxYears: expected strong relevance
   const t = years;
   const peak = maxYears;
-  // simple decay: 100% at t=0, ~0% at t ~ peak+4
   const raw = Math.max(0, 1 - (t / (peak + 4)));
   return Math.round(raw * 100);
 }
@@ -647,7 +658,7 @@ function analyze() {
 
   // =========================
   // TIMELINE (0–10 YEARS)
-// =========================
+  // =========================
   const now = new Date().getFullYear();
   const timelineGrid = document.getElementById("timelineGrid");
   timelineGrid.innerHTML = "";
@@ -657,7 +668,6 @@ function analyze() {
   for (let yearOffset = 0; yearOffset <= 10; yearOffset++) {
     const year = now + yearOffset;
 
-    // System health = min of component health that year
     const gpuHealth = healthCurve(yearOffset, gpuYears);
     const cpuHealth = healthCurve(yearOffset, cpuYears);
     const ramHealth = healthCurve(yearOffset, ramYears);
@@ -670,15 +680,15 @@ function analyze() {
     if (yearOffset === 0) {
       description = "System feels fresh and highly responsive.";
     } else if (yearOffset === 1) {
-      description = "Still strong in modern titles; only ultra‑demanding games push it.";
+      description = "Still strong in modern titles; only ultra-demanding games push it.";
     } else if (yearOffset === 2) {
       description = "You may start to lower some settings in new AAA releases.";
     } else if (yearOffset === 3) {
-      description = "GPU begins to show strain in cutting‑edge engines.";
+      description = "GPU begins to show strain in cutting-edge engines.";
     } else if (yearOffset === 4) {
       description = "Noticeable compromises: lower presets or resolution scaling.";
     } else if (yearOffset === 5) {
-      description = "System feels clearly older; mid‑range performance in new games.";
+      description = "System feels clearly older; mid-range performance in new games.";
     } else if (yearOffset === 6) {
       description = "Recommended upgrade window for " + weakestNames.toLowerCase() + ".";
     } else if (yearOffset === 7) {
@@ -686,7 +696,7 @@ function analyze() {
     } else if (yearOffset === 8) {
       description = "System is now considered legacy for modern AAA experiences.";
     } else if (yearOffset === 9) {
-      description = "Playable mostly in older or well‑optimized titles.";
+      description = "Playable mostly in older or well-optimized titles.";
     } else {
       description = "Strong candidate for a full platform refresh.";
     }
@@ -749,7 +759,7 @@ function analyze() {
     This configuration is tuned for ${resLabel} ${usageLabel}, built around ${cpu.name} and ${gpu.name}
     with ${ramVal}GB DDR5 and ${ssdVal.toUpperCase()} storage. Over the next ${totalYears} years, the system
     is expected to feel "current" before ${weakestNames} become the primary limiting factor. Beyond that point,
-    you will gradually shift from ultra/high presets to more balanced or performance‑oriented settings in new titles.${budgetLine}
+    you will gradually shift from ultra/high presets to more balanced or performance-oriented settings in new titles.${budgetLine}
   `.replace(/\s+/g, " ").trim();
 
   // =========================
@@ -773,7 +783,6 @@ function analyze() {
   aiSummaryEl.style.display = "block";
   aiSummaryEl.textContent = aiText;
 
-  // Breakdown table
   let rows = `
     <tr><th>Component</th><th>Selection</th><th>Estimated Strong Years</th></tr>
   `;
