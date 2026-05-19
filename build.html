@@ -387,7 +387,7 @@ function usdFromNok(nok) {
 }
 
 // =========================
-// GPU DATABASE (RTX 50 SERIES)
+// GPU DATABASE (RTX 50 + WS)
 // =========================
 const gpus = [
   { name: "GeForce RTX 5050", price: usdFromNok(3200), tier: 2, tdp: 130, vram: 8, length: 240 },
@@ -396,11 +396,12 @@ const gpus = [
   { name: "GeForce RTX 5070", price: usdFromNok(7500), tier: 5, tdp: 250, vram: 12, length: 300 },
   { name: "GeForce RTX 5070 Ti", price: usdFromNok(13400), tier: 6, tdp: 300, vram: 16, length: 320 },
   { name: "GeForce RTX 5080", price: usdFromNok(14900), tier: 7, tdp: 360, vram: 16, length: 330 },
-  { name: "GeForce RTX 5090", price: usdFromNok(37900), tier: 8, tdp: 575, vram: 24, length: 360 }
+  { name: "GeForce RTX 5090", price: usdFromNok(37990), tier: 8, tdp: 520, vram: 32, length: 360 },
+  { name: "RTX 6000 Ada (Workstation)", price: usdFromNok(65000), tier: 9, tdp: 300, vram: 48, length: 300 }
 ];
 
 // =========================
-// CPU DATABASE
+// CPU DATABASE (inkl. WS)
 // =========================
 const cpus = [
   { name: "Intel Core i5-14400F", price: usdFromNok(1942), tier: 3, tdp: 125, platform: "LGA1700" },
@@ -415,7 +416,9 @@ const cpus = [
   { name: "Ryzen 9 9950X3D", price: usdFromNok(6950), tier: 8, tdp: 200, platform: "AM5" },
 
   { name: "Ultra 7 270K", price: usdFromNok(3610), tier: 5, tdp: 170, platform: "ULTRA" },
-  { name: "Ultra 9 285K", price: usdFromNok(6482), tier: 7, tdp: 220, platform: "ULTRA" }
+  { name: "Ultra 9 285K", price: usdFromNok(6482), tier: 7, tdp: 220, platform: "ULTRA" },
+
+  { name: "Ryzen Threadripper Pro 7985WX", price: usdFromNok(40000), tier: 9, tdp: 350, platform: "TR5" }
 ];
 
 // =========================
@@ -424,7 +427,8 @@ const cpus = [
 const motherboards = [
   { platform: "AM5", name: "AM5 ATX Gaming Motherboard (WiFi)", price: usdFromNok(2200), wifi: true },
   { platform: "LGA1700", name: "LGA1700 ATX Z790 Motherboard", price: usdFromNok(2400), wifi: false },
-  { platform: "ULTRA", name: "Ultra-Series X Chipset Motherboard (WiFi)", price: usdFromNok(2800), wifi: true }
+  { platform: "ULTRA", name: "Ultra-Series X Chipset Motherboard (WiFi)", price: usdFromNok(2800), wifi: true },
+  { platform: "TR5", name: "TR5 Workstation Motherboard", price: usdFromNok(9000), wifi: true }
 ];
 
 // =========================
@@ -475,7 +479,7 @@ const thermalPastes = [
 ];
 
 const wifiCard = { name: "PCIe WiFi 6 Card", price: usdFromNok(500) };
-const osOption = { name: "Windows 11 Home (License)", price: 120 }; // USD direkte
+const osOption = { name: "Windows 11 Home (License)", price: 120 };
 
 // =========================
 // HELPERS
@@ -532,7 +536,12 @@ function build() {
   const totalBox = document.getElementById("totalBox");
   const analysisBox = document.getElementById("analysisBox");
 
-  if (!budget || budget < 400) {
+  if (!budget) {
+    alert("Please enter your total budget in USD before generating a build.");
+    return;
+  }
+  if (budget < 400) {
+    alert("Minimum supported budget is $400. Please increase your budget.");
     resultTable.innerHTML = "";
     perfBox.style.display = "none";
     scoreRow.style.display = "none";
@@ -551,16 +560,16 @@ function build() {
 
   if (usage === "gaming" && priority === "fps") {
     gpuFrac = 0.52;
-    cpuFrac = 0.22;
+    cpuFrac = 0.24;
   } else if (usage === "gaming" && priority === "balanced") {
     gpuFrac = 0.48;
-    cpuFrac = 0.24;
+    cpuFrac = 0.26;
   } else if (usage === "creator") {
     gpuFrac = 0.40;
-    cpuFrac = 0.28;
+    cpuFrac = 0.30;
   } else if (usage === "workstation") {
     gpuFrac = 0.30;
-    cpuFrac = 0.32;
+    cpuFrac = 0.36;
   } else if (priority === "future") {
     gpuFrac = 0.47;
     cpuFrac = 0.26;
@@ -573,13 +582,29 @@ function build() {
   const maxGpuPrice = budget * gpuFrac;
   let gpu = chooseBestUnder(gpus, maxGpuPrice);
 
-  // CPU
-  const targetCpuTier = Math.max(3, gpu.tier - (usage === "creator" || usage === "workstation" ? 0 : 1));
+  // CPU – hardere prioritering, spesielt for gaming
+  let targetCpuTier = Math.max(3, gpu.tier - 1);
+  if (usage === "creator" || usage === "workstation") {
+    targetCpuTier = Math.max(targetCpuTier, gpu.tier); // mer CPU-fokus
+  } else if (usage === "gaming" && priority === "fps") {
+    targetCpuTier = Math.max(targetCpuTier, gpu.tier); // ikke la CPU henge etter
+  }
+
   let cpuCandidates = cpus
     .filter(c => c.tier >= targetCpuTier - 1 && c.tier <= targetCpuTier + 1)
     .sort((a, b) => a.price - b.price);
 
   let cpu = cpuCandidates.find(c => c.price <= budget * cpuFrac) || chooseBestUnder(cpus, budget * cpuFrac);
+
+  // Workstation super‑mode (5000+)
+  if (usage === "workstation" && budget >= 5000) {
+    const wsCpu = cpus.find(c => c.platform === "TR5");
+    const wsGpu = gpus.find(g => g.name.startsWith("RTX 6000"));
+    if (wsCpu && wsGpu) {
+      cpu = wsCpu;
+      gpu = wsGpu;
+    }
+  }
 
   // Motherboard
   let mobo = motherboards.find(m => m.platform === cpu.platform) || motherboards[0];
@@ -600,6 +625,10 @@ function build() {
   if ((usage === "creator" || usage === "workstation") && budget > 2500) {
     secondarySsd = ssds[0];
   }
+  if (usage === "workstation" && budget >= 5000) {
+    ssd = ssds[1];
+    secondarySsd = ssds[1];
+  }
 
   // Cooler
   let cooler;
@@ -610,7 +639,7 @@ function build() {
   // Case
   let pcCase;
   if (priority === "quiet") pcCase = cases[1];
-  else if (priority === "future") pcCase = cases[2];
+  else if (priority === "future" || usage === "workstation") pcCase = cases[2];
   else pcCase = cases[0];
 
   if (gpu.length > pcCase.gpuMax) {
@@ -638,8 +667,39 @@ function build() {
   // OS
   let os = osOption;
 
-  // Total
+  // Total (før trimming)
   let total =
+    gpu.price +
+    cpu.price +
+    mobo.price +
+    ram.price +
+    ssd.price +
+    cooler.price +
+    pcCase.price +
+    psu.price +
+    caseFans[0].price + // midlertidig, justeres under
+    thermalPastes[0].price +
+    (wifi ? wifi.price : 0) +
+    os.price;
+
+  // Bruk faktisk valgte fans/paste
+  total -= caseFans[0].price;
+  total -= thermalPastes[0].price;
+  total += fans.price;
+  total += paste.price;
+
+  if (secondarySsd) total += secondarySsd.price;
+
+  // Hvis vi sprenger budsjettet hardt – trim luksus først
+  if (total > budget * 1.15) {
+    secondarySsd = null;
+    fans = caseFans[0];
+    paste = thermalPastes[0];
+    os = null;
+  }
+
+  // Reberegn total etter trimming
+  total =
     gpu.price +
     cpu.price +
     mobo.price +
@@ -651,9 +711,8 @@ function build() {
     fans.price +
     paste.price +
     (wifi ? wifi.price : 0) +
-    os.price;
-
-  if (secondarySsd) total += secondarySsd.price;
+    (os ? os.price : 0) +
+    (secondarySsd ? secondarySsd.price : 0);
 
   if (total > budget * 1.1) {
     budgetInfo.innerHTML = '<div class="budget-error">Warning: This build is significantly above your budget.</div>';
@@ -702,6 +761,7 @@ function build() {
   if (cpu.platform === "AM5") upgradeNote = "AM5 supports future Ryzen 9000/10000 CPUs.";
   else if (cpu.platform === "LGA1700") upgradeNote = "LGA1700 is near end-of-life — limited CPU upgrades.";
   else if (cpu.platform === "ULTRA") upgradeNote = "Ultra platform supports next-gen Ultra 9 CPUs.";
+  else if (cpu.platform === "TR5") upgradeNote = "TR5 workstation platform with long-term CPU upgrade options.";
 
   // Bottlenecks
   let bottlenecks = [];
@@ -734,9 +794,9 @@ function build() {
 
   // Future-proof score
   let futureScore = 7;
-  if (cpu.platform === "AM5" || cpu.platform === "ULTRA") futureScore += 1;
+  if (cpu.platform === "AM5" || cpu.platform === "ULTRA" || cpu.platform === "TR5") futureScore += 1;
   if (gpu.tier >= 6) futureScore += 1;
-  if (ram.size.startsWith("32GB")) futureScore += 1;
+  if (ram.size.startsWith("32GB") || ram.size.startsWith("64GB")) futureScore += 1;
   if (psu.max >= 850) futureScore += 1;
   if (futureScore > 10) futureScore = 10;
 
@@ -789,7 +849,9 @@ function build() {
   if (wifi) {
     rows += `<tr><td>WiFi</td><td>${wifi.name}</td><td>$${wifi.price}</td></tr>`;
   }
-  rows += `<tr><td>Operating System</td><td>${os.name}</td><td>$${os.price}</td></tr>`;
+  if (os) {
+    rows += `<tr><td>Operating System</td><td>${os.name}</td><td>$${os.price}</td></tr>`;
+  }
   rows += `<tr><th>Total</th><th></th><th>$${total}</th></tr>`;
 
   resultTable.innerHTML = rows;
