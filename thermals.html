@@ -130,6 +130,59 @@
     text-shadow: 0 0 12px #ffd700;
   }
 
+  /* ▼ MORE MENU DROPDOWN */
+.nav-more {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav-more-btn {
+  color: #ffd700;
+  cursor: pointer;
+  font-size: 16px;
+  letter-spacing: 1px;
+  padding-bottom: 4px;
+  transition: 0.25s ease;
+}
+
+.nav-more-btn:hover {
+  color: white;
+  text-shadow: 0 0 10px #ffd700;
+}
+
+.nav-more-menu {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 10px;
+  width: 220px;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 0 25px rgba(255,215,0,0.15);
+  z-index: 9999;
+}
+
+.nav-more-menu a {
+  color: #ffd700;
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: 0.25s ease;
+  display: block;
+  font-size: 14px;
+}
+
+.nav-more-menu a:hover {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  text-shadow: 0 0 10px #ffd700;
+}
+
   .tag {
     display: inline-block;
     padding: 4px 10px;
@@ -269,7 +322,33 @@
   <a href="thermals.html" class="nav-link" data-page="thermals">Thermal & Cooling</a>
   <a href="consumption.html" class="nav-link" data-page="consumption">Power Consumption</a>
   <a href="storage.html" class="nav-link" data-page="storage">Storage & Load Times</a>
+
+  <!-- ▼ NEW DROPDOWN BUTTON (INSIDE NAV!) -->
+  <div class="nav-more">
+    <span class="nav-more-btn">More ▼</span>
+    <div class="nav-more-menu">
+      <a href="bottleneck.html">Bottleneck Analyzer</a>
+      <a href="future1.html">Future Tool 1</a>
+      <a href="future2.html">Future Tool 2</a>
+      <a href="future3.html">Future Tool 3</a>
+    </div>
+  </div>
 </div>
+
+  <script>
+  const moreBtn = document.querySelector(".nav-more-btn");
+  const moreMenu = document.querySelector(".nav-more-menu");
+
+  moreBtn.addEventListener("click", () => {
+    moreMenu.style.display = moreMenu.style.display === "flex" ? "none" : "flex";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".nav-more")) {
+      moreMenu.style.display = "none";
+    }
+  });
+</script>
 
 <script>
   const current = window.location.pathname.split("/").pop().toLowerCase();
