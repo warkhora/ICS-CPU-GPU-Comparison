@@ -655,11 +655,11 @@ function ramConfigInfo(key) {
 // STORAGE CONFIG
 // =========================
 function storageInfo(key) {
-  if (key === "hdd")   return { name: "HDD",      perf: 0.4 };
-  if (key === "sata")  return { name: "SATA SSD", perf: 0.7 };
+  if (key === "hdd")   return { name: "HDD",      perf: 0.3 };
+  if (key === "sata")  return { name: "SATA SSD", perf: 0.6 };
   if (key === "nvme3") return { name: "NVMe Gen3",perf: 0.85 };
-  if (key === "nvme4") return { name: "NVMe Gen4",perf: 1.0 };
-  if (key === "nvme5") return { name: "NVMe Gen5",perf: 1.1 };
+  if (key === "nvme4") return { name: "NVMe Gen4",perf: 1.3 };  // was 1.0
+  if (key === "nvme5") return { name: "NVMe Gen5",perf: 1.5 };  // was 1.1
   return { name: key, perf: 1.0 };
 }
 
